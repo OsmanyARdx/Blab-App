@@ -20,7 +20,9 @@ Blab brings together cultural language exchange students, fostering engagement a
 ## Links
 - **GitHub Repository:** [Blab-App](https://github.com/OsmanyARdx/Blab-App)  
 - **Design Flow (Lucidchart):** [Blab - Design Flow](https://lucid.app/lucidspark/6a2f0117-83ce-4ff2-a623-4fe6ece72e80/edit?viewport_loc=-2404%2C-2790%2C7614%2C3794%2C0_0&invitationId=inv_f25b0910-b53a-4bdc-b24f-e61e3c5f4282)  
-- **Figma HiFi Flow:** [Blab - Figma Design](https://www.figma.com/design/ZxDJ7oOAUms1RXCJO9NvaZ/Blab-Design?node-id=0-1&p=f)  
+- **Figma HiFi Flow:** [Blab - Figma Design](https://www.figma.com/design/ZxDJ7oOAUms1RXCJO9NvaZ/Blab-Design?node-id=0-1&p=f)
+- **Burndown Documentation:** [Blab - Burndown Documentation](https://farmingdale-my.sharepoint.com/:x:/g/personal/arguoa_farmingdale_edu/EbpVCgReMEJBu6tKbXZ-heMB5GEEDon5UaIjMM9W_7GyyA?e=n48Urw)
+- **Physical Entity Relationship Diagram:** [Blab - Physical Entity Relationship Diagram](https://lucid.app/lucidchart/429bdd0d-8548-4f12-ab30-7c7b92602bc9/edit?view_items=EoqRHk2t2rBd&invitationId=inv_e3d6a405-3707-4b22-b812-2434d5bd7028)
 
 ---
 
