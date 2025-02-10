@@ -26,26 +26,26 @@ Blab brings together cultural language exchange students, fostering engagement a
 
 
 ### **Features**
--User Authentication
--User profile picture
--User screen mode
--User avatar and bio
--User Learning Streak
--User rank
--Direct messaging
--Add friends list
--Phrase of the Day
--Learning Modules
--Module Quizes
--Quiz error feedback
--Learning Flash cards
--Flash cards to pdf
--Learning Mini games
--Short form video media player
--Video likes
--Video comments
--Video sharing
--Word dictionary  
+- User Authentication
+- User profile picture
+- User screen mode
+- User avatar and bio
+- User Learning Streak
+- User rank
+- Direct messaging
+- Add friends list
+- Phrase of the Day
+- Learning Modules
+- Module Quizes
+- Quiz error feedback
+- Learning Flash cards
+- Flash cards to pdf
+- Learning Mini games
+- Short form video media player
+- Video likes
+- Video comments
+- Video sharing
+- Word dictionary  
 
 #### **User Features**
 - Profile settings  
