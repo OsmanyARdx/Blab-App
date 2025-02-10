@@ -26,7 +26,6 @@ Blab brings together cultural language exchange students, fostering engagement a
 
 
 ### **Features**
-#### **Learning Modules**
 - Ranking system based on completed modules  
 - Select preferred dialect  
 - Quiz feature  
