@@ -65,7 +65,10 @@ This innovative approach maximizes engagement, builds confidence, and helps lang
 
 ![Blab App - Design Flow](https://github.com/user-attachments/assets/b0bdcc1d-c58f-4b28-ac4f-f87e19184465)
 
+![Blab App - Figma HiFi](https://github.com/user-attachments/assets/73d39909-b01f-40a8-b11a-1250df18331c)
+
+
 ---
 
-This README provides an overview of the Blab App project, including its goals, target audience, and development roadmap. Feel free to contribute or reach out with any questions!
+
 
