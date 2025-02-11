@@ -8,9 +8,11 @@
 ---
 
 ## Overview
-Blab App is designed to provide a more conversational approach to learning Spanish. While many apps offer structured lessons, Blab creates an environment where users can engage in natural conversations with native Spanish speakers. The goal is to help users feel comfortable communicating in real-world scenarios.
+There are countless apps and resources available for learning a new language, but many learners struggle to stay engaged and motivated. Traditional language-learning apps often focus on memorization and individualized exercises. There is a lack in connection with other learners and native speakers, which can result in loss of interest and a lack in confidence when using the language in real life.
 
-Blab brings together cultural language exchange students, fostering engagement and maximizing their learning experience.
+Our Blab app offers a more immersive and conversational approach to language learning by integrating social media features that foster a community of users interested in learning and exchanging language and culture. By connecting language learners with native speakers, Blab creates an environment where users can practice real conversations and support each other’s learning journey.
+
+This innovative approach maximizes engagement, builds confidence, and helps language acquisition by making learning feel natural, social, and interactive.
 
 ## Target Users
 - **Primary Target:** Cultural Language Exchange Students  
