@@ -23,6 +23,7 @@ Blab brings together cultural language exchange students, fostering engagement a
 - **Figma HiFi Flow:** [Blab - Figma Design](https://www.figma.com/design/ZxDJ7oOAUms1RXCJO9NvaZ/Blab-Design?node-id=0-1&p=f)
 - **Burndown Documentation:** [Blab - Burndown Documentation](https://farmingdale-my.sharepoint.com/:x:/g/personal/arguoa_farmingdale_edu/EbpVCgReMEJBu6tKbXZ-heMB5GEEDon5UaIjMM9W_7GyyA?e=n48Urw)
 - **Physical Entity Relationship Diagram:** [Blab - Physical Entity Relationship Diagram](https://lucid.app/lucidchart/429bdd0d-8548-4f12-ab30-7c7b92602bc9/edit?view_items=EoqRHk2t2rBd&invitationId=inv_e3d6a405-3707-4b22-b812-2434d5bd7028)
+- **Context Diagram:** [Blab - Context Diagram](https://lucid.app/lucidchart/39e1226a-f947-4c6e-87b1-281b8c7bbf2c/edit?viewport_loc=-964%2C-274%2C3498%2C1720%2C0_0&invitationId=inv_9a72df10-ffb8-42a8-968b-3ac0a00d1d04)
 
 ---
 
