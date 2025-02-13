@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Blab-App"
+rootProject.name = "BlabApp"
 include(":app")
  

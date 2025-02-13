@@ -1,4 +1,4 @@
-package com.example.blab_app.ui.theme
+package com.example.blabapp.ui.theme
 
 import android.app.Activity
 import android.os.Build

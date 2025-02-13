@@ -1,4 +1,4 @@
-package com.example.blab_app
+package com.example.blabapp
 
 import org.junit.Test
 
