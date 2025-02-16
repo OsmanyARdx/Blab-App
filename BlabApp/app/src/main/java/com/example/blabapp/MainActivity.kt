@@ -1,6 +1,7 @@
 package com.example.blabapp
 
 import android.os.Bundle
+import android.text.util.Linkify
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,12 +11,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -48,7 +51,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             BlabAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RegistrationScreen(modifier = Modifier.padding(innerPadding))
+                    Greeting(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
@@ -103,6 +109,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    BlabAppTheme {
+        Greeting("Android")
+    }
+}
+
+
+@Composable
 private fun RegistrationScreen(modifier: Modifier) {
     val context = LocalContext.current
     var firstName by rememberSaveable { mutableStateOf("") }
@@ -150,6 +173,11 @@ private fun RegistrationScreen(modifier: Modifier) {
                     text = "Register",
                     fontSize = 30.sp)
             }
+            Row {
+                Text(text = "Already have an account?")
+//                ClickableText() { }
+            }
+
         }
     }
 }//end RegistrationScreen
@@ -170,7 +198,7 @@ private fun InputField(label: String, value: String, isPassword: Boolean = false
                 focusedContainerColor = Pink40, unfocusedContainerColor = Pink40,
                 focusedTextColor = Color.White, unfocusedTextColor = Color.White,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
-                ),
+            ),
             shape = RoundedCornerShape(14.dp)
         )
 
