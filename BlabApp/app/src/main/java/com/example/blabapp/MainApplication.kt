@@ -1,10 +1,13 @@
 package com.example.blabapp
 
+import android.content.Context
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -128,16 +132,17 @@ fun RegistrationScreen(navController: NavController) {
     var confirmPassword by rememberSaveable { mutableStateOf("") }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Pink80),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Pink80),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }
@@ -146,26 +151,38 @@ fun RegistrationScreen(navController: NavController) {
             InputField("Password", password, isPassword = true) { password = it }
             InputField("Confirm Password", confirmPassword, isPassword = true) { confirmPassword = it }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Button(
                 onClick = {
-                    Toast.makeText(context, "Registered: $firstName $lastName", Toast.LENGTH_SHORT)
-                        .show()
+                    when {
+                        firstName.isEmpty() || lastName.isEmpty() ->
+                            showToast(context, "Name fields cannot be empty")
+                        email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                            showToast(context, "Enter a valid email")
+                        phone.isEmpty() || phone.length < 10 ->
+                            showToast(context, "Enter a valid phone number")
+                        password.length < 6 ->
+                            showToast(context, "Password must be at least 6 characters")
+                        password != confirmPassword ->
+                            showToast(context, "Passwords do not match")
+                        else -> {
+                            registerUser(email, password) { result, message ->
+                                showToast(context, message)
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(containerColor = Pink40)
             ) {
-                Text(text = "Register", fontSize = 30.sp)
+                Text(text = "Register", fontSize = 20.sp)
             }
-
             Row {
                 Text(text = "Already have an account?")
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Log in",
+                    text = "Login",
                     color = Color.Blue,
-                    modifier = Modifier.clickable { navController.navigate("LoginScreen") }
+                    modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }
         }
@@ -183,6 +200,7 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
             onValueChange = onValueChange,
             label = { Text("Enter $label", color = Color.White) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Pink40, unfocusedContainerColor = Pink40,
@@ -191,7 +209,34 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
             ),
             shape = RoundedCornerShape(14.dp)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
     }
+}
+
+private fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+private fun registerUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
+    if (email.isBlank() || password.isBlank()) {
+        onResult(false, "Email or password cannot be empty")
+        return
+    }
+    else {
+        onResult(true, "Registration successful!")
+    }
+
+    //to work when firebase get added
+    /*
+    firebaseAuth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.i("Registration", "User registered successfully")
+                onResult(true, "Registration successful")
+            } else {
+                val error = task.exception?.message ?: "Unknown error occurred"
+                Log.e("Registration", "Error: $error")
+                onResult(false, error)
+            }
+        }
+    */
 }

@@ -11,24 +11,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.ui.theme.BlabAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             BlabAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                // NavController setup
+                val navController = rememberNavController()
+
+                RegistrationScreen(navController)
             }
         }
     }
+}
+
 
     private fun loginUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
         if (email.isBlank() || password.isBlank()) {
@@ -52,9 +57,9 @@ class MainActivity : ComponentActivity() {
             }
            */
 
-    }
+//    }
 
-    private fun registerUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
+    fun registerUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
         if (email.isBlank() || password.isBlank()) {
             onResult(false, "Email or password cannot be empty")
             return
