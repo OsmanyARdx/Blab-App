@@ -28,12 +28,6 @@ import com.example.blabapp.Nav.MyNavItem
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
 
-/**
- * Creates NavBar
- * It clears AddSaleScreen when you navigate
- * to SalesListsScreen
- */
-
 
 @Composable
 fun RootScreen(){

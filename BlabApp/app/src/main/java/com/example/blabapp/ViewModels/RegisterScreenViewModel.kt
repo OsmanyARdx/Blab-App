@@ -1,32 +1,29 @@
 package com.example.blabapp.ViewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.blabapp.Nav.AccountRepository
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 class RegisterScreenViewModel(private var accountRepository: AccountRepository): ViewModel() {
-    fun registerUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
-        if (email.isBlank() || password.isBlank()) {
-            onResult(false, "Email or password cannot be empty")
-            return
-        }
-        else {
-            onResult(true, "Registration successful!")
-        }
 
-        //to work when firebase get added
-        /*
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.i("Registration", "User registered successfully")
-                    onResult(true, "Registration successful")
-                } else {
-                    val error = task.exception?.message ?: "Unknown error occurred"
-                    Log.e("Registration", "Error: $error")
-                    onResult(false, error)
-                }
+    fun registerUserFirebase(
+        email: String,
+        password: String,
+        successfulRegistrationHandler: () -> Unit,
+        unsuccessfulRegistrationHandler: (String) -> Unit
+    ) {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        viewModelScope.launch {
+            try {
+                firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+                successfulRegistrationHandler()
+            } catch (e: Exception) {
+                unsuccessfulRegistrationHandler(e.message ?: "Unknown error occurred")
             }
-        */
+        }
     }
 }

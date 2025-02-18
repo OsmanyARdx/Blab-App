@@ -43,7 +43,7 @@ fun StartupScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate("RegistrationScreen") },
+                onClick = { navController.navigate("RegisterScreen") },
                 modifier = Modifier.fillMaxWidth(0.7f),
                 colors = ButtonDefaults.buttonColors(containerColor = Pink40)
             ) {

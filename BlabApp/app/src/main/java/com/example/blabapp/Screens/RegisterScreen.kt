@@ -88,9 +88,17 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                         password != confirmPassword ->
                             showToast(context, "Passwords do not match")
                         else -> {
-                            viewModel.registerUser(email, password) { result, message ->
-                                showToast(context, message)
-                            }
+                            viewModel.registerUserFirebase(
+                                email = email,
+                                password = password,
+                                successfulRegistrationHandler = {
+                                    Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("LoginScreen")
+                                },
+                                unsuccessfulRegistrationHandler = { error ->
+                                    Toast.makeText(context, "Registration failed: $error", Toast.LENGTH_SHORT).show()
+                                }
+                            )
                         }
                     }
                 },

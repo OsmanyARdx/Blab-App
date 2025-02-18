@@ -84,7 +84,17 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
 
             Button(
                 onClick = {
-                    Toast.makeText(context, "Logged in with: $email", Toast.LENGTH_SHORT).show()
+                    viewModel.loginFirebase(
+                        email = email,
+                        password = password,
+                        successfulLoginHandler = {
+                            //navController.navigate("HomeScreen") //for later use
+                            Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+                        },
+                        unsuccessfulLoginHandler = {
+                            Toast.makeText(context, "Login failed. Please try again.", Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(containerColor = Pink40)
