@@ -1,4 +1,4 @@
-package com.example.blabapp
+package com.example.blabapp.Nav
 
 import android.app.Application
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,6 +1,5 @@
-package com.example.blabapp
+package com.example.blabapp.Nav
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AccountRepository(var fireStoreDb : FirebaseFirestore) {

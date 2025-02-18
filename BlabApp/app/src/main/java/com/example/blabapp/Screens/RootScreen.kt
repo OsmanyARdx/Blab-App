@@ -1,19 +1,16 @@
-package com.example.blabapp
+package com.example.blabapp.Screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,6 +23,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.blabapp.Nav.BlabApp
+import com.example.blabapp.Nav.MyNavItem
+import com.example.blabapp.Screens.SplashScreen
+import com.example.blabapp.Screens.StartupScreen
 
 /**
  * Creates NavBar
@@ -84,11 +85,23 @@ fun RootScreen(){
         Column(
             modifier = Modifier.padding(padding)
         ) {
-            NavHost(navController=navController, startDestination="LoginScreen"){
+            NavHost(navController=navController, startDestination="SplashScreen"){
 
+                composable(route="SplashScreen"){
+                    isVisible=false
+                    SplashScreen(navController)
+                }
+                composable(route="StartupScreen"){
+                    isVisible=false
+                    StartupScreen(navController)
+                }
                 composable(route="LoginScreen"){
                     isVisible=false
                     LoginScreen(BlabApp.accountRepository, navController)
+                }
+                composable(route="RegisterScreen"){
+                    isVisible=false
+                    RegisterScreen(BlabApp.accountRepository, navController)
                 }
             }
         }

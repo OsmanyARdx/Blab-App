@@ -1,7 +1,8 @@
-package com.example.blabapp
+package com.example.blabapp.ViewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.blabapp.Nav.AccountRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await

@@ -1,4 +1,4 @@
-package com.example.blabapp
+package com.example.blabapp.Nav
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
