@@ -1,7 +1,9 @@
 package com.example.blabapp
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,81 +17,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.blabapp.ui.theme.BlabAppTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var imm: InputMethodManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            BlabAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            RootScreen()
         }
-    }
-
-    private fun loginUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
-        if (email.isBlank() || password.isBlank()) {
-            onResult(false, "Email or password cannot be empty")
-            return
-        }
-
-
-        //to work when firebase get added
-        /*
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.i("Authentication", "User authenticated successfully")
-                    onResult(true, "Login successful")
-                } else {
-                    val error = task.exception?.message ?: "Unknown error occurred"
-                    Log.e("Authentication", "Error: $error")
-                    onResult(false, error)
-                }
-            }
-           */
-
-    }
-
-    private fun registerUser(email: String, password: String, onResult: (Boolean, String) -> Unit) {
-        if (email.isBlank() || password.isBlank()) {
-            onResult(false, "Email or password cannot be empty")
-            return
-        }
-
-        //to work when firebase get added
-        /*
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.i("Registration", "User registered successfully")
-                    onResult(true, "Registration successful")
-                } else {
-                    val error = task.exception?.message ?: "Unknown error occurred"
-                    Log.e("Registration", "Error: $error")
-                    onResult(false, error)
-                }
-            }
-        */
-    }
-
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BlabAppTheme {
-        Greeting("Android")
     }
 }
