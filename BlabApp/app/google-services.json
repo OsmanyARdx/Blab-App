@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "980420858568",
+    "project_id": "blab-e63b9",
+    "storage_bucket": "blab-e63b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980420858568:android:5006cd81d99f07c376cbfd",
+        "android_client_info": {
+          "package_name": "com.example.blabapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDklE3ETLtZxJNkcg1dxqbTpYSbUVvopM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
