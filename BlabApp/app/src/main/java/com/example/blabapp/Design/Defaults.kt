@@ -15,6 +15,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.blabapp.ui.theme.BlabDarkPurple
+import com.example.blabapp.ui.theme.BlabGrey
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink40
 
 
@@ -27,13 +31,13 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text("Enter $label", color = Color.White) },
+            label = { Text("Enter $label", color = BlabYellow) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Pink40, unfocusedContainerColor = Pink40,
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                focusedContainerColor = BlabDarkPurple, unfocusedContainerColor = BlabPurple,
+                focusedTextColor = BlabYellow, unfocusedTextColor = BlabYellow,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(14.dp)

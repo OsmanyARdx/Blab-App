@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +47,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.ViewModels.LoginScreenViewModel
+import com.example.blabapp.ui.theme.BlabGrey
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink40
 import com.example.blabapp.ui.theme.Pink80
 
@@ -66,14 +71,15 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
     var password by rememberSaveable { mutableStateOf("") }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Pink80),
+        modifier = Modifier.fillMaxSize().background(BlabYellow),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Login", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text("Login", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -97,7 +103,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                     )
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
             ) {
                 Text(text = "Login", fontSize = 30.sp)
             }
@@ -109,35 +115,11 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",
-                    color = Color.Blue,
+                    color = BlabPurple,
                     modifier = Modifier.clickable { navController.navigate("RegisterScreen") }
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun InputField(label: String, value: String, isPassword: Boolean = false, onValueChange: (String) -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth(0.8f)
-    ) {
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text("Enter $label", color = Color.White) },
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Pink40, unfocusedContainerColor = Pink40,
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(14.dp)
-        )
     }
 }
 

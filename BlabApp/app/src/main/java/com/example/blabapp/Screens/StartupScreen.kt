@@ -17,6 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.blabapp.ui.theme.BlabGrey
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink40
 import com.example.blabapp.ui.theme.Pink80
 
@@ -24,18 +27,18 @@ import com.example.blabapp.ui.theme.Pink80
 @Composable
 fun StartupScreen(navController: NavController) {
     Box(
-        modifier = Modifier.fillMaxSize().background(Pink80),
+        modifier = Modifier.fillMaxSize().background(BlabYellow),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Welcome to Blab App", fontSize = 30.sp, color = Color.White)
+            Text("Welcome to Blab App", fontSize = 30.sp, color = BlabPurple)
 
             Spacer(modifier = Modifier.height(50.dp))
 
             Button(
                 onClick = { navController.navigate("LoginScreen") },
                 modifier = Modifier.fillMaxWidth(0.7f),
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
             ) {
                 Text(text = "Login", fontSize = 20.sp)
             }
@@ -45,7 +48,7 @@ fun StartupScreen(navController: NavController) {
             Button(
                 onClick = { navController.navigate("RegisterScreen") },
                 modifier = Modifier.fillMaxWidth(0.7f),
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }

@@ -33,6 +33,9 @@ import androidx.navigation.NavController
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
+import com.example.blabapp.ui.theme.BlabGrey
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink40
 import com.example.blabapp.ui.theme.Pink80
 
@@ -57,7 +60,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Pink80),
+            .background(BlabYellow),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -65,7 +68,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
 
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }
@@ -103,7 +106,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
@@ -112,7 +115,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",
-                    color = Color.Blue,
+                    color = BlabPurple,
                     modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }

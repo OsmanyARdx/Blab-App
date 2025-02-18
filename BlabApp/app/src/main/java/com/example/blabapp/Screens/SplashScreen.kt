@@ -37,15 +37,17 @@ import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Nav.MyNavItem
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
 
 
 @Composable
 fun SplashScreen(navController: NavController) {
     Box(
-        modifier = Modifier.fillMaxSize().background(Pink80),
+        modifier = Modifier.fillMaxSize().background(BlabPurple),
         contentAlignment = Alignment.Center
     ) {
-        Text("Blab App", fontSize = 50.sp, color = Color.White)
+        Text("Blab App", fontSize = 50.sp, color = BlabYellow)
     }
 
     LaunchedEffect(Unit) {
