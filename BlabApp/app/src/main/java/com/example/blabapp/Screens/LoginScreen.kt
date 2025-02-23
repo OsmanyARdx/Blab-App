@@ -83,8 +83,10 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                         email = email,
                         password = password,
                         successfulLoginHandler = {
-                            //navController.navigate("HomeScreen") //for later use
+                            navController.navigate("HomeScreen") //for later use
                             Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+//
+
                         },
                         unsuccessfulLoginHandler = {
                             Toast.makeText(context, "Login failed. Please try again.", Toast.LENGTH_SHORT).show()

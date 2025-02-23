@@ -97,6 +97,10 @@ fun RootScreen(){
                     isVisible=false
                     RegisterScreen(BlabApp.accountRepository, navController)
                 }
+                composable(route="HomeScreen"){
+                    isVisible=false
+                    HomeScreen(BlabApp.accountRepository, navController)
+                }
             }
         }
     }
