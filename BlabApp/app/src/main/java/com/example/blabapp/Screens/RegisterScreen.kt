@@ -65,7 +65,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Register", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
 
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }

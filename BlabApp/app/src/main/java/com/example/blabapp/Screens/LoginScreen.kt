@@ -68,7 +68,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Login", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
 
             Spacer(modifier = Modifier.height(8.dp))
 
