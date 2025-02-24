@@ -27,6 +27,7 @@ import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Nav.MyNavItem
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
+import com.example.blabapp.AppNavigation
 
 
 @Composable
@@ -99,7 +100,7 @@ fun RootScreen(){
                 }
                 composable(route="HomeScreen"){
                     isVisible=false
-                    HomeScreen(BlabApp.accountRepository, navController)
+                    AppNavigation(BlabApp.accountRepository, navController)
                 }
             }
         }
