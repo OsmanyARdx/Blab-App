@@ -1,6 +1,7 @@
 package com.example.blabapp.Screens
 
 import android.content.Context
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -91,6 +92,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                             viewModel.registerUserFirebase(
                                 email = email,
                                 password = password,
+                                name = firstName + " " + lastName,
+                                imageUrl = "",
                                 successfulRegistrationHandler = {
                                     Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
                                     navController.navigate("LoginScreen")
@@ -99,6 +102,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                                     Toast.makeText(context, "Registration failed: $error", Toast.LENGTH_SHORT).show()
                                 }
                             )
+
                         }
                     }
                 },
