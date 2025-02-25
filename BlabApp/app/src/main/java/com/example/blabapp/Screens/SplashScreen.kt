@@ -18,15 +18,12 @@ import com.example.blabapp.ui.theme.BlabPurple
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    val logoPic = painterResource(R.drawable.logo)
+    //val logoPic = painterResource(R.drawable.logo)
     Box(
         modifier = Modifier.fillMaxSize().background(BlabPurple),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = logoPic,
-            contentDescription = null
-        )
+
     }
 
     LaunchedEffect(Unit) {
