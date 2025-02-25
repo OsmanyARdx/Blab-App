@@ -9,6 +9,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,7 @@ fun MessagesScreen(navController: NavHostController) {
     val messages = listOf("Message 1", "Message 2", "Message 3", "Message 4")
     val pagerState = rememberPagerState(pageCount = { messages.size })
 
-    Box(modifier = Modifier.fillMaxSize().background(BlabYellow)) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) {
         // Back Arrow Icon inside Box with correct alignment
         Icon(
             imageVector = Icons.Default.ArrowBack,

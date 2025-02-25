@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -31,13 +32,13 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text("Enter $label", color = BlabYellow) },
+            label = { Text("Enter $label", color = MaterialTheme.colorScheme.secondary) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = BlabDarkPurple, unfocusedContainerColor = BlabPurple,
-                focusedTextColor = BlabYellow, unfocusedTextColor = BlabYellow,
+                focusedContainerColor = MaterialTheme.colorScheme.tertiary, unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                focusedTextColor = MaterialTheme.colorScheme.secondary, unfocusedTextColor = MaterialTheme.colorScheme.secondary,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(14.dp)

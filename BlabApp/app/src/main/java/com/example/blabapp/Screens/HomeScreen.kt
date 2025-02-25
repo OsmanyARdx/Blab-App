@@ -66,7 +66,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
         }
     }
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
     ) {
         Icon(
             imageVector = Icons.Default.AccountCircle,
@@ -91,7 +91,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary
         )
 
         Column(
@@ -107,7 +107,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(top = 16.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -118,8 +118,8 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 modifier = Modifier
                     .size(300.dp)
                     .clip(CircleShape)
-                    .border(1.dp, BlabPurple, CircleShape)
-                    .background(BlabPurple)
+                    .border(1.dp, MaterialTheme.colorScheme.tertiary, CircleShape)
+                    .background(MaterialTheme.colorScheme.tertiary)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -127,7 +127,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             Text(
                 text = userName.value.toString(),
                 fontSize = 34.sp,
-                color = BlabPurple,
+                color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold
             )
 
@@ -149,7 +149,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                     Column {
                         Text(
                             text = "Phrase of the Day:",
-                            color = BlabPurple,
+                            color = MaterialTheme.colorScheme.secondary,
                             fontSize = 18.sp
                         )
                     }

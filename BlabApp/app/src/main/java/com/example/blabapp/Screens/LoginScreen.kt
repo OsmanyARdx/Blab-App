@@ -18,8 +18,10 @@ import androidx.navigation.NavController
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -62,7 +64,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
     var password by rememberSaveable { mutableStateOf("") }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -70,7 +72,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -96,7 +98,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                     )
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabGreen, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = "Login", fontSize = 30.sp)
             }
@@ -105,11 +107,11 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
 
             Row {
                 Text(text = "Don't have an account?",
-                    color = MaterialTheme.colorScheme.primary)
+                    color = MaterialTheme.colorScheme.secondary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",
-                    color = BlabPurple,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.clickable { navController.navigate("RegisterScreen") }
                 )
             }
