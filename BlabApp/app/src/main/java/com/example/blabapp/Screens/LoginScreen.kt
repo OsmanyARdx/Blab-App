@@ -62,7 +62,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
     var password by rememberSaveable { mutableStateOf("") }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(

@@ -66,7 +66,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
         }
     }
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         Icon(
             imageVector = Icons.Default.AccountCircle,

@@ -61,7 +61,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlabYellow),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
