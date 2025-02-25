@@ -62,14 +62,14 @@ fun StartupScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(50.dp))
 
-            Text("Welcome to Blab App", fontSize = 30.sp, color = BlabPurple, fontWeight = FontWeight.Bold)
+            Text("Welcome to Blab App", fontSize = 30.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(50.dp))
 
             Button(
                 onClick = { navController.navigate("LoginScreen") },
                 modifier = Modifier.fillMaxWidth(0.7f),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = "Login", fontSize = 20.sp)
             }
@@ -79,7 +79,7 @@ fun StartupScreen(navController: NavController) {
             Button(
                 onClick = { navController.navigate("RegisterScreen") },
                 modifier = Modifier.fillMaxWidth(0.7f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabBlue, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }

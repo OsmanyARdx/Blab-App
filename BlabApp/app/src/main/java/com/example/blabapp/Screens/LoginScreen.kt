@@ -70,7 +70,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -96,7 +96,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                     )
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabGreen, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = "Login", fontSize = 30.sp)
             }
@@ -105,11 +105,11 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
 
             Row {
                 Text(text = "Don't have an account?",
-                    color = MaterialTheme.colorScheme.primary)
+                    color = MaterialTheme.colorScheme.secondary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",
-                    color = BlabPurple,
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.clickable { navController.navigate("RegisterScreen") }
                 )
             }

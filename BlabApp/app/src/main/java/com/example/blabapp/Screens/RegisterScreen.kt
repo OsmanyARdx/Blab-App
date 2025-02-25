@@ -69,7 +69,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Register", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
 
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }
@@ -110,17 +110,17 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabBlue, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
             Row {
                 Text(text = "Already have an account?",
-                    color = MaterialTheme.colorScheme.primary)
+                    color = MaterialTheme.colorScheme.secondary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",
-                    color = BlabPurple,
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }

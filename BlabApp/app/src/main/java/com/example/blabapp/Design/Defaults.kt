@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -19,6 +20,7 @@ import com.example.blabapp.ui.theme.BlabDarkPurple
 import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
+import com.example.blabapp.ui.theme.DarkBlabBlue
 import com.example.blabapp.ui.theme.Pink40
 
 
@@ -36,7 +38,7 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = BlabDarkPurple, unfocusedContainerColor = BlabPurple,
+                focusedContainerColor = MaterialTheme.colorScheme.onTertiary, unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
                 focusedTextColor = BlabYellow, unfocusedTextColor = BlabYellow,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),

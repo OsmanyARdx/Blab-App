@@ -73,7 +73,8 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             contentDescription = "Profile",
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(16.dp)
+                .padding(16.dp),
+            tint = MaterialTheme.colorScheme.secondary
         )
 
         Icon(
@@ -82,7 +83,9 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
-                .clickable { navController.navigate("messages") }
+                .clickable { navController.navigate("messages")
+                },
+            tint = MaterialTheme.colorScheme.secondary
         )
 
         Text(
@@ -91,7 +94,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary
         )
 
         Column(
@@ -107,7 +110,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(top = 16.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(modifier = Modifier.height(16.dp))
