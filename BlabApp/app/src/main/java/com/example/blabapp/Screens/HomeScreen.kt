@@ -29,12 +29,41 @@ import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
-
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
 fun HomeScreen(title: String, navController: NavHostController, profileImageUrl: String) {
+
+    val userStreak = remember { mutableStateOf("Loading...") }
+    val userRank = remember { mutableStateOf("Loading...") }
+    val userName = remember { mutableStateOf("Loading...") }
+
+    // Get user data from Firebase
+    LaunchedEffect(Unit) {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val firestore = FirebaseFirestore.getInstance()
+        val userId = firebaseAuth.currentUser?.uid
+
+        if (userId != null) {
+            firestore.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        userStreak.value = document.getString("userStreak") ?: "0"
+                        userRank.value = document.getString("rank") ?: "Rookie"
+                        userName.value = document.getString("name") ?: "user"
+                    }
+                }
+                .addOnFailureListener {
+                    userStreak.value = "Error"
+                    userRank.value = "Error"
+                }
+        } else {
+            userStreak.value = "Not Logged In"
+            userRank.value = "Not Available"
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize().background(BlabYellow)
     ) {
@@ -56,7 +85,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
         )
 
         Text(
-            text = "Level 3",  //replace with actual Ranking
+            text = userRank.value.toString(),
             fontSize = 24.sp,
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -69,6 +98,17 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 .padding(bottom = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+
+            Text(
+                text = "Streak: " + userStreak.value,
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.pfp), //replace with actual user's image
                 contentDescription = "Profile Picture",
@@ -82,11 +122,12 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Maria", //replace with actual name
+                text = userName.value.toString(),
                 fontSize = 34.sp,
                 color = BlabPurple,
                 fontWeight = FontWeight.Bold
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -108,7 +149,6 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                             color = BlabPurple,
                             fontSize = 18.sp
                         )
-                        Text(text = "Click Me", color = BlabPurple, fontSize = 18.sp)
                     }
                 }
 
