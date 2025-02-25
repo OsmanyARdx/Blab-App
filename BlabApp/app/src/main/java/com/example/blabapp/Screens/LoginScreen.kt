@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.ViewModels.LoginScreenViewModel
+import com.example.blabapp.ui.theme.BlabGreen
 import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
@@ -94,7 +95,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                     )
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabGreen, contentColor = BlabYellow)
             ) {
                 Text(text = "Login", fontSize = 30.sp)
             }

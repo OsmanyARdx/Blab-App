@@ -47,7 +47,7 @@ fun HomeScreen(accountRepository: AccountRepository, navController: NavControlle
             Row (modifier = Modifier
                 .height(40.dp)){
                 Text(
-                    text = "Rank: ",
+                    text = "Rank: Rookie", //default for now
                     fontWeight = FontWeight.Bold,
                     fontSize = 30.sp,
                     color = BlabGrey
