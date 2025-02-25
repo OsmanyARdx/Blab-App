@@ -33,6 +33,8 @@ import androidx.navigation.NavController
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
+import com.example.blabapp.ui.theme.BlabBlue
+import com.example.blabapp.ui.theme.BlabGreen
 import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
@@ -66,7 +68,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
+            Text("Register", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = BlabPurple)
 
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }
@@ -107,7 +109,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = BlabGrey, contentColor = BlabYellow)
+                colors = ButtonDefaults.buttonColors(containerColor = BlabBlue, contentColor = BlabYellow)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
