@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.platform.LocalContext
@@ -103,7 +104,8 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
             Spacer(modifier = Modifier.height(16.dp))
 
             Row {
-                Text(text = "Don't have an account?")
+                Text(text = "Don't have an account?",
+                    color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",

@@ -76,7 +76,6 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: String
     }
 }
 
-// SCREEN PROTOTYPING: TO BE REMOVED ONCE ACTUAL PAGES ARE MADE
 @Composable
 fun ScreenContent(title: String) {
     Box(

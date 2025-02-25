@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -114,7 +115,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                 Text(text = "Register", fontSize = 20.sp)
             }
             Row {
-                Text(text = "Already have an account?")
+                Text(text = "Already have an account?",
+                    color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",

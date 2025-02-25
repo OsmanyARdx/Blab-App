@@ -90,7 +90,8 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
             fontSize = 24.sp,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 16.dp)
+                .padding(top = 16.dp),
+            color = MaterialTheme.colorScheme.primary
         )
 
         Column(
@@ -105,7 +106,8 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 text = "Streak: " + userStreak.value,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp),
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(16.dp))

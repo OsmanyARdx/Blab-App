@@ -32,7 +32,7 @@ import com.example.blabapp.ui.theme.BlabYellow
 @Composable
 fun SplashScreen(navController: NavController) {
 
-    val logoPic = painterResource(R.drawable.logo2)
+    val logoPic = painterResource(R.drawable.logo)
 
     Box(
         modifier = Modifier
