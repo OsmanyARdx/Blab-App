@@ -35,7 +35,7 @@ fun AppNavigation(accountRepository: AccountRepository, navController: NavContro
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             NavHost(navController, startDestination = "home") {
-                composable("home") { HomeScreen("Home",navController,"") }
+                composable("home") { HomeScreen("Home",navController,"", context = navController.context) }
                 composable("search") { ScreenContent("Search") }
                 composable("reels") { ScreenContent("Reels") }
                 composable("modules") { ScreenContent("Modules") }
