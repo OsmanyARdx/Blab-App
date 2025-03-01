@@ -1,6 +1,6 @@
 package com.example.blabapp.Nav
 
-import com.google.firebase.auth.FirebaseAuth
+
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
@@ -8,15 +8,22 @@ import kotlinx.coroutines.tasks.await
 interface UserRepository{
 
     suspend fun getUser(uid: String): User
-    suspend fun getUserUsingToObj(uid:String): User
 }
 
 
-class AccountRepository(private var fireStoreDb : FirebaseFirestore) {
+class AccountRepository(private var fireStoreDb : FirebaseFirestore): UserRepository{
 
-    //val currentUser = getUser(FirebaseAuth.getInstance().uid.toString())
+    var currentUser = User()
+    override suspend fun getUser(uid:String): User{
 
-    suspend fun getUser(uid:String): User{
+        val user = fireStoreDb.collection("users").document(uid).get().await()
+            .toObject<User>()
+
+        return user ?: User()
+
+    }
+    /*
+    override suspend fun getUser(uid:String): User{
         var user:User
         val userDoc = fireStoreDb.collection("users").document(uid).get().await()
 
@@ -42,13 +49,6 @@ class AccountRepository(private var fireStoreDb : FirebaseFirestore) {
         }
         return user
     }
+    */
 
-    suspend fun getUserUsingToObj(uid:String): User{
-
-        val user = fireStoreDb.collection("users").document(uid).get().await()
-            .toObject<User>()
-
-        return user ?: User()
-
-    }
 }
