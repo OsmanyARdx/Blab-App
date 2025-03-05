@@ -13,7 +13,8 @@ interface UserRepository{
 
 class AccountRepository(private var fireStoreDb : FirebaseFirestore): UserRepository{
 
-    var currentUser = User()
+    lateinit var currentUser: User
+
     override suspend fun getUser(uid:String): User{
 
         val user = fireStoreDb.collection("users").document(uid).get().await()
