@@ -74,6 +74,10 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // For making network requests
 
+    implementation("androidx.compose.ui:ui:1.4.0")
+    implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.compose.foundation:foundation:1.4.0")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
