@@ -18,6 +18,7 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
         imageUrl: String,
         userBio: String = "My description",
         userStreak: String = "0",
+        userRank: String = "Simple Student",
         successfulRegistrationHandler: () -> Unit,
         unsuccessfulRegistrationHandler: (String) -> Unit
     ) {
@@ -37,7 +38,8 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
                         "email" to email,
                         "imageUrl" to imageUrl,
                         "userBio" to userBio,
-                        "userStreak" to userStreak
+                        "userStreak" to userStreak,
+                        "userRank" to userRank
                     )
 
                     firestore.collection("users")
