@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,18 +42,17 @@ import com.example.blabapp.ui.theme.BlabGreen
 import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.TextField
+import com.example.blabapp.ui.theme.DarkBlabBlue
 
 
 @Composable
-fun RegisterScreen(accountRepository: AccountRepository, navController: NavController){
+fun RegisterScreen(accountRepository: AccountRepository, navController: NavController) {
     val viewModel = viewModel { RegisterScreenViewModel(accountRepository) }
-    var rememberEmail by rememberSaveable { mutableStateOf("") }
-    var rememberPassword by rememberSaveable { mutableStateOf("") }
-    var success by rememberSaveable {
-        mutableStateOf(true)
-    }
-
-    val context = LocalContext.current
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -58,10 +60,14 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
 
+    var selectedLanguage by rememberSaveable { mutableStateOf("ES") }
+
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -78,25 +84,51 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             InputField("Password", password, isPassword = true) { password = it }
             InputField("Confirm Password", confirmPassword, isPassword = true) { confirmPassword = it }
 
+            // Language selection with two buttons
+            Text("I want to learn:", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(0.7f)
+            ) {
+                Button(
+                    onClick = { selectedLanguage = "EN" },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedLanguage == "EN") MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                        contentColor = BlabYellow
+                    )
+                ) {
+                    Text("English", fontSize = 16.sp)
+                }
+
+                Button(
+                    onClick = { selectedLanguage = "ES" },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedLanguage == "ES") MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                        contentColor = BlabYellow
+                    )
+                ) {
+                    Text("Spanish", fontSize = 16.sp)
+                }
+            }
+
             Button(
                 onClick = {
                     when {
-                        firstName.isEmpty() || lastName.isEmpty() ->
-                            showToast(context, "Name fields cannot be empty")
-                        email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                            showToast(context, "Enter a valid email")
-                        phone.isEmpty() || phone.length < 10 ->
-                            showToast(context, "Enter a valid phone number")
-                        password.length < 6 ->
-                            showToast(context, "Password must be at least 6 characters")
-                        password != confirmPassword ->
-                            showToast(context, "Passwords do not match")
+                        firstName.isEmpty() || lastName.isEmpty() -> showToast(context, "Name fields cannot be empty")
+                        email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> showToast(context, "Enter a valid email")
+                        phone.isEmpty() || phone.length < 10 -> showToast(context, "Enter a valid phone number")
+                        password.length < 6 -> showToast(context, "Password must be at least 6 characters")
+                        password != confirmPassword -> showToast(context, "Passwords do not match")
                         else -> {
                             viewModel.registerUserFirebase(
                                 email = email,
                                 password = password,
-                                name = firstName + " " + lastName,
+                                name = "$firstName $lastName",
                                 imageUrl = "",
+                                learning = selectedLanguage,
                                 successfulRegistrationHandler = {
                                     Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
                                     navController.navigate("LoginScreen")
@@ -105,30 +137,30 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                                     Toast.makeText(context, "Registration failed: $error", Toast.LENGTH_SHORT).show()
                                 }
                             )
-
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                )
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
+
             Row {
-                Text(text = "Already have an account?",
-                    color = MaterialTheme.colorScheme.secondary)
+                Text(text = "Already have an account?", color = MaterialTheme.colorScheme.secondary)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }
         }
     }
 }
-
-
 
 private fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

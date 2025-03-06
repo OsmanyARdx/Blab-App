@@ -41,7 +41,7 @@ fun StartupScreen(navController: NavController) {
     val logoPic = painterResource(R.drawable.logo)
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
 

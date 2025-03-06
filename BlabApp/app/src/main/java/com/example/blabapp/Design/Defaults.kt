@@ -20,6 +20,7 @@ import com.example.blabapp.ui.theme.BlabDarkPurple
 import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
+import com.example.blabapp.ui.theme.DarkBlabBlue
 import com.example.blabapp.ui.theme.Pink40
 
 
@@ -32,13 +33,13 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text("Enter $label", color = MaterialTheme.colorScheme.secondary) },
+            label = { Text("Enter $label", color = BlabYellow) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.tertiary, unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                focusedTextColor = MaterialTheme.colorScheme.secondary, unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                focusedContainerColor = MaterialTheme.colorScheme.onTertiary, unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                focusedTextColor = BlabYellow, unfocusedTextColor = BlabYellow,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(14.dp)
