@@ -20,6 +20,8 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
         userStreak: String = "0",
         userRank: String = "Simple Student",
         learning: String,
+        chatList: MutableList<String> = mutableListOf<String>(),
+        friendList: MutableList<String> = mutableListOf<String>(),
         successfulRegistrationHandler: () -> Unit,
         unsuccessfulRegistrationHandler: (String) -> Unit
     ) {
@@ -41,7 +43,9 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
                         "userBio" to userBio,
                         "userStreak" to userStreak,
                         "userRank" to userRank,
-                        "learning" to learning
+                        "learning" to learning,
+                        "chatList" to chatList,
+                        "friendList" to friendList
                     )
 
                     firestore.collection("users")
