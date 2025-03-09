@@ -37,6 +37,24 @@ import java.net.URLEncoder
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Message
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.Screens.SidebarMenu
+import com.example.blabapp.ui.theme.BlabYellow
+import com.example.blabapp.ui.theme.Pink80
+import com.example.blabapp.ui.theme.Purple40
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -58,7 +76,6 @@ fun rememberPhraseOfTheDay(context: Context): Pair<MutableState<String>, Mutable
                 phraseInEnglish.value = english
                 phraseInSpanish.value = spanish
 
-                // Save new phrase and date
                 sharedPreferences.edit().apply {
                     putString("lastFetchDate", todayDate)
                     putString("phraseEnglish", english)
@@ -79,6 +96,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
     val userName = remember { mutableStateOf("Loading...") }
     val (phraseInEnglish, phraseInSpanish) = rememberPhraseOfTheDay(context)
     val isSpanish = remember { mutableStateOf(true) }
+    val isSidebarVisible = remember { mutableStateOf(false) }
 
     // Fetch user data
     LaunchedEffect(Unit) {
@@ -158,41 +176,123 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = userName.value,
-                fontSize = 34.sp,
-                color = BlabPurple,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(Modifier.padding(0.dp)) {
 
             Box(
                 modifier = Modifier
-                    .size(width = 300.dp, height = 100.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(3.dp, BlabPurple, RoundedCornerShape(16.dp))
-                    .padding(1.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+
+                    .padding(7.dp)
             ) {
-                Button(
-                    onClick = { isSpanish.value = !isSpanish.value },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    modifier = Modifier.fillMaxSize()
+                IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.onTertiary
+                    )
+                }
+
+                // navigate to Messages screen
+                IconButton(onClick = { navController.navigate("messages_screen") }, modifier = Modifier.align(Alignment.TopEnd)) {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Messenger",
+                        tint = MaterialTheme.colorScheme.onTertiary
+                    )
+                }
+
+                Text(
+                    text = userRank.value,
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    modifier = Modifier.align(Alignment.Center).padding(top = 16.dp)
+                )
+            }
+
+            // Main content
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+                Column(
+                    modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column {
-                        Text(
-                            text = "Phrase of the Day:\n\n" +
-                                    if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
-                            color = BlabPurple,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center
-                        )
+                    Text(
+                        text = "Streak: ${userStreak.value}",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(top = 16.dp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.pfp),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(300.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, BlabPurple, CircleShape)
+                            .background(BlabPurple)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = userName.value,
+                        fontSize = 34.sp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .size(width = 300.dp, height = 100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(3.dp, if (isSpanish.value) Pink80 else BlabPurple, RoundedCornerShape(50.dp))
+                            .background(
+                                animateColorAsState(targetValue = if (isSpanish.value) BlabPurple else Pink80).value,
+                                RoundedCornerShape(50.dp)
+                            )
+                            .padding(1.dp)
+                    ) {
+                        Button(
+                            onClick = { isSpanish.value = !isSpanish.value },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Phrase of the Day:\n\n" + if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
+                                    color = if (isSpanish.value) Pink80 else BlabPurple,
+                                    fontSize = 18.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+
+
+        // Sidebar
+        if (isSidebarVisible.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp)) // semi-transparent background
+                    .clickable { isSidebarVisible.value = false } // close sidebar on click outside
+            ) {
+                SidebarMenu(navController) // Sidebar content
+            }
+        }
     }
-}
+
 
 
 // Fetches an English phrase and translates it to Spanish
@@ -221,7 +321,6 @@ fun fetchAndTranslateRandomPhrase(onResult: (String, String) -> Unit) {
                     }
 
                     if (englishSentences.isNotEmpty()) {
-                        Log.d("sentences", englishSentences.toString())
                         val randomSentence = englishSentences.random()
                         translateSentence(randomSentence) { translatedText ->
                             onResult(randomSentence, translatedText)

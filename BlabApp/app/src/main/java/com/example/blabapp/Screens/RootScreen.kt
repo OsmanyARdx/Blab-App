@@ -1,108 +1,98 @@
-package com.example.blabapp.Screens
+package com.example.blabapp
 
-import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import BottomNavigationBar
+import ScreenContent
+import android.annotation.SuppressLint
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
+import com.example.blabapp.Nav.AccountRepository
+import com.example.blabapp.Screens.ChatScreen
+import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.ui.theme.BlabPurple
+import com.example.blabapp.ui.theme.BlabYellow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.BlabApp
-import com.example.blabapp.Nav.MyNavItem
+import com.example.blabapp.Screens.AddFriendsScreen
+import com.example.blabapp.Screens.FriendsListScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
-import com.example.blabapp.AppNavigation
-
+import com.example.blabapp.Screens.LoginScreen
+import com.example.blabapp.Screens.RegisterScreen
 
 @Composable
-fun RootScreen(){
-    Text("Root Screen", fontSize=30.sp)
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
-    val navItemsList = listOf(
-        MyNavItem(title="Home",
-            iconSelected = Icons.Filled.Home,
-            iconUnselected = Icons.Outlined.Home,
-            route="LoginScreen"
-        )
-    )
-    val context = LocalContext.current
+fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
-    var isVisible by rememberSaveable { mutableStateOf(false) }
-    Scaffold (
-        bottomBar = {if(isVisible){
-            NavigationBar {
-                navItemsList.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = (selectedItemIndex == index),
-                        onClick = {
-                            selectedItemIndex = index
-                            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
-                            if(item.route=="LoginScreen"){
-                                navController.navigate(item.route)
-                            }
-                            else{
-                                navController.popBackStack()
-                            }
 
-                        },
-                        label = { Text(text = item.title) },
-                        icon = {
-                            Icon(
-                                contentDescription = item.title,
-                                imageVector =
-                                if (index == selectedItemIndex) item.iconSelected
-                                else item.iconUnselected
-                            )
-                        }
-                    )
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends")
+
+    var selectedScreen by remember { mutableStateOf("home") }
+
+    Scaffold(
+        bottomBar = {
+            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+            if (currentRoute in screensWithNavBar) {
+                BottomNavigationBar(navController, selectedScreen) { route ->
+                    selectedScreen = route
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             }
-        }
-        }
-    )
-    { padding ->
-        Column(
-            modifier = Modifier.padding(padding)
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
-            NavHost(navController=navController, startDestination="SplashScreen"){
-
-                composable(route="SplashScreen"){
-                    isVisible=false
-                    SplashScreen(navController)
+            NavHost(
+                navController = navController,
+                startDestination = "splashScreen",
+                modifier = Modifier.fillMaxSize()
+            ) {
+                composable("splashScreen") { SplashScreen(navController) }
+                composable("startupScreen") { StartupScreen(navController) }
+                composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
+                composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
+                composable("home") { HomeScreen("Home", navController, profileImageUrl = "", context = LocalContext.current) }
+                composable("search") { ScreenContent("Search") }
+                composable("reels") { ScreenContent("Reels") }
+                composable("modules") { ScreenContent("Modules") }
+                composable("games") { ScreenContent("Games") }
+                composable("messages_screen") { MessagesScreen(navController) }
+                composable("chat_screen/{contactName}") { backStackEntry ->
+                    val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
+                    ChatScreen(navController, contactName)
                 }
-                composable(route="StartupScreen"){
-                    isVisible=false
-                    StartupScreen(navController)
-                }
-                composable(route="LoginScreen"){
-                    isVisible=false
-                    LoginScreen(BlabApp.accountRepository, navController)
-                }
-                composable(route="RegisterScreen"){
-                    isVisible=false
-                    RegisterScreen(BlabApp.accountRepository, navController)
-                }
-                composable(route="HomeScreen"){
-                    isVisible=false
-                    AppNavigation(BlabApp.accountRepository, navController)
-                }
+                composable("friends_list") { FriendsListScreen(navController) }
+                composable("add_friends") { AddFriendsScreen(navController) }
             }
         }
     }
 }
+
