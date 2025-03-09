@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +15,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +31,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,10 +42,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
+import com.example.blabapp.R
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
 import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
-import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
 
@@ -57,11 +66,13 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     var phone by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
+    val logoPic = painterResource(R.drawable.logo)
+
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -69,14 +80,27 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Transparent, shape = RoundedCornerShape(75.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = logoPic,
+                    contentDescription = null,
+                    modifier = Modifier.size(300.dp)
+                )
+            }
             InputField("First Name", firstName) { firstName = it }
             InputField("Last Name", lastName) { lastName = it }
             InputField("Email Address", email) { email = it }
             InputField("Phone Number", phone) { phone = it }
             InputField("Password", password, isPassword = true) { password = it }
             InputField("Confirm Password", confirmPassword, isPassword = true) { confirmPassword = it }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
@@ -109,18 +133,22 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
+                modifier = Modifier
+                    .size(150.dp, 50.dp)
+                    .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50.dp))
+                    .clip(RoundedCornerShape(50.dp))
+                    .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.Black)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
             Row {
                 Text(text = "Already have an account?",
-                    color = MaterialTheme.colorScheme.secondary)
+                    color = BlabPurple)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = BlabGreen,
                     modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }

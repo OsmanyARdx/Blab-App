@@ -1,31 +1,29 @@
 package com.example.blabapp.Design
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import com.example.blabapp.ui.theme.BlabDarkPurple
-import com.example.blabapp.ui.theme.BlabGrey
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
-import com.example.blabapp.ui.theme.DarkBlabBlue
-import com.example.blabapp.ui.theme.Pink40
-
+import com.example.blabapp.ui.theme.*
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.focus.onFocusChanged
 
 @Composable
 fun InputField(label: String, value: String, isPassword: Boolean = false, onValueChange: (String) -> Unit) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(false) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(0.8f)
@@ -33,16 +31,29 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text("Enter $label", color = BlabYellow) },
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            label = { Text(label, color = if (isFocused) Color.Black else BlabPurple) },
+            visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(2.dp, if (isFocused) Color.Black else BlabPurple, RoundedCornerShape(50.dp))
+                .onFocusChanged { isFocused = it.isFocused },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.onTertiary, unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                focusedTextColor = BlabYellow, unfocusedTextColor = BlabYellow,
+                focusedContainerColor = BlabPurple, unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = Color.Black, unfocusedTextColor =  BlabPurple,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),
-            shape = RoundedCornerShape(14.dp)
+            shape = RoundedCornerShape(50.dp),
+            trailingIcon = {
+                if (isPassword) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = "Toggle Password Visibility",
+                        tint = if (isFocused) Color.Black else BlabPurple,
+                        modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+                    )
+                }
+            }
         )
     }
 }

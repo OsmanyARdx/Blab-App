@@ -42,11 +42,15 @@ android {
 }
 
 dependencies {
+
     dependencies {
         val nav_version = "2.8.7"
 
         implementation("androidx.navigation:navigation-compose:$nav_version")
     }
+    implementation ("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -60,20 +64,6 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.auth.ktx)
-
-
-    //apis
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("io.ktor:ktor-client-core:2.3.3")
-    implementation("io.ktor:ktor-client-cio:2.3.3")
-    implementation("io.ktor:ktor-client-json:2.3.3")
-    implementation("io.ktor:ktor-client-serialization:2.3.3")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.3")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.3")
-
-    implementation("com.squareup.okhttp3:okhttp:4.9.3") // For making network requests
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

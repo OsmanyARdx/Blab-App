@@ -33,26 +33,13 @@ fun SplashScreen(navController: NavController) {
     ) {
         Image(
             painter = logoPic,
-            contentDescription = null
-        )
-        Box(
-            modifier = Modifier
-                .background(Color.White, shape = RoundedCornerShape(100.dp))
-                .padding(16.dp)
-                .size(200.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = logoPic,
-                contentDescription = null,
-                modifier = Modifier.size(150.dp)
+            contentDescription = null,
+                modifier = Modifier.size(250.dp)
             )
         }
-    }
 
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate("StartupScreen") // After splash screen, navigate to startup
         navController.navigate("StartupScreen")
     }
 }

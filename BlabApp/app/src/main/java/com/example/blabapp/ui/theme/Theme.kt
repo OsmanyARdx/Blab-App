@@ -13,23 +13,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BlabGrey,
-    secondary = BlabYellow,
-    tertiary = BlabPurple,
-    background = BlabGrey,
-    onTertiary = BlabDarkPurple
+    primary = BlabPurple,
+    secondary = Blablight,
+    tertiary = BlabDarkBlue,
+    background = BlabPurple,
+    onTertiary = Color.White,
+    surface = BlabDark
+
 
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = BlabYellow,
-    secondary = BlabGrey,
+    primary = BlabPurple,
+    secondary = BlabPurple,
     tertiary = BlabBlue,
-    background = BlabYellow,
-    onTertiary = DarkBlabBlue
-
+    background = BlabPurple,
+    onTertiary = Color.Black,
+    surface = Blablight
 
 )
+
 
 @Composable
 fun BlabAppTheme(

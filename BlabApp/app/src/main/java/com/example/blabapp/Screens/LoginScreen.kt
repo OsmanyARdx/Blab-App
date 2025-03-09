@@ -18,7 +18,9 @@ import androidx.navigation.NavController
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,21 +28,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
+import com.example.blabapp.R
 import com.example.blabapp.ViewModels.LoginScreenViewModel
 import com.example.blabapp.ui.theme.BlabGreen
-import com.example.blabapp.ui.theme.BlabGrey
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
 
@@ -60,9 +71,11 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
     val context = LocalContext.current
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    val logoPic = painterResource(R.drawable.logo)
+
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -70,7 +83,19 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Login", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Transparent, shape = RoundedCornerShape(75.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = logoPic,
+                    contentDescription = null,
+                    modifier = Modifier.size(300.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -79,37 +104,47 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    viewModel.loginFirebase(
-                        email = email,
-                        password = password,
-                        successfulLoginHandler = {
-                            navController.navigate("HomeScreen") //for later use
-                            Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
-//
-
-                        },
-                        unsuccessfulLoginHandler = {
-                            Toast.makeText(context, "Login failed. Please try again.", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(0.5f),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = MaterialTheme.colorScheme.secondary)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(50.dp))
+                    .border(2.dp, color = Color.Black, RoundedCornerShape(50.dp))
             ) {
-                Text(text = "Login", fontSize = 30.sp)
+                Button(
+                    onClick = {
+                        viewModel.loginFirebase(
+                            email = email,
+                            password = password,
+                            successfulLoginHandler = {
+                                navController.navigate("home")
+                                Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+                            },
+                            unsuccessfulLoginHandler = {
+                                Toast.makeText(context, "Login failed. Please try again.", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(text = "Login", fontSize = 30.sp)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row {
                 Text(text = "Don't have an account?",
-                    color = MaterialTheme.colorScheme.secondary)
+                    color = BlabPurple)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Register",
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = BlabGreen,
                     modifier = Modifier.clickable { navController.navigate("RegisterScreen") }
                 )
             }
