@@ -109,7 +109,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         userStreak.value = document.getString("userStreak") ?: "0"
-                        userRank.value = document.getString("rank") ?: "Rookie"
+                        userRank.value = document.getString("userRank") ?: "Default"
                         userName.value = document.getString("name") ?: "User"
                     }
                 }
@@ -123,6 +123,58 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
         }
     }
 
+    Box(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+    ) {
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Profile",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        )
+
+        Icon(
+            imageVector = Icons.Default.Email,
+            contentDescription = "Messenger",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .clickable { navController.navigate("messages") }
+        )
+
+        Text(
+            text = userRank.value,
+            fontSize = 24.sp,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 16.dp),
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Column(
+            modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Streak: ${userStreak.value}",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(top = 16.dp),
+                color = MaterialTheme.colorScheme.secondary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.pfp),
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(300.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, BlabPurple, CircleShape)
+                    .background(BlabPurple)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
         Column(Modifier.padding(0.dp)) {
 
@@ -245,7 +297,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
 
 // Fetches an English phrase and translates it to Spanish
 fun fetchAndTranslateRandomPhrase(onResult: (String, String) -> Unit) {
-    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=50"
+    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=200"
 
     val request = Request.Builder().url(url).build()
     val client = OkHttpClient()
