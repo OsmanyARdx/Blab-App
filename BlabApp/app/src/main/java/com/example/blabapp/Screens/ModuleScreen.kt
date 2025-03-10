@@ -79,6 +79,7 @@ fun getModule(): MutableState<List<Module>> {
         db.collection("modules")
             .get()
             .addOnSuccessListener { documents ->
+                // Map documents to Module objects
                 val moduleList = documents.mapNotNull { document ->
                     val moduleNum = document.getLong("moduleNum")?.toInt()
                     val topic = document.getString("topic")
@@ -86,7 +87,12 @@ fun getModule(): MutableState<List<Module>> {
                         Module(moduleNum, topic, document.id)  // Include moduleId
                     } else null
                 }
-                modules.value = moduleList
+
+                // Sort modules by moduleNum
+                val sortedModules = moduleList.sortedBy { it.moduleNum }
+
+                // Update state with sorted modules
+                modules.value = sortedModules
             }
             .addOnFailureListener { exception ->
                 Log.e("Firestore", "Error fetching modules: ${exception.message}")

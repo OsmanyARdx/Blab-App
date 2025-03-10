@@ -123,181 +123,129 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
-    ) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile",
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-        )
 
-        Icon(
-            imageVector = Icons.Default.Email,
-            contentDescription = "Messenger",
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-                .clickable { navController.navigate("messages") }
-        )
+    Column(Modifier.padding(0.dp)) {
 
-        Text(
-            text = userRank.value,
-            fontSize = 24.sp,
+        Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.secondary
-        )
-        Column(
-            modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+
+                .padding(7.dp)
         ) {
-            Text(
-                text = "Streak: ${userStreak.value}",
-                fontSize = 24.sp,
-                modifier = Modifier.padding(top = 16.dp),
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Image(
-                painter = painterResource(id = R.drawable.pfp),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(300.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, BlabPurple, CircleShape)
-                    .background(BlabPurple)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-        Column(Modifier.padding(0.dp)) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-
-                    .padding(7.dp)
-            ) {
-                IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.onTertiary
-                    )
-                }
-
-                // navigate to Messages screen
-                IconButton(onClick = { navController.navigate("messages_screen") }, modifier = Modifier.align(Alignment.TopEnd)) {
-                    Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "Messenger",
-                        tint = MaterialTheme.colorScheme.onTertiary
-                    )
-                }
-
-                Text(
-                    text = userRank.value,
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    modifier = Modifier.align(Alignment.Center).padding(top = 16.dp)
+            IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    tint = MaterialTheme.colorScheme.onTertiary
                 )
             }
 
-            // Main content
-            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-                Column(
-                    modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            // navigate to Messages screen
+            IconButton(onClick = { navController.navigate("messages_screen") }, modifier = Modifier.align(Alignment.TopEnd)) {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Messenger",
+                    tint = MaterialTheme.colorScheme.onTertiary
+                )
+            }
+
+            Text(
+                text = userRank.value,
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.onTertiary,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        // Main content
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+            Column(
+                modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Streak: ${userStreak.value}",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(top = 16.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.pfp),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(300.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, BlabPurple, CircleShape)
+                        .background(BlabPurple)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = userName.value,
+                    fontSize = 34.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(width = 300.dp, height = 100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(3.dp, if (isSpanish.value) Pink80 else BlabPurple, RoundedCornerShape(50.dp))
+                        .background(
+                            animateColorAsState(targetValue = if (isSpanish.value) BlabPurple else Pink80).value,
+                            RoundedCornerShape(50.dp)
+                        )
+                        .padding(1.dp)
                 ) {
-                    Text(
-                        text = "Streak: ${userStreak.value}",
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(top = 16.dp),
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.pfp),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(300.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = userName.value,
-                        fontSize = 34.sp,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .size(width = 300.dp, height = 100.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(3.dp, if (isSpanish.value) Pink80 else BlabPurple, RoundedCornerShape(50.dp))
-                            .background(
-                                animateColorAsState(targetValue = if (isSpanish.value) BlabPurple else Pink80).value,
-                                RoundedCornerShape(50.dp)
-                            )
-                            .padding(1.dp)
+                    Button(
+                        onClick = { isSpanish.value = !isSpanish.value },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Button(
-                            onClick = { isSpanish.value = !isSpanish.value },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            modifier = Modifier.fillMaxSize()
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Phrase of the Day:\n\n" + if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
-                                    color = if (isSpanish.value) Pink80 else BlabPurple,
-                                    fontSize = 18.sp,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                            Text(
+                                text = "Phrase of the Day:\n\n" + if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
+                                color = if (isSpanish.value) Pink80 else BlabPurple,
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
             }
         }
+    }
 
 
-        // Sidebar
-        if (isSidebarVisible.value) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp)) // semi-transparent background
-                    .clickable { isSidebarVisible.value = false } // close sidebar on click outside
-            ) {
-                SidebarMenu(navController) // Sidebar content
-            }
+    // Sidebar
+    if (isSidebarVisible.value) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp)) // semi-transparent background
+                .clickable { isSidebarVisible.value = false } // close sidebar on click outside
+        ) {
+            SidebarMenu(navController) // Sidebar content
         }
     }
+}
 
 
 
 // Fetches an English phrase and translates it to Spanish
 fun fetchAndTranslateRandomPhrase(onResult: (String, String) -> Unit) {
-    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=200"
+    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=50"
 
     val request = Request.Builder().url(url).build()
     val client = OkHttpClient()

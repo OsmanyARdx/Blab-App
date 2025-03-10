@@ -1,7 +1,5 @@
 package com.example.blabapp
 
-import BottomNavigationBar
-import ScreenContent
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -36,9 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Screens.AddFriendsScreen
 import com.example.blabapp.Screens.FriendsListScreen
+import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
 import com.example.blabapp.Screens.LoginScreen
+import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.Screens.RegisterScreen
 
 @Composable
@@ -75,6 +75,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 startDestination = "splashScreen",
                 modifier = Modifier.fillMaxSize()
             ) {
+                // Handle all your screens here in a single NavHost
                 composable("splashScreen") { SplashScreen(navController) }
                 composable("startupScreen") { StartupScreen(navController) }
                 composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
@@ -82,7 +83,11 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("home") { HomeScreen("Home", navController, profileImageUrl = "", context = LocalContext.current) }
                 composable("search") { ScreenContent("Search") }
                 composable("reels") { ScreenContent("Reels") }
-                composable("modules") { ScreenContent("Modules") }
+                composable("modules") { ModulesScreen(navController) }
+                composable("learning/{moduleId}") { backStackEntry ->
+                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+                    LessonScreen(navController, moduleId)
+                }
                 composable("games") { ScreenContent("Games") }
                 composable("messages_screen") { MessagesScreen(navController) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
@@ -95,4 +100,3 @@ fun RootScreen(accountRepository: AccountRepository) {
         }
     }
 }
-

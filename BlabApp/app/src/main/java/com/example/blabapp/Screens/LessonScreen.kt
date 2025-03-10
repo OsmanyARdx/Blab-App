@@ -31,6 +31,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun LessonScreen(navController: NavHostController, moduleId: String) {
+
+    Log.d("Tap","Loaded LessonScreen")
     val lessons = remember { mutableStateOf<List<Lesson>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
 
