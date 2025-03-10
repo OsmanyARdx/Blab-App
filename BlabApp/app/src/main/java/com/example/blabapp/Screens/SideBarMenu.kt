@@ -36,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun SidebarMenu(navController: NavController) {
     val userName = remember { mutableStateOf("Loading...") }
+    val numFriends = remember { mutableStateOf(0) } // Holds the number of friends
 
     LaunchedEffect(Unit) {
         val firebaseAuth = FirebaseAuth.getInstance()
@@ -48,6 +49,9 @@ fun SidebarMenu(navController: NavController) {
                     if (document.exists()) {
                         // Safely retrieve the user's name
                         userName.value = document.getString("name") ?: "User"
+                        // Retrieve the friends list and count the number of friends
+                        val friends = document.get("friendList") as? List<String>
+                        numFriends.value = friends?.size ?: 0 // Update friend count
                     } else {
                         userName.value = "No User Data Found"
                     }
@@ -82,7 +86,8 @@ fun SidebarMenu(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("3 Friends", fontSize = 17.sp, color = Color.White, modifier = Modifier.align(Alignment.CenterHorizontally))
+        // Show the number of friends
+        Text("${numFriends.value} Friends", fontSize = 17.sp, color = Color.White, modifier = Modifier.align(Alignment.CenterHorizontally))
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -105,7 +110,7 @@ fun SidebarMenu(navController: NavController) {
         }
 
         Button(
-            onClick = {},
+            onClick = {} ,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
         ) {
             Text("Log out", fontSize = 14.sp, color = Color.White)
