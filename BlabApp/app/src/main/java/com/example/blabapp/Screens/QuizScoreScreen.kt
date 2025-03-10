@@ -65,7 +65,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = { navController.navigate("modules")},
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
