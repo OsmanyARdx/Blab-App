@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,13 +36,57 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.blabapp.ui.theme.BlabPurple
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun FriendsListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-    val friendsList = listOf("John", "Alice", "Bob")
-    val filteredFriends = friendsList.filter { it.contains(searchQuery, ignoreCase = true) }
+    val friendsList = remember { mutableStateOf<List<String>>(emptyList()) }
+    val friendNames = remember { mutableStateOf<List<String>>(emptyList()) } // Holds the friend names
+    val filteredFriends = friendNames.value.filter { it.contains(searchQuery, ignoreCase = true) }
     val isSidebarVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val firestore = FirebaseFirestore.getInstance()
+        val userId = firebaseAuth.currentUser?.uid
+
+        if (userId != null) {
+            firestore.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // Assuming the friendsList field is an array of userIds in Firestore
+                        val friends = document.get("friendList") as? List<String>
+                        if (friends != null) {
+                            friendsList.value = friends // Update the friends list state
+
+                            // Query Firestore to get names for each friend in the list
+                            val namesList = mutableListOf<String>()
+                            friends.forEach { friendId ->
+                                firestore.collection("users").document(friendId).get()
+                                    .addOnSuccessListener { friendDoc ->
+                                        val friendName = friendDoc.getString("name")
+                                        if (friendName != null) {
+                                            namesList.add(friendName)
+                                        }
+
+                                        // After fetching all the names, update the state
+                                        if (namesList.size == friends.size) {
+                                            friendNames.value = namesList
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    // Handle failure (e.g., show a toast or log the error)
+                }
+        } else {
+            // Handle case when the user is not authenticated
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
@@ -128,8 +173,6 @@ fun FriendsListScreen(navController: NavController) {
                     }
                 }
             }
-
-
         }
         if (isSidebarVisible.value) {
             Box(
@@ -143,5 +186,6 @@ fun FriendsListScreen(navController: NavController) {
         }
     }
 }
+
 
 

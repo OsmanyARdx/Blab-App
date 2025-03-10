@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,13 +38,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.blabapp.ui.theme.BlabPurple
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun AddFriendsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-    val potentialFriends = listOf("Fred", "Janice")
-    val filteredUsers = potentialFriends.filter { it.contains(searchQuery, ignoreCase = true) }
+    val filteredUsers = remember { mutableStateOf<List<User>>(emptyList()) } // State to hold filtered users (using User data class)
     val isSidebarVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(searchQuery) {
+        // Only query Firestore if the search query is not empty
+        if (searchQuery.isNotEmpty()) {
+            val firestore = FirebaseFirestore.getInstance()
+
+            // Query users whose names are similar to the search query
+            firestore.collection("users")
+                .whereGreaterThanOrEqualTo("name", searchQuery)
+                .whereLessThanOrEqualTo("name", searchQuery + "\uf8ff") // The '\uf8ff' is used for matching all names that lexicographically follow the search query
+                .get()
+                .addOnSuccessListener { result ->
+                    val users = mutableListOf<User>()
+                    for (document in result) {
+                        val userName = document.getString("name")
+                        val userId = document.id // Get userId directly from the document ID
+                        if (userName != null) {
+                            users.add(User(userName, userId)) // Add User with name and userId
+                        }
+                    }
+                    filteredUsers.value = users // Update the state with the filtered users
+                }
+                .addOnFailureListener { e ->
+                    // Handle failure (e.g., show a toast or log the error)
+                }
+        } else {
+            filteredUsers.value = emptyList() // Clear the list if the search query is empty
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -51,15 +83,6 @@ fun AddFriendsScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
-                    .drawBehind {
-                        val strokeWidth = 2.dp.toPx()
-                        drawLine(
-                            color = BlabPurple,
-                            start = Offset(0f, size.height),
-                            end = Offset(size.width, size.height),
-                            strokeWidth = strokeWidth
-                        )
-                    }
                     .padding(7.dp)
             ) {
                 IconButton(
@@ -99,13 +122,13 @@ fun AddFriendsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(filteredUsers) { user ->
+                        items(filteredUsers.value) { user ->
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(user, fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
-                                Button(onClick = { /* Add friend logic */ }) {
+                                Text(user.name, fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
+                                Button(onClick = { addFriend(user.userId) }) {
                                     Text("Add")
                                 }
                             }
@@ -142,3 +165,25 @@ fun AddFriendsScreen(navController: NavController) {
         }
     }
 }
+
+fun addFriend(userId: String) {
+    val firestore = FirebaseFirestore.getInstance()
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUserId = firebaseAuth.currentUser?.uid
+
+    if (currentUserId != null) {
+        // Update the current user's friends list with userId
+        firestore.collection("users").document(currentUserId)
+            .update("friendList", FieldValue.arrayUnion(userId)) // Add userId to friends list
+            .addOnSuccessListener {
+                // Handle success (e.g., show a confirmation message)
+            }
+            .addOnFailureListener { e ->
+                // Handle failure (e.g., show an error message)
+            }
+    }
+}
+
+data class User(val name: String, val userId: String)
+
+

@@ -58,8 +58,8 @@ fun BottomNavigationBar(
     )
 
     NavigationBar(
-        modifier = Modifier.background(BlabYellow),
-        containerColor = BlabYellow
+        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         screens.forEach { (screen, icon) ->
             NavigationBarItem(
@@ -76,7 +76,7 @@ fun BottomNavigationBar(
                     Icon(
                         icon,
                         contentDescription = screen,
-                        tint = if (screen == selectedScreen) BlabPurple else Color.Black
+                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.secondary else Color.Black
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
