@@ -1,7 +1,9 @@
 package com.example.blabapp.Screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,22 +34,32 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ModulesScreen(navController: NavHostController) {
-    val modules = getModule()
+    val modules = remember { getModule() }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = "Select a Module", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Select a Module",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onTertiary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (modules.value.isEmpty()) {
-            CircularProgressIndicator()
-        } else {
-            LazyColumn {
-                items(modules.value) { module ->
-                    ModuleItem(module) {
-                        navController.navigate("learning/${module.id}")
+            if (modules.value.isEmpty()) {
+                CircularProgressIndicator()
+            } else {
+                LazyColumn {
+                    items(modules.value) { module ->
+                        ModuleItem(module, navController)
                     }
                 }
             }
@@ -56,48 +68,40 @@ fun ModulesScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ModuleItem(module: Module, onClick: () -> Unit) {
+fun ModuleItem(module: Module, navController: NavHostController) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp).clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
+            navController.navigate("moduleDetail/${module.id}")
+        },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Module ${module.moduleNum}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-            Text(text = "Topic: ${module.topic}", fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Module ${module.moduleNum}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiary)
+            Text(text = "Topic: ${module.topic}", fontSize = 16.sp, color = MaterialTheme.colorScheme.onTertiary)
         }
     }
 }
 
-@Composable
 fun getModule(): MutableState<List<Module>> {
-    val modules = remember { mutableStateOf<List<Module>>(emptyList()) }
+    val modules = mutableStateOf(emptyList<Module>()) // Not using remember
 
-    LaunchedEffect(Unit) {
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("modules")
-            .get()
-            .addOnSuccessListener { documents ->
-                // Map documents to Module objects
-                val moduleList = documents.mapNotNull { document ->
-                    val moduleNum = document.getLong("moduleNum")?.toInt()
-                    val topic = document.getString("topic")
-                    if (moduleNum != null && topic != null) {
-                        Module(moduleNum, topic, document.id)  // Include moduleId
-                    } else null
-                }
-
-                // Sort modules by moduleNum
-                val sortedModules = moduleList.sortedBy { it.moduleNum }
-
-                // Update state with sorted modules
-                modules.value = sortedModules
+    FirebaseFirestore.getInstance().collection("modules")
+        .get()
+        .addOnSuccessListener { documents ->
+            val moduleList = documents.mapNotNull { document ->
+                val moduleNum = document.getLong("moduleNum")?.toInt()
+                val topic = document.getString("topic")
+                if (moduleNum != null && topic != null) {
+                    Module(moduleNum, topic, document.id)
+                } else null
             }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error fetching modules: ${exception.message}")
-            }
-    }
+
+            modules.value = moduleList.sortedBy { it.moduleNum }
+        }
+        .addOnFailureListener { exception ->
+            Log.e("Firestore", "Error fetching modules: ${exception.message}")
+        }
 
     return modules
 }

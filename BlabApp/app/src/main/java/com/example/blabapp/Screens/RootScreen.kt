@@ -38,7 +38,10 @@ import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
 import com.example.blabapp.Screens.LoginScreen
+import com.example.blabapp.Screens.ModuleDetailScreen
 import com.example.blabapp.Screens.ModulesScreen
+import com.example.blabapp.Screens.QuizScoreScreen
+import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.RegisterScreen
 
 @Composable
@@ -84,9 +87,22 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("search") { ScreenContent("Search") }
                 composable("reels") { ScreenContent("Reels") }
                 composable("modules") { ModulesScreen(navController) }
-                composable("learning/{moduleId}") { backStackEntry ->
+                composable("moduleDetail/{moduleId}") { backStackEntry ->
+                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+                    ModuleDetailScreen(navController, moduleId)
+                }
+                composable("lesson/{moduleId}") { backStackEntry ->
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     LessonScreen(navController, moduleId)
+                }
+                composable("quiz/{moduleId}") { backStackEntry ->
+                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+                    QuizScreen(navController, moduleId)
+                }
+                composable("quiz_score/{score}/{totalQuestions}") { backStackEntry ->
+                    val score = backStackEntry.arguments?.getString("score")?.toInt() ?: 0
+                    val totalQuestions = backStackEntry.arguments?.getString("totalQuestions")?.toInt() ?: 0
+                    QuizScoreScreen(navController, score, totalQuestions)
                 }
                 composable("games") { ScreenContent("Games") }
                 composable("messages_screen") { MessagesScreen(navController) }

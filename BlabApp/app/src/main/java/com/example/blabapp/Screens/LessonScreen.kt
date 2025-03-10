@@ -1,7 +1,9 @@
 package com.example.blabapp.Screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 @Composable
 fun LessonScreen(navController: NavHostController, moduleId: String) {
 
-    Log.d("Tap","Loaded LessonScreen")
+    Log.d("Tap", "Loaded LessonScreen")
     val lessons = remember { mutableStateOf<List<Lesson>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
 
@@ -66,98 +68,105 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
             }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.Center
     ) {
-        if (isLoading.value) {
-            CircularProgressIndicator()
-        } else if (lessons.value.isNotEmpty()) {
-            val currentLesson = lessons.value[wordIndex.value]
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLoading.value) {
+                CircularProgressIndicator()
+            } else if (lessons.value.isNotEmpty()) {
+                val currentLesson = lessons.value[wordIndex.value]
 
-            // Always show the word at the top
-            Text(
-                text = "Word: ${currentLesson.word}",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.secondary
-            )
+                Text(
+                    text = "Word: ${currentLesson.word}",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = "Showing: ${displayLabels[lessonIndex.value]}",
-                fontSize = 18.sp,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.secondary
-            )
+                Text(
+                    text = "Showing: ${displayLabels[lessonIndex.value]}",
+                    fontSize = 18.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            val currentText = when (lessonIndex.value) {
-                0 -> currentLesson.definition ?: "N/A"
-                1 -> currentLesson.sentence ?: "N/A"
-                2 -> currentLesson.translation ?: "N/A"
-                else -> currentLesson.definition ?: "N/A"
-            }
+                val currentText = when (lessonIndex.value) {
+                    0 -> currentLesson.definition ?: "N/A"
+                    1 -> currentLesson.sentence ?: "N/A"
+                    2 -> currentLesson.translation ?: "N/A"
+                    else -> currentLesson.definition ?: "N/A"
+                }
 
-            Text(
-                text = currentText,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.secondary
-            )
+                Text(
+                    text = currentText,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                    onClick = {
-                        if (lessonIndex.value > 0) {
-                            lessonIndex.value-- // Move to the previous detail
-                        } else {
-                            if (wordIndex.value > 0) {
-                                wordIndex.value-- // Move to the previous word
-                                lessonIndex.value = 2 // Start at the last detail of the previous word
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        onClick = {
+                            if (lessonIndex.value > 0) {
+                                lessonIndex.value-- // Move to the previous detail
                             } else {
-                                navController.navigate("modules") {
-                                    popUpTo("modules") { inclusive = true }
+                                if (wordIndex.value > 0) {
+                                    wordIndex.value-- // Move to the previous word
+                                    lessonIndex.value =
+                                        2 // Start at the last detail of the previous word
+                                } else {
+                                    navController.navigate("modules") {
+                                        popUpTo("modules") { inclusive = true }
+                                    }
                                 }
                             }
                         }
+                    ) {
+                        Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
                     }
-                ) {
-                    Text(text = "Back", color = MaterialTheme.colorScheme.secondary)
-                }
 
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                    onClick = {
-                        if (lessonIndex.value < 2) {
-                            lessonIndex.value++ // Move to next detail
-                        } else {
-                            lessonIndex.value = 0 // Reset detail index
-                            if (wordIndex.value < lessons.value.size - 1) {
-                                wordIndex.value++ // Move to next word
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        onClick = {
+                            if (lessonIndex.value < 2) {
+                                lessonIndex.value++ // Move to next detail
                             } else {
-                                navController.navigate("modules") {
-                                    popUpTo("modules") { inclusive = true }
+                                lessonIndex.value = 0 // Reset detail index
+                                if (wordIndex.value < lessons.value.size - 1) {
+                                    wordIndex.value++ // Move to next word
+                                } else {
+                                    navController.navigate("modules") {
+                                        popUpTo("modules") { inclusive = true }
+                                    }
                                 }
                             }
                         }
+                    ) {
+                        Text(text = "Next", color = MaterialTheme.colorScheme.onTertiary)
                     }
-                ) {
-                    Text(text = "Next", color = MaterialTheme.colorScheme.secondary)
                 }
-            }
 
+            }
         }
     }
 }
