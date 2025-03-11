@@ -57,6 +57,8 @@ import com.example.blabapp.ui.theme.Pink80
 import com.example.blabapp.ui.theme.Purple40
 import java.text.SimpleDateFormat
 import java.util.*
+import coil.compose.rememberAsyncImagePainter
+
 
 @Composable
 fun rememberPhraseOfTheDay(context: Context): Pair<MutableState<String>, MutableState<String>> {
@@ -97,6 +99,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
     val (phraseInEnglish, phraseInSpanish) = rememberPhraseOfTheDay(context)
     val isSpanish = remember { mutableStateOf(true) }
     val isSidebarVisible = remember { mutableStateOf(false) }
+    val profileImageUrl = remember { mutableStateOf("") }
 
     // Fetch user data
     LaunchedEffect(Unit) {
@@ -111,6 +114,7 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                         userStreak.value = document.getString("userStreak") ?: "0"
                         userRank.value = document.getString("userRank") ?: "Default"
                         userName.value = document.getString("name") ?: "User"
+                        profileImageUrl.value = document.getString("imageUrl") ?: ""
                     }
                 }
                 .addOnFailureListener {
@@ -173,15 +177,28 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Image(
-                    painter = painterResource(id = R.drawable.pfp),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(300.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, BlabPurple, CircleShape)
-                        .background(BlabPurple)
-                )
+                if (profileImageUrl.value.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(profileImageUrl.value),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(300.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, BlabPurple, CircleShape)
+                            .background(BlabPurple),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_profile_photo),
+                        contentDescription = "Default Profile Picture",
+                        modifier = Modifier
+                            .size(300.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, BlabPurple, CircleShape)
+                            .background(BlabPurple)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 

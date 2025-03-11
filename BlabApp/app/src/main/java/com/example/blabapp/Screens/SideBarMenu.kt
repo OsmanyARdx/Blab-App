@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.blabapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,11 +38,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun SidebarMenu(navController: NavController) {
     val userName = remember { mutableStateOf("Loading...") }
     val numFriends = remember { mutableStateOf(0) } // Holds the number of friends
+    val profileImageUrl = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         val firebaseAuth = FirebaseAuth.getInstance()
         val firestore = FirebaseFirestore.getInstance()
         val userId = firebaseAuth.currentUser?.uid
+
 
         if (userId != null) {
             firestore.collection("users").document(userId).get()
@@ -52,6 +55,7 @@ fun SidebarMenu(navController: NavController) {
                         // Retrieve the friends list and count the number of friends
                         val friends = document.get("friendList") as? List<String>
                         numFriends.value = friends?.size ?: 0 // Update friend count
+                        profileImageUrl.value = document.getString("imageUrl") ?: ""
                     } else {
                         userName.value = "No User Data Found"
                     }
@@ -73,11 +77,20 @@ fun SidebarMenu(navController: NavController) {
     ) {
         Spacer(modifier = Modifier.height(150.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.pfp),
-            contentDescription = "Profile Picture",
-            modifier = Modifier.size(120.dp).clip(CircleShape).align(Alignment.CenterHorizontally)
-        )
+        if (profileImageUrl.value.isNotEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(profileImageUrl.value),
+                contentDescription = "Profile Picture",
+                modifier = Modifier.size(120.dp).clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }else{
+            Image(
+                painter = painterResource(id = R.drawable.default_profile_photo),
+                contentDescription = "Profile Picture",
+                modifier = Modifier.size(120.dp).clip(CircleShape).align(Alignment.CenterHorizontally)
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
