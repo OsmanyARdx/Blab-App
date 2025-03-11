@@ -161,7 +161,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 )
                             }
                         }
-                    ) {
                         Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
                     }
 
