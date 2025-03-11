@@ -50,6 +50,10 @@ dependencies {
     }
     implementation ("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation ("androidx.compose.foundation:foundation:1.6.0")
+    implementation ("com.google.accompanist:accompanist-pager:0.25.0")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

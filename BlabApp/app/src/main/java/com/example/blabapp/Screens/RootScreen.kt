@@ -45,7 +45,7 @@ import com.example.blabapp.Screens.RegisterScreen
 fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
 
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends")
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends","learning/{moduleId}")
 
     var selectedScreen by remember { mutableStateOf("home") }
 
