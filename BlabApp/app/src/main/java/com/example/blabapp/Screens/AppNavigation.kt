@@ -76,7 +76,7 @@ fun BottomNavigationBar(
                     Icon(
                         icon,
                         contentDescription = screen,
-                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.secondary else Color.Black
+                        tint = if (screen == selectedScreen) BlabYellow else Color.Black
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
