@@ -149,6 +149,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     1 -> targetLesson.sentence ?: "N/A"
                                     2 -> targetLesson.translation ?: "N/A"
                                     else -> targetLesson.definition ?: "N/A"
+
                                 }
 
                                 Text(
@@ -160,7 +161,10 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 )
                             }
                         }
+                    ) {
+                        Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
                     }
+
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -181,12 +185,14 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 if (wordIndex.value > 0) {
                                     wordIndex.value--
                                     lessonIndex.value = 2
+
                                 } else {
                                     navController.navigate("modules") {
                                         popUpTo("modules") { inclusive = true }
                                     }
                                 }
                             }
+
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.tertiary,
@@ -224,6 +230,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                         Text(text = nextText)
                     }
                 }
+
             }
         }
     }

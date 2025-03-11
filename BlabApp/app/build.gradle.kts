@@ -79,6 +79,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:2.3.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.3")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // For making network requests
 
