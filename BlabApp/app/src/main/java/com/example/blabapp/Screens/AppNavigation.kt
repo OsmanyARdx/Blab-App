@@ -23,25 +23,6 @@ import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
 
-@Composable
-fun AppNavigation(accountRepository: AccountRepository, navController: NavController) {
-    // Initialize NavController here
-    val navController = rememberNavController()
-
-    var selectedScreen by remember { mutableStateOf("home") }
-
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController, selectedScreen) { selectedScreen = it }
-        },
-        containerColor = BlabYellow
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-
-        }
-    }
-}
-
 
 @Composable
 fun BottomNavigationBar(
