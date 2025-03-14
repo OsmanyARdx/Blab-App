@@ -27,12 +27,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.QuizQuestion
+import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuizScreen(navController: NavHostController, moduleId: String) {
@@ -42,32 +45,84 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
     val selectedAnswer = remember { mutableStateOf<String?>(null) }
     val showResult = remember { mutableStateOf(false) }
     val selectedAnswers = remember { mutableStateOf<Map<Int, String>>(emptyMap()) }
+    val userLearning = remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(moduleId) {
+
+    LaunchedEffect(moduleId, userLearning) {
+
+        coroutineScope.launch {
+            val user = UserRepository.getUser()
+            user?.let {
+                userLearning.value = it.learning
+            }
+        }
+
         val db = FirebaseFirestore.getInstance()
+        val quizCollection = if (userLearning.value == "EN") "quizForLearningEN" else "quizForLearningES"
+
         db.collection("modules")
             .document(moduleId)
             .collection("quizes")
             .get()
-            .addOnSuccessListener { snapshot ->
-                val items = snapshot.documents.mapNotNull { doc ->
-                    val question = doc.getString("question")
-                    val optionsList = doc.get("options") as? List<*>
-                    val options = optionsList?.filterIsInstance<String>() ?: emptyList()
-                    val correctAnswer = doc.getString("answer")
+            .addOnSuccessListener { quizSnapshot ->
+                val allQuestions = mutableListOf<QuizQuestion>()
 
-                    if (question != null && options.isNotEmpty() && correctAnswer != null) {
-                        QuizQuestion(question, options, correctAnswer)
-                    } else null
+                // Track the number of quiz documents processed
+                var documentsProcessed = 0
+                val totalDocuments = quizSnapshot.documents.size
+
+                if (totalDocuments == 0) {
+                    isLoading.value = false
                 }
-                quizQuestions.value = items
-                isLoading.value = false
+
+                quizSnapshot.documents.forEach { quizDoc ->
+                    quizDoc.reference.collection(quizCollection).get()
+                        .addOnSuccessListener { snapshot ->
+                            val items = snapshot.documents.mapNotNull { doc ->
+                                if (userLearning.value == "EN") {
+                                    val question = doc.getString("pregunta")
+                                    val optionsList = doc.get("opciones") as? List<*>
+                                    val options = optionsList?.filterIsInstance<String>() ?: emptyList()
+                                    val correctAnswer = doc.getString("respuesta")
+
+                                    if (question != null && options.isNotEmpty() && correctAnswer != null) {
+                                        QuizQuestion(question, options, correctAnswer)
+                                    } else null
+                                } else {
+                                    val question = doc.getString("question")
+                                    val optionsList = doc.get("options") as? List<*>
+                                    val options = optionsList?.filterIsInstance<String>() ?: emptyList()
+                                    val correctAnswer = doc.getString("answer")
+
+                                    if (question != null && options.isNotEmpty() && correctAnswer != null) {
+                                        QuizQuestion(question, options, correctAnswer)
+                                    } else null
+                                }
+                            }
+
+                            allQuestions.addAll(items)
+                            documentsProcessed++
+
+                            // If all documents have been processed, update state
+                            if (documentsProcessed == totalDocuments) {
+                                quizQuestions.value = allQuestions
+                                isLoading.value = false
+                            }
+                        }
+                        .addOnFailureListener {
+                            documentsProcessed++
+                            if (documentsProcessed == totalDocuments) {
+                                isLoading.value = false
+                            }
+                        }
+                }
             }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error fetching quiz: ${exception.message}")
+            .addOnFailureListener {
                 isLoading.value = false
             }
     }
+
 
     Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
@@ -143,7 +198,7 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
                                 currentQuestionIndex.value++
                             } else {
                                 val score = calculateScore(quizQuestions.value, selectedAnswers.value)
-                                navController.navigate("quiz_score/$score/${quizQuestions.value.size}")
+                                navController.navigate("quiz_score/$score/${quizQuestions.value.size}/${moduleId}")
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)

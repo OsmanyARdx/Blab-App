@@ -85,7 +85,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("startupScreen") { StartupScreen(navController) }
                 composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
                 composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
-                composable("home") { HomeScreen("Home", navController, profileImageUrl = "", context = LocalContext.current) }
+                composable("home") { HomeScreen("Home", navController, context = LocalContext.current) }
                 composable("search") { ScreenContent("Search") }
                 composable("reels") { ScreenContent("Reels") }
                 composable("modules") { ModulesScreen(navController) }
@@ -101,10 +101,11 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScreen(navController, moduleId)
                 }
-                composable("quiz_score/{score}/{totalQuestions}") { backStackEntry ->
+                composable("quiz_score/{score}/{totalQuestions}/{moduleId}") { backStackEntry ->
                     val score = backStackEntry.arguments?.getString("score")?.toInt() ?: 0
                     val totalQuestions = backStackEntry.arguments?.getString("totalQuestions")?.toInt() ?: 0
-                    QuizScoreScreen(navController, score, totalQuestions)
+                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+                    QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
                 composable("games") { ScreenContent("Games") }
                 composable("messages_screen") { MessagesScreen(navController) }

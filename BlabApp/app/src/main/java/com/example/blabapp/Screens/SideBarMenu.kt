@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,40 +32,28 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.blabapp.R
+import com.example.blabapp.Repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun SidebarMenu(navController: NavController) {
     val userName = remember { mutableStateOf("Loading...") }
     val numFriends = remember { mutableStateOf(0) } // Holds the number of friends
     val profileImageUrl = remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+
 
     LaunchedEffect(Unit) {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val firestore = FirebaseFirestore.getInstance()
-        val userId = firebaseAuth.currentUser?.uid
-
-
-        if (userId != null) {
-            firestore.collection("users").document(userId).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        // Safely retrieve the user's name
-                        userName.value = document.getString("name") ?: "User"
-                        // Retrieve the friends list and count the number of friends
-                        val friends = document.get("friendList") as? List<String>
-                        numFriends.value = friends?.size ?: 0 // Update friend count
-                        profileImageUrl.value = document.getString("imageUrl") ?: ""
-                    } else {
-                        userName.value = "No User Data Found"
-                    }
-                }
-                .addOnFailureListener {
-                    userName.value = "Failed to Load User Data"
-                }
-        } else {
-            userName.value = "Not Logged In"
+        coroutineScope.launch {
+            val user = UserRepository.getUser()
+            user?.let {
+                userName.value = it.name ?: "User"
+                profileImageUrl.value = it.imageUrl ?: ""
+                numFriends.value = it.friendList.size ?: 0
+            }
         }
     }
 

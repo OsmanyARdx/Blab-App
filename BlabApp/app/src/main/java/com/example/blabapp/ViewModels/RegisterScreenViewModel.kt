@@ -17,11 +17,12 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
         name: String,
         imageUrl: String,
         userBio: String = "My description",
-        userStreak: String = "0",
+        userStreak: Int = 0,
         userRank: String = "Simple Student",
         learning: String,
         chatList: MutableList<String> = mutableListOf<String>(),
         friendList: MutableList<String> = mutableListOf<String>(),
+        completeMod: MutableList<String> = mutableListOf<String>(),
         successfulRegistrationHandler: () -> Unit,
         unsuccessfulRegistrationHandler: (String) -> Unit
     ) {
@@ -45,7 +46,9 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
                         "userRank" to userRank,
                         "learning" to learning,
                         "chatList" to chatList,
-                        "friendList" to friendList
+                        "friendList" to friendList,
+                        "lastLogin" to com.google.firebase.Timestamp.now(),
+                        "completeMod" to completeMod,
                     )
 
                     firestore.collection("users")

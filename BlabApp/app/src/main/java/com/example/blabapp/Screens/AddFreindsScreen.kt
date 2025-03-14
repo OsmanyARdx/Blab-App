@@ -37,10 +37,14 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.blabapp.Repository.UserRepository.refreshUser
 import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddFriendsScreen(navController: NavController) {
@@ -176,7 +180,10 @@ fun addFriend(userId: String) {
         firestore.collection("users").document(currentUserId)
             .update("friendList", FieldValue.arrayUnion(userId)) // Add userId to friends list
             .addOnSuccessListener {
-                // Handle success (e.g., show a confirmation message)
+                val coroutineScope = CoroutineScope(Dispatchers.IO)
+                coroutineScope.launch {
+                    refreshUser()
+                }
             }
             .addOnFailureListener { e ->
                 // Handle failure (e.g., show an error message)
