@@ -46,7 +46,6 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = screen == selectedScreen,
                 onClick = {
-                    // Handle navigation logic
                     navController.navigate(screen) {
                         launchSingleTop = true
                         restoreState = true

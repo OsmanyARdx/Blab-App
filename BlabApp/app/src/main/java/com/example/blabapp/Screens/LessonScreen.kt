@@ -1,5 +1,6 @@
 package com.example.blabapp.Screens
 
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
@@ -25,9 +26,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import com.example.blabapp.Nav.Module
+import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ui.theme.BlabGreen
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun LessonScreen(navController: NavHostController, moduleId: String) {
@@ -42,30 +49,131 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
     val displayLabels = listOf("Definition", "Sentence", "Translation")
 
+
+    // 🟢 Initialize Text-to-Speech ONCE when the screen loads
+    val context = LocalContext.current
+    var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
+    var ttsReady by remember { mutableStateOf(false) }
+
+
+    fun speakText(text: String) {
+        if (ttsReady) {
+            textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        } else {
+            Log.w("TTS", "TTS not ready yet!")
+        }
+    }
+
+
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
+    val userId = firebaseAuth.currentUser?.uid
     LaunchedEffect(moduleId) {
         val db = FirebaseFirestore.getInstance()
+        val tempLessons = mutableListOf<Lesson>()
 
-        db.collection("modules")
-            .document(moduleId)
-            .collection("learning")
+
+
+        Log.d("userid", userId.toString())
+        db.collection("users").document(userId.toString())
+
             .get()
-            .addOnSuccessListener { snapshot ->
-                val items = snapshot.documents.mapNotNull { doc ->
-                    val word = doc.getString("word")
-                    val definition = doc.getString("definition")
-                    val sentence = doc.getString("sentence")
-                    val translation = doc.getString("translation")
+            .addOnSuccessListener { userDoc ->
+                val learningPreference = userDoc.getString("learning") ?: "ES"
+                val subCollection = if (learningPreference == "ES") "learningES" else "learningEN"
 
-                    if (word != null) Lesson(word, definition, sentence, translation) else null
-                }
-                lessons.value = items
-                isLoading.value = false
+                db.collection("modules").document(moduleId)
+                    .collection("learning")
+                    .get()
+                    .addOnSuccessListener { learningSnapshot ->
+                        val learningDocs = learningSnapshot.documents
+                        if (learningDocs.isEmpty()) {
+                            isLoading.value = false
+                            return@addOnSuccessListener
+                        }
+
+                        var completedRequests = 0
+                        learningDocs.forEach { learningDoc ->
+                            learningDoc.reference.collection(subCollection)
+                                .get()
+                                .addOnSuccessListener { subCollectionSnapshot ->
+                                    tempLessons.addAll(
+                                        subCollectionSnapshot.documents.mapNotNull { doc ->
+                                            val isSpanish = learningPreference == "ES"
+                                            Lesson(
+                                                word = doc.getString(if (isSpanish) "word" else "palabra").toString(),
+                                                definition = doc.getString(if (isSpanish) "definition" else "definición"),
+                                                sentence = doc.getString(if (isSpanish) "sentence" else "oración"),
+                                                translation = doc.getString(if (isSpanish) "translation" else "traducción")
+                                            )
+                                        }
+                                    )
+
+                                    completedRequests++
+                                    if (completedRequests == learningDocs.size) {
+                                        lessons.value = tempLessons
+                                        isLoading.value = false
+                                    }
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e("Firestore", "Error fetching $subCollection: ${exception.message}")
+                                    isLoading.value = false
+                                }
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("Firestore", "Error fetching learning: ${exception.message}")
+                        isLoading.value = false
+                    }
             }
             .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error fetching lessons: ${exception.message}")
-                isLoading.value = false
+                Log.e("Firestore", "Error fetching user data: ${exception.message}")
             }
     }
+
+
+    val userLearningPref = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(userId) {
+        userId?.let {
+            firestore.collection("users").document(it)
+                .get()
+                .addOnSuccessListener { userDoc ->
+                    userLearningPref.value = userDoc.getString("learning") ?: "ES" // Default to "ES"
+                    Log.d("learning", userLearningPref.toString())
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching user learning preference: ${exception.message}")
+                }
+        }
+    }
+
+    DisposableEffect(userLearningPref.value) {
+        if (userLearningPref.value != null) {
+            textToSpeech = TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    val locale = if (userLearningPref.value == "EN") Locale("en", "US") else Locale("es", "ES")
+                    val result = textToSpeech?.setLanguage(locale)
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Language $locale is not supported!")
+                    } else {
+                        ttsReady = true
+                    }
+                } else {
+                    Log.e("TTS", "TTS Initialization failed!")
+                }
+            }
+        }
+
+        onDispose {
+            textToSpeech?.stop()
+            textToSpeech?.shutdown()
+        }
+    }
+
+
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -87,10 +195,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (modules.value.isNotEmpty()) {
-                ModuleName(module = modules.value[0])
-                Spacer(modifier = Modifier.weight(1f))
-            }
         }
 
         Column(
@@ -133,6 +237,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     color = Color.Black
                                 )
 
+
                                 Spacer(modifier = Modifier.height(32.dp))
 
                                 Text(
@@ -159,6 +264,22 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     textAlign = TextAlign.Center,
                                     color = Color.Black
                                 )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+
+
+                                IconButton(
+                                    onClick = { speakText(targetLesson.word) },
+                                    modifier = Modifier.padding(top = 16.dp)
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(50.dp),
+                                        imageVector = Icons.Default.VolumeUp,
+                                        contentDescription = "Play Audio",
+                                        tint = Color.Black,
+                                    )
+                                }
                             }
                         }
                         Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
@@ -250,3 +371,5 @@ fun ModuleName(module: Module) {
         )
     }
 }
+
+

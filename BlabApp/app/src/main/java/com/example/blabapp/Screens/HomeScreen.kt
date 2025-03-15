@@ -38,6 +38,7 @@ import java.net.URLEncoder
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Message
+import android.speech.tts.TextToSpeech
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
@@ -58,74 +59,39 @@ import com.example.blabapp.ui.theme.Purple40
 import java.text.SimpleDateFormat
 import java.util.*
 import coil.compose.rememberAsyncImagePainter
-
+import com.example.blabapp.Repository.UserRepository
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.Timestamp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
-fun rememberPhraseOfTheDay(context: Context): Pair<MutableState<String>, MutableState<String>> {
-    val sharedPreferences = context.getSharedPreferences("PhrasePrefs", Context.MODE_PRIVATE)
-    val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+fun HomeScreen(title: String, navController: NavHostController, context: Context) {
+    val userStreak = remember { mutableStateOf("Loading...") }
+    val userRank = remember { mutableStateOf("Loading...") }
+    val userName = remember { mutableStateOf("Loading...") }
+    val profileImageUrl = remember { mutableStateOf("") }
+    val (phraseInEnglish, phraseInSpanish) = rememberPhraseOfTheDay(context)
+    val isSpanish = remember { mutableStateOf(true) }
+    val isSidebarVisible = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val storedDate = sharedPreferences.getString("lastFetchDate", null)
-    val storedEnglish = sharedPreferences.getString("phraseEnglish", "Fetching...")
-    val storedSpanish = sharedPreferences.getString("phraseSpanish", "Fetching...")
-
-    val phraseInEnglish = remember { mutableStateOf(storedEnglish ?: "Fetching...") }
-    val phraseInSpanish = remember { mutableStateOf(storedSpanish ?: "Fetching...") }
 
     LaunchedEffect(Unit) {
-        if (storedDate != todayDate) {
-            fetchAndTranslateRandomPhrase { english, spanish ->
-                phraseInEnglish.value = english
-                phraseInSpanish.value = spanish
-
-                sharedPreferences.edit().apply {
-                    putString("lastFetchDate", todayDate)
-                    putString("phraseEnglish", english)
-                    putString("phraseSpanish", spanish)
-                    apply()
-                }
+        coroutineScope.launch {
+            val user = UserRepository.getUser()
+            user?.let {
+                userStreak.value = it.userStreak.toString()
+                userRank.value = it.userRank ?: "Default"
+                userName.value = it.name ?: "User"
+                profileImageUrl.value = it.imageUrl ?: ""
             }
         }
     }
 
-    return Pair(phraseInEnglish, phraseInSpanish)
-}
-
-@Composable
-fun HomeScreen(title: String, navController: NavHostController, profileImageUrl: String, context: Context) {
-    val userStreak = remember { mutableStateOf("Loading...") }
-    val userRank = remember { mutableStateOf("Loading...") }
-    val userName = remember { mutableStateOf("Loading...") }
-    val (phraseInEnglish, phraseInSpanish) = rememberPhraseOfTheDay(context)
-    val isSpanish = remember { mutableStateOf(true) }
-    val isSidebarVisible = remember { mutableStateOf(false) }
-    val profileImageUrl = remember { mutableStateOf("") }
-
-    // Fetch user data
-    LaunchedEffect(Unit) {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val firestore = FirebaseFirestore.getInstance()
-        val userId = firebaseAuth.currentUser?.uid
-
-        if (userId != null) {
-            firestore.collection("users").document(userId).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        userStreak.value = document.getString("userStreak") ?: "0"
-                        userRank.value = document.getString("userRank") ?: "Default"
-                        userName.value = document.getString("name") ?: "User"
-                        profileImageUrl.value = document.getString("imageUrl") ?: ""
-                    }
-                }
-                .addOnFailureListener {
-                    userStreak.value = "Error"
-                    userRank.value = "Error"
-                }
-        } else {
-            userStreak.value = "Not Logged In"
-            userRank.value = "Not Available"
-        }
-    }
 
 
     Column(Modifier.padding(0.dp)) {
@@ -138,11 +104,26 @@ fun HomeScreen(title: String, navController: NavHostController, profileImageUrl:
                 .padding(7.dp)
         ) {
             IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile",
-                    tint = MaterialTheme.colorScheme.onTertiary
-                )
+                if (profileImageUrl.value.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(profileImageUrl.value),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .border(1.dp, BlabPurple, CircleShape)
+                            .background(BlabPurple),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_profile_photo),
+                        contentDescription = "Default Profile Picture",
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .border(1.dp, BlabPurple, CircleShape)
+                            .background(BlabPurple)
+                    )
+                }
             }
 
             // navigate to Messages screen
@@ -326,4 +307,37 @@ fun translateSentence(sentence: String, onResult: (String) -> Unit) {
             } ?: onResult("No response from server")
         }
     })
+}
+
+
+
+@Composable
+fun rememberPhraseOfTheDay(context: Context): Pair<MutableState<String>, MutableState<String>> {
+    val sharedPreferences = context.getSharedPreferences("PhrasePrefs", Context.MODE_PRIVATE)
+    val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+    val storedDate = sharedPreferences.getString("lastFetchDate", null)
+    val storedEnglish = sharedPreferences.getString("phraseEnglish", "Fetching...")
+    val storedSpanish = sharedPreferences.getString("phraseSpanish", "Fetching...")
+
+    val phraseInEnglish = remember { mutableStateOf(storedEnglish ?: "Fetching...") }
+    val phraseInSpanish = remember { mutableStateOf(storedSpanish ?: "Fetching...") }
+
+    LaunchedEffect(Unit) {
+        if (storedDate != todayDate) {
+            fetchAndTranslateRandomPhrase { english, spanish ->
+                phraseInEnglish.value = english
+                phraseInSpanish.value = spanish
+
+                sharedPreferences.edit().apply {
+                    putString("lastFetchDate", todayDate)
+                    putString("phraseEnglish", english)
+                    putString("phraseSpanish", spanish)
+                    apply()
+                }
+            }
+        }
+    }
+
+    return Pair(phraseInEnglish, phraseInSpanish)
 }

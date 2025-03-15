@@ -27,47 +27,116 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.QuizQuestion
+import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuizScreen(navController: NavHostController, moduleId: String) {
-    val quizQuestions = remember { mutableStateOf<List<QuizQuestion>>(emptyList()) }
     val currentQuestionIndex = remember { mutableStateOf(0) }
-    val isLoading = remember { mutableStateOf(true) }
     val selectedAnswer = remember { mutableStateOf<String?>(null) }
     val showResult = remember { mutableStateOf(false) }
     val selectedAnswers = remember { mutableStateOf<Map<Int, String>>(emptyMap()) }
+    val userLearning = remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
+    val userId = firebaseAuth.currentUser?.uid
+    val quizQuestions = remember { mutableStateOf<List<QuizQuestion>>(emptyList()) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(moduleId) {
-        val db = FirebaseFirestore.getInstance()
-        db.collection("modules")
-            .document(moduleId)
-            .collection("quizes")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val items = snapshot.documents.mapNotNull { doc ->
-                    val question = doc.getString("question")
-                    val optionsList = doc.get("options") as? List<*>
-                    val options = optionsList?.filterIsInstance<String>() ?: emptyList()
-                    val correctAnswer = doc.getString("answer")
+        if (userId == null) {
+            isLoading.value = false
+            return@LaunchedEffect
+        }
 
-                    if (question != null && options.isNotEmpty() && correctAnswer != null) {
-                        QuizQuestion(question, options, correctAnswer)
-                    } else null
-                }
-                quizQuestions.value = items
-                isLoading.value = false
+        // Step 1: Fetch user learning preference
+        firestore.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { userDoc ->
+                val learningPreference = userDoc.getString("learning") ?: "ES" // Default to "ES"
+                val quizCollection =
+                    if (learningPreference == "ES") "quizForLearningES" else "quizForLearningEN"
+
+                // Step 2: Fetch quizzes under the module
+                firestore.collection("modules").document(moduleId)
+                    .collection("quizes")
+                    .get()
+                    .addOnSuccessListener { quizSnapshot ->
+                        val quizDocs = quizSnapshot.documents
+                        if (quizDocs.isEmpty()) {
+                            isLoading.value = false
+                            return@addOnSuccessListener
+                        }
+
+                        val allQuestions = mutableListOf<QuizQuestion>()
+                        var completedRequests = 0
+
+                        // Step 3: Fetch questions from each quiz subcollection
+                        quizDocs.forEach { quizDoc ->
+                            quizDoc.reference.collection(quizCollection)
+                                .get()
+                                .addOnSuccessListener { subCollectionSnapshot ->
+                                    val items = subCollectionSnapshot.documents.mapNotNull { doc ->
+                                        if (learningPreference == "EN") {
+                                            val question = doc.getString("pregunta")
+                                            val optionsList = doc.get("opciones") as? List<*>
+                                            val options = optionsList?.filterIsInstance<String>()
+                                                ?: emptyList()
+                                            val correctAnswer = doc.getString("respuesta")
+
+                                            if (question != null && options.isNotEmpty() && correctAnswer != null) {
+                                                QuizQuestion(question, options, correctAnswer)
+                                            } else null
+                                        } else {
+                                            val question = doc.getString("question")
+                                            val optionsList = doc.get("options") as? List<*>
+                                            val options = optionsList?.filterIsInstance<String>()
+                                                ?: emptyList()
+                                            val correctAnswer = doc.getString("answer")
+
+                                            if (question != null && options.isNotEmpty() && correctAnswer != null) {
+                                                QuizQuestion(question, options, correctAnswer)
+                                            } else null
+                                        }
+                                    }
+
+                                    allQuestions.addAll(items)
+                                    completedRequests++
+
+                                    // If all quizzes are processed, update UI
+                                    if (completedRequests == quizDocs.size) {
+                                        quizQuestions.value = allQuestions
+                                        isLoading.value = false
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    completedRequests++
+                                    if (completedRequests == quizDocs.size) {
+                                        isLoading.value = false
+                                    }
+                                }
+                        }
+                    }
+                    .addOnFailureListener {
+                        isLoading.value = false
+                    }
             }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error fetching quiz: ${exception.message}")
+            .addOnFailureListener {
                 isLoading.value = false
             }
     }
+
 
     Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
@@ -143,7 +212,7 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
                                 currentQuestionIndex.value++
                             } else {
                                 val score = calculateScore(quizQuestions.value, selectedAnswers.value)
-                                navController.navigate("quiz_score/$score/${quizQuestions.value.size}")
+                                navController.navigate("quiz_score/$score/${quizQuestions.value.size}/${moduleId}")
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
