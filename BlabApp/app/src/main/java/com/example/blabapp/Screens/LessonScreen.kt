@@ -55,26 +55,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
     var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
 
-    // 🟢 Initialize Text-to-Speech ONCE when the screen loads
-    DisposableEffect(Unit) {
-        textToSpeech = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                val result = textToSpeech?.setLanguage(Locale("es", "ES"))
-                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Log.e("TTS", "Spanish language is not supported!")
-                } else {
-                    ttsReady = true
-                }
-            } else {
-                Log.e("TTS", "TTS Initialization failed!")
-            }
-        }
-
-        onDispose {
-            textToSpeech?.stop()
-            textToSpeech?.shutdown()
-        }
-    }
 
     fun speakText(text: String) {
         if (ttsReady) {
@@ -94,12 +74,12 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
 
 
-Log.d("userid", userId.toString())
+        Log.d("userid", userId.toString())
         db.collection("users").document(userId.toString())
 
             .get()
             .addOnSuccessListener { userDoc ->
-                val learningPreference = userDoc.getString("learning") ?: "ES" // Default to "ES" if not found
+                val learningPreference = userDoc.getString("learning") ?: "ES"
                 val subCollection = if (learningPreference == "ES") "learningES" else "learningEN"
 
                 db.collection("modules").document(moduleId)
@@ -149,6 +129,47 @@ Log.d("userid", userId.toString())
             .addOnFailureListener { exception ->
                 Log.e("Firestore", "Error fetching user data: ${exception.message}")
             }
+    }
+
+
+    val userLearningPref = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(userId) {
+        userId?.let {
+            firestore.collection("users").document(it)
+                .get()
+                .addOnSuccessListener { userDoc ->
+                    userLearningPref.value = userDoc.getString("learning") ?: "ES" // Default to "ES"
+                    Log.d("learning", userLearningPref.toString())
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching user learning preference: ${exception.message}")
+                }
+        }
+    }
+
+    DisposableEffect(userLearningPref.value) {
+        if (userLearningPref.value != null) {
+            textToSpeech = TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    val locale = if (userLearningPref.value == "EN") Locale("en", "US") else Locale("es", "ES")
+                    val result = textToSpeech?.setLanguage(locale)
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Language $locale is not supported!")
+                    } else {
+                        ttsReady = true
+                    }
+                } else {
+                    Log.e("TTS", "TTS Initialization failed!")
+                }
+            }
+        }
+
+        onDispose {
+            textToSpeech?.stop()
+            textToSpeech?.shutdown()
+        }
     }
 
 

@@ -85,7 +85,7 @@ fun ModulesScreen(navController: NavHostController) {
 @Composable
 fun ModuleItem(module: Module, userLearningPreference: String, isCompleted: Boolean, onClick: () -> Unit) {
     val backgroundColor = if (isCompleted) Color.Green else MaterialTheme.colorScheme.primary
-    val displayTopic = if (userLearningPreference == "ES") module.topic else module.topic
+    val displayTopic = if (userLearningPreference == "ES") module.topic else module.topicES
 
     Card(
         modifier = Modifier
