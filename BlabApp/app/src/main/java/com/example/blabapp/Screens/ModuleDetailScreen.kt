@@ -64,6 +64,25 @@ fun ModuleDetailScreen(navController: NavHostController, moduleId: String) {
             ) {
                 Text(text = "Quiz", fontSize = 30.sp)
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate("game_selection") {
+                        popUpTo("moduleDetails/$moduleId") { inclusive = true }
+                    }
+                },
+                modifier = Modifier.width(200.dp),
+                shape = RoundedCornerShape(50.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
+                Text(text = "Games", fontSize = 30.sp)
+            }
         }
     }
 }

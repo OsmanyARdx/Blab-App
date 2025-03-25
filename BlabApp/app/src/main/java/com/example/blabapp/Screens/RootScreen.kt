@@ -33,7 +33,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Screens.AddFriendsScreen
+import com.example.blabapp.Screens.CardMatchingGameScreen
 import com.example.blabapp.Screens.FriendsListScreen
+import com.example.blabapp.Screens.GameSelectionScreen
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
@@ -105,6 +107,8 @@ fun RootScreen(accountRepository: AccountRepository) {
                     QuizScoreScreen(navController, score, totalQuestions)
                 }
                 composable("games") { ScreenContent("Games") }
+                composable("game_selection") { GameSelectionScreen(navController) }
+                composable("card_matching_game") { CardMatchingGameScreen(navController) }
                 composable("messages_screen") { MessagesScreen(navController) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
