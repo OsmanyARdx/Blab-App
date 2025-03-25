@@ -18,12 +18,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.blabapp.Nav.AccountRepository
+import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.ui.theme.BlabPurple
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 data class Message(val sender: String, val content: String, var isRead: Boolean = false)
 
 @Composable
-fun ChatScreen(navController: NavHostController, contactName: String) {
+fun ChatScreen(navController: NavHostController, contactName: String, accountRepository: AccountRepository) {
     val messages = remember { mutableStateListOf<Message>() }
     var newMessage by remember { mutableStateOf(TextFieldValue("")) }
     val isSidebarVisible = remember { mutableStateOf(false) }
@@ -31,7 +35,7 @@ fun ChatScreen(navController: NavHostController, contactName: String) {
 
     // Placeholder: load messages from Firebase
     LaunchedEffect(contactName) {
-        loadMessagesFromFirebase(contactName) { loadedMessages ->
+        loadMessagesFromFirebase(accountRepository.currentUser.userId, contactName) { loadedMessages ->
             messages.clear()
             messages.addAll(loadedMessages)
         }
@@ -140,17 +144,33 @@ fun UserImage() {
 }
 
 // Placeholder: load messages from Firebase
-fun loadMessagesFromFirebase(contactName: String, onMessagesLoaded: (List<Message>) -> Unit) {
-    // TODO: Replace with actual Firebase  logic
-    val sampleMessages = listOf(
-        Message("You", "¡Hey! ¿Cómo te va?"),
-        Message(contactName, "¡Todo bien! ¿Y tú?"),
-        Message("You", "Igual por aquí, solo relajándome."),
-        Message("You", "¿Has jugado Mario Kart antes?"),
-        Message(contactName, "O sea, ¡sí! ¿Quién no?")
-    )
-    onMessagesLoaded(sampleMessages) // Simulate Firebase callback
+fun loadMessagesFromFirebase(
+    currentUser: String,
+    contactName: String,
+    onMessagesLoaded: (List<Message>) -> Unit
+) {
+    val db = FirebaseFirestore.getInstance()
+
+    db.collection("messages")
+        .whereIn("sender", listOf(currentUser, contactName)) // Messages where sender is either user
+        .whereIn("receiver", listOf(currentUser, contactName)) // Messages where receiver is either user
+        .orderBy("timestamp", Query.Direction.ASCENDING)
+        .get()
+        .addOnSuccessListener { result ->
+            val messages = result.map { document ->
+                Message(
+                    sender = document.getString("sender") ?: "",
+                    content = document.getString("content") ?: "",
+                    isRead = document.getBoolean("isRead") ?: false
+                )
+            }
+            onMessagesLoaded(messages)
+        }
+        .addOnFailureListener {
+            onMessagesLoaded(emptyList()) // Handle failure
+        }
 }
+
 
 // Placeholder: send messages to Firebase
 fun sendMessageToFirebase(sender: String, content: String, contactName: String) {

@@ -43,6 +43,7 @@ import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.RegisterScreen
+import com.example.blabapp.Screens.WordleScreen
 
 @Composable
 fun RootScreen(accountRepository: AccountRepository) {
@@ -107,11 +108,11 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-                composable("games") { ScreenContent("Games") }
+                composable("games") { WordleScreen() }
                 composable("messages_screen") { MessagesScreen(navController) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
-                    ChatScreen(navController, contactName)
+                    ChatScreen(navController, contactName, accountRepository)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
