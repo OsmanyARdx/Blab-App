@@ -1,7 +1,18 @@
 package com.example.blabapp.Screens
 
+import android.content.Context
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import android.os.Bundle
+import android.os.Environment
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.print.PrintManager
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,11 +41,17 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import com.example.blabapp.Nav.Module
+import com.example.blabapp.R
 import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ui.theme.BlabGreen
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.Locale
+
 
 @Composable
 fun LessonScreen(navController: NavHostController, moduleId: String) {
@@ -43,18 +60,16 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
     val lessons = remember { mutableStateOf<List<Lesson>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
     val modules = getModule()
+    val module = remember { mutableStateOf<List<Module>>(emptyList()) }
 
     val wordIndex = remember { mutableStateOf(0) }
     val lessonIndex = remember { mutableStateOf(0) }
 
     val displayLabels = listOf("Definition", "Sentence", "Translation")
 
-
-    // 🟢 Initialize Text-to-Speech ONCE when the screen loads
     val context = LocalContext.current
     var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
     var ttsReady by remember { mutableStateOf(false) }
-
 
     fun speakText(text: String) {
         if (ttsReady) {
@@ -64,7 +79,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
         }
     }
 
-
     val firebaseAuth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
     val userId = firebaseAuth.currentUser?.uid
@@ -72,11 +86,8 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
         val db = FirebaseFirestore.getInstance()
         val tempLessons = mutableListOf<Lesson>()
 
-
-
         Log.d("userid", userId.toString())
         db.collection("users").document(userId.toString())
-
             .get()
             .addOnSuccessListener { userDoc ->
                 val learningPreference = userDoc.getString("learning") ?: "ES"
@@ -131,7 +142,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
             }
     }
 
-
     val userLearningPref = remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(userId) {
@@ -172,8 +182,21 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
         }
     }
 
+    val moduleName = remember { mutableStateOf("Loading...") }
+    val selectedModule = remember { mutableStateOf<Module?>(null) } // To store the selected module
 
+    LaunchedEffect(moduleId) {
+        val db = FirebaseFirestore.getInstance()
 
+        db.collection("modules").document(moduleId)
+            .get()
+            .addOnSuccessListener { document ->
+                moduleName.value = document.getString("topic") ?: "Module"
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "Error fetching module name: ${exception.message}")
+            }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -193,8 +216,8 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                 )
             }
 
+            Text(text = moduleName.value, fontSize = 20.sp, color = Color.Black)
             Spacer(modifier = Modifier.weight(1f))
-
         }
 
         Column(
@@ -211,7 +234,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                 val currentLesson = lessons.value[wordIndex.value]
 
                 AnimatedContent(targetState = currentLesson) { targetLesson ->
-
                     Card(
                         modifier = Modifier
                             .width(300.dp)
@@ -237,7 +259,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     color = Color.Black
                                 )
 
-
                                 Spacer(modifier = Modifier.height(32.dp))
 
                                 Text(
@@ -254,7 +275,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     1 -> targetLesson.sentence ?: "N/A"
                                     2 -> targetLesson.translation ?: "N/A"
                                     else -> targetLesson.definition ?: "N/A"
-
                                 }
 
                                 Text(
@@ -266,8 +286,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 )
 
                                 Spacer(modifier = Modifier.height(32.dp))
-
-
 
                                 IconButton(
                                     onClick = { speakText(targetLesson.word) },
@@ -284,7 +302,6 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                         }
                         Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
                     }
-
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -305,14 +322,12 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 if (wordIndex.value > 0) {
                                     wordIndex.value--
                                     lessonIndex.value = 2
-
                                 } else {
                                     navController.navigate("modules") {
                                         popUpTo("modules") { inclusive = true }
                                     }
                                 }
                             }
-
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.tertiary,
@@ -351,25 +366,107 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                     }
                 }
 
+                // PDF download button
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    modifier = Modifier
+                        .border(2.dp, Color.Black, RoundedCornerShape(50.dp))
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(MaterialTheme.colorScheme.tertiary),
+                    onClick = {
+                        //downloadPDF()
+                        printPdf(context)
+
+                    },
+
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text(text = "Download PDF")
+                }
             }
         }
     }
 }
 
-@Composable
-fun ModuleName(module: Module) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Text(
-            text = "Module #${module.moduleNum}",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onTertiary
-        )
-    }
-}
+//fun downloadPDF(module: Module, context: Context) {
+//    // Determine  PDF file based on the module's topic
+//    val pdfName = when (module.topic) {
+//        "Greetings" -> "greetings.pdf"
+//        "Hobbies" -> "hobbies.pdf"
+//        "Family" -> "family.pdf"
+//        else -> "default.pdf"
+//    }
+//
+//    // Get reference to Firebase Storage
+//    val storageRef = FirebaseStorage.getInstance().reference.child("pdfs/$pdfName")
+//
+//    // Download the PDF from Firebase Storage
+//    storageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+//        // Save PDF to device
+//        val file = File(context.getExternalFilesDir(null), pdfName)
+//        file.writeBytes(bytes)
+//
+//        // Show success message
+//        Toast.makeText(context, "$pdfName downloaded successfully", Toast.LENGTH_SHORT).show()
+//    }.addOnFailureListener {
+//        // Show error message
+//        Toast.makeText(context, "Failed to download $pdfName", Toast.LENGTH_SHORT).show()
+//    }
+//}
 
+
+//Placeholder pdf
+fun printPdf(context: Context) {
+    val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
+
+    val adapter = object : PrintDocumentAdapter() {
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes?,
+            cancellationSignal: android.os.CancellationSignal?,
+            callback: LayoutResultCallback?,
+            extras: Bundle?
+        ) {
+            if (cancellationSignal?.isCanceled == true) {
+                callback?.onLayoutCancelled()
+                return
+            }
+
+            val info = PrintDocumentInfo.Builder("greetings.pdf")
+                .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                .setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN)
+                .build()
+
+            callback?.onLayoutFinished(info, true)
+        }
+
+        override fun onWrite(
+            pages: Array<out android.print.PageRange>?,
+            destination: android.os.ParcelFileDescriptor?,
+            cancellationSignal: android.os.CancellationSignal?,
+            callback: WriteResultCallback?
+        ) {
+            try {
+                val inputStream = context.resources.openRawResource(R.raw.greetings)
+                val outputStream = FileOutputStream(destination?.fileDescriptor)
+
+                inputStream.copyTo(outputStream)
+
+                inputStream.close()
+                outputStream.close()
+
+                callback?.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+            } catch (e: IOException) {
+                e.printStackTrace()
+                callback?.onWriteFailed(e.message)
+            }
+        }
+    }
+
+    printManager.print("Greetings PDF", adapter, null)
+}
 

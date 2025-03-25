@@ -98,7 +98,7 @@ fun SidebarMenu(navController: NavController) {
                 Button(
                     onClick = {
                         when (item) {
-                            "Profile" -> {}
+                            "Profile" ->  navController.navigate("profile")
                             "Friend List" -> navController.navigate("friends_list")
                             "Settings" -> {}
                             "Saved" -> {}
