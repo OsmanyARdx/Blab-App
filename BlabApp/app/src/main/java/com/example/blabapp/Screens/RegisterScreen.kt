@@ -72,7 +72,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     val logoPic = painterResource(R.drawable.logo)
 
 
-    var selectedLanguage by rememberSaveable { mutableStateOf("ES") }
+    var selectedLanguage by rememberSaveable { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
 
@@ -119,8 +119,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "EN" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "EN") MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
-                        contentColor = BlabYellow
+                        containerColor = if (selectedLanguage == "EN") BlabPurple else MaterialTheme.colorScheme.tertiary,
+                        contentColor = Color.Black
                     )
                 ) {
                     Text("English", fontSize = 16.sp)
@@ -130,8 +130,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "ES" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "ES") MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
-                        contentColor = BlabYellow
+                        containerColor = if (selectedLanguage == "ES") BlabPurple else MaterialTheme.colorScheme.tertiary,
+                        contentColor = Color.Black
                     )
                 ) {
                     Text("Spanish", fontSize = 16.sp)
@@ -146,13 +146,14 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                         phone.isEmpty() || phone.length < 10 -> showToast(context, "Enter a valid phone number")
                         password.length < 6 -> showToast(context, "Password must be at least 6 characters")
                         password != confirmPassword -> showToast(context, "Passwords do not match")
+                        selectedLanguage == null -> showToast(context, "Please select a language") // Language selection check
                         else -> {
                             viewModel.registerUserFirebase(
                                 email = email,
                                 password = password,
                                 name = "$firstName $lastName",
                                 imageUrl = "",
-                                learning = selectedLanguage,
+                                learning = selectedLanguage!!, // Use selectedLanguage with non-null assertion
                                 successfulRegistrationHandler = {
                                     Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
                                     navController.navigate("LoginScreen")
@@ -171,7 +172,6 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     .clip(RoundedCornerShape(50.dp))
                     .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.Black)
-
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
