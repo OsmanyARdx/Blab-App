@@ -36,7 +36,7 @@ fun GameSelectionScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Choose a Game 🎮",
+            text = "Choose a Game",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -44,25 +44,6 @@ fun GameSelectionScreen(navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-
-        // Quiz Button
-        Button(
-            onClick = { navController.navigate("game1_screen") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(60.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
-        ) {
-            Text(
-                text = "Game1",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onTertiary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Card Matching Button
         Button(

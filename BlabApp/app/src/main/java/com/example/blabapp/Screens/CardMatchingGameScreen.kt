@@ -52,7 +52,6 @@ fun CardMatchingGameScreen(navController: NavHostController) {
     // Randomly select 6 words for the game
     val selectedWords = words.shuffled().take(6)
 
-    // Create shuffled cards and prepare state variables
     val shuffledCards = remember { (selectedWords + selectedWords.map { it.second to it.first }).shuffled() }
     val matchedPairs = remember { mutableStateOf(mutableSetOf<Int>()) }
     val flippedCards = remember { mutableStateOf<List<Int>>(emptyList()) }
@@ -75,7 +74,6 @@ fun CardMatchingGameScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Lazy grid to display the cards
         LazyVerticalGrid(
             columns = GridCells.Fixed(3), // You can adjust this if needed
             modifier = Modifier
@@ -148,13 +146,12 @@ fun CardMatchingGameScreen(navController: NavHostController) {
     }
 }
 
-// Function to check if flipped cards are a match
 private fun checkMatch(
     flippedCards: MutableState<List<Int>>,
     shuffledCards: List<Pair<String, String>>,
     matchedPairs: MutableState<MutableSet<Int>>,
     allMatched: MutableState<Boolean>,
-    showDialog: MutableState<Boolean> // Pass the showDialog state here
+    showDialog: MutableState<Boolean>
 ) {
     if (flippedCards.value.size == 2) {
         val (firstIndex, secondIndex) = flippedCards.value
