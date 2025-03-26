@@ -25,22 +25,25 @@ fun ModulesScreen(navController: NavHostController) {
     val completeMod = remember { mutableStateOf<List<String>>(emptyList()) }
     val userLearningPreference = remember { mutableStateOf("ES") }
 
-    // Fetch completed modules from Firestore
+    // Fetch completed modules from Firestore when the screen is navigated to
     LaunchedEffect(Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
-        val db = FirebaseFirestore.getInstance()
 
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                val completedModules = document.get("completeMod") as? List<String> ?: emptyList()
-                completeMod.value = completedModules
-                val learningPreference = document.getString("learning") ?: "ES"
-                userLearningPreference.value = learningPreference
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error fetching completed modules: ${exception.message}")
-            }
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    val completedModules = document.get("completeMod") as? List<String> ?: emptyList()
+                    completeMod.value = completedModules
+                    val learningPreference = document.getString("learning") ?: "ES"
+                    userLearningPreference.value = learningPreference
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firestore", "Error fetching completed modules: ${exception.message}")
+                }
     }
+
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -81,6 +84,7 @@ fun ModulesScreen(navController: NavHostController) {
         }
     }
 }
+
 
 @Composable
 fun ModuleItem(module: Module, userLearningPreference: String, isCompleted: Boolean, onClick: () -> Unit) {

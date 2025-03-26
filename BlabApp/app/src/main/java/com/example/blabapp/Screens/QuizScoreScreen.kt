@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions: Int, moduleNum: String) {
     val scorePercentage = (score.toFloat() / totalQuestions.toFloat()) * 100
     val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
@@ -77,17 +78,26 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
 
             Button(
                 onClick = {
-                    val firebaseAuth = FirebaseAuth.getInstance()
-                    val userId = firebaseAuth.currentUser?.uid
-
-                    if(scorePercentage.toInt() == 100){
-                        if (userId != null) {
-                            upgradeUserRank(userId)
-                            upgradeCompleteMod(userId, moduleNum)
-                        }
+                    // Update Firestore after quiz completion
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                    if (scorePercentage.toInt() == 100 && userId != null) {
+                        val db = FirebaseFirestore.getInstance()
+                        val userRef = db.collection("users").document(userId)
+                        userRef.update("completeMod", FieldValue.arrayUnion(moduleNum))
                     }
-                    navController.navigate("modules")
-                          },
+
+                    upgradeUserRank(userId.toString())
+                    // Refresh the user repository before navigating back to modules
+                    coroutineScope.launch {
+                        UserRepository.refreshUser()
+                    }
+
+                    navController.navigate("modules") {
+                        // Prevent duplicate back stack entries
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
@@ -116,39 +126,6 @@ fun upgradeUserRank(userId: String) {
                         .addOnSuccessListener {
 
                             Log.d("Firebase", "User rank upgraded to $newRank")
-                            val coroutineScope = CoroutineScope(Dispatchers.IO)
-                            coroutineScope.launch {
-                                refreshUser()
-                            }
-
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("Firebase", "Failed to update user rank", e)
-                        }
-                }
-            }
-        }
-        .addOnFailureListener { e ->
-            Log.e("Firebase", "Failed to fetch user rank", e)
-        }
-}
-
-
-fun upgradeCompleteMod(userId: String, moduleNumber: String) {
-    val firestore = FirebaseFirestore.getInstance()
-    val userRef = firestore.collection("users").document(userId)
-
-    userRef.get()
-        .addOnSuccessListener { document ->
-            if (document.exists()) {
-                val currentRank = document.getString("userRank") ?: "Simple Student"
-                val newRank = getNextRank(currentRank)
-
-                if (newRank != currentRank) { // Upgrade only if different
-                    userRef.update("completeMod", FieldValue.arrayUnion(moduleNumber))
-                        .addOnSuccessListener {
-
-                            Log.d("Firebase", "User completeMod updated")
                             val coroutineScope = CoroutineScope(Dispatchers.IO)
                             coroutineScope.launch {
                                 refreshUser()
