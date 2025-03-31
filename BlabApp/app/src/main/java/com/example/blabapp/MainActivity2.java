@@ -1,5 +1,6 @@
 package com.example.blabapp;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -81,9 +82,12 @@ public class MainActivity2 extends AppCompatActivity {
                     return null;
                 });
 
+
+
+
         // Load the Texture
         Texture.builder()
-                .setSource(this, R.drawable.fox_face_mesh_texture)
+                .setSource(this, R.drawable.m)
                 .build()
                 .thenAccept(texture -> {
                     this.texture = texture;
@@ -121,7 +125,7 @@ public class MainActivity2 extends AppCompatActivity {
                     augmentedFaceNode.setParent(sceneView.getScene());
 
                     // ✅ Attach face filter model and texture
-                    augmentedFaceNode.setFaceRegionsRenderable(modelRenderable);
+
                     augmentedFaceNode.setFaceMeshTexture(texture);
 
                     isAdded = true;
