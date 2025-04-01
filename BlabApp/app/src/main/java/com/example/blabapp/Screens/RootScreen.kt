@@ -23,7 +23,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.ChatScreen
-import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.MessagesScreen
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
 import androidx.compose.ui.unit.dp
@@ -111,10 +111,10 @@ fun RootScreen(accountRepository: AccountRepository) {
                 }
                 composable("games") { WordleScreen() }
                 composable("messages_screen") { MessagesScreen(navController, accountRepository) }
-                composable("chat_screen/{contactName}") { backStackEntry ->
-                    val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
-                    Log.e("errpr", contactName)
-                    ChatScreen(navController, contactName, accountRepository)
+                composable("ChatScreen/{chatRoomId}/{currentUserId}") { backStackEntry ->
+                    val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: ""
+                    val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
+                    ChatScreen(navController, chatRoomId, currentUserId)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }

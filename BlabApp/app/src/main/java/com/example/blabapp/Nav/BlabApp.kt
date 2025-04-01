@@ -5,6 +5,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
+
+
 class BlabApp : Application() {
     companion object{
         lateinit var accountRepository: AccountRepository

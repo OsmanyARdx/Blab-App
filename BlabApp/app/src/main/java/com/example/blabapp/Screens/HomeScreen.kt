@@ -51,7 +51,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.MessagesScreen
 import com.example.blabapp.Screens.SidebarMenu
 import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink80
