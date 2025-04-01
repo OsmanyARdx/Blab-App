@@ -59,11 +59,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddFriendsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-    val filteredUsers = remember { mutableStateOf<List<User>>(emptyList()) } // State to hold filtered users (using User data class)
+    val filteredUsers = remember { mutableStateOf<List<User>>(emptyList()) }
     val isSidebarVisible = remember { mutableStateOf(false) }
     val profileImageUrl = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
-
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
     LaunchedEffect(searchQuery) {
         coroutineScope.launch {
@@ -77,28 +77,24 @@ fun AddFriendsScreen(navController: NavController) {
         // Only query Firestore if the search query is not empty
         if (searchQuery.isNotEmpty()) {
             val firestore = FirebaseFirestore.getInstance()
-
-            // Query users whose names are similar to the search query
             firestore.collection("users")
                 .whereGreaterThanOrEqualTo("name", searchQuery)
-                .whereLessThanOrEqualTo("name", searchQuery + "\uf8ff") // The '\uf8ff' is used for matching all names that lexicographically follow the search query
+                .whereLessThanOrEqualTo("name", searchQuery + "\uf8ff")
                 .get()
                 .addOnSuccessListener { result ->
                     val users = mutableListOf<User>()
                     for (document in result) {
                         val userName = document.getString("name")
-                        val userId = document.id // Get userId directly from the document ID
-                        if (userName != null) {
-                            users.add(User(userName, userId)) // Add User with name and userId
+                        val userId = document.id
+                        if (userName != null && userId != currentUserId) {
+                            users.add(User(userName, userId))
                         }
                     }
-                    filteredUsers.value = users // Update the state with the filtered users
+                    filteredUsers.value = users
                 }
-                .addOnFailureListener { e ->
-                    // Handle failure (e.g., show a toast or log the error)
-                }
+                .addOnFailureListener { e -> }
         } else {
-            filteredUsers.value = emptyList() // Clear the list if the search query is empty
+            filteredUsers.value = emptyList()
         }
     }
 

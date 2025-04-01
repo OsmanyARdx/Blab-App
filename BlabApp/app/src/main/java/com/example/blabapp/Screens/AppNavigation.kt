@@ -46,10 +46,7 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = screen == selectedScreen,
                 onClick = {
-                    navController.navigate(screen) {
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(screen)
                     onScreenSelected(screen)
                 },
                 icon = {

@@ -77,7 +77,7 @@ fun StartupScreen(navController: NavController) {
                     .clip(RoundedCornerShape(50.dp))
                     .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = Color.Black
                 ),
             ) {
@@ -93,7 +93,7 @@ fun StartupScreen(navController: NavController) {
                     .clip(RoundedCornerShape(50.dp))
                     .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = Color.Black),
             ){
                 Text(text = "Register", fontSize = 30.sp)

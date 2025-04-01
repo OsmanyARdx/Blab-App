@@ -112,7 +112,12 @@ fun SidebarMenu(navController: NavController) {
         }
 
         Button(
-            onClick = {} ,
+            onClick = {
+                FirebaseAuth.getInstance().signOut()
+                navController.navigate("loginScreen") {
+                    popUpTo("loginScreen") { inclusive = true }
+                }
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
         ) {
             Text("Log out", fontSize = 14.sp, color = Color.White)
