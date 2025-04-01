@@ -1,5 +1,6 @@
 package com.example.blabapp.Screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,21 +28,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.blabapp.Nav.AccountRepository
+import com.example.blabapp.ViewModels.MessagesScreenViewModel
+import com.example.blabapp.ViewModels.RegisterScreenViewModel
+import com.example.blabapp.ViewModels.WordleViewModel
 import com.example.blabapp.ui.theme.Purple40
 import java.net.URLEncoder
 
 
 @Composable
-fun MessagesScreen(navController: NavHostController) {
+fun MessagesScreen(navController: NavHostController, accountRepository: AccountRepository) {
     // Sample conversations (Replace with Firebase data)
-    val conversations = remember {
-        mutableStateListOf(
-            Message("John", "O sea, ¡sí! ¿Quién no?", false),
-            Message("Alice", "¡Quedamos mañana!", false),
-            Message("Bob", "¿Terminaste el proyecto?", true) // Already read
-        )
+    val viewModel = viewModel { MessagesScreenViewModel(accountRepository) }
+    val conversations by viewModel.conversations.collectAsState()
+
+    // Fetch conversations when the screen is loaded
+    LaunchedEffect(Unit) {
+        viewModel.fetchConversations()
     }
+
+
 
     Box(
         modifier = Modifier
@@ -77,7 +88,6 @@ fun MessagesScreen(navController: NavHostController) {
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .clickable {
-                                conversation.isRead = true
                                 val encodedName = URLEncoder.encode(conversation.sender, "UTF-8")
                                 navController.navigate("chat_screen/$encodedName") // navigate to Chat screen
                             },

@@ -1,7 +1,10 @@
 package com.example.blabapp.Nav
 
 
+import com.example.blabapp.Screens.Message
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 
@@ -23,6 +26,32 @@ class AccountRepository(private var fireStoreDb : FirebaseFirestore): UserReposi
         return user ?: User()
 
     }
+
+
+
+
+
+    fun loadConversations(onConversationsLoaded: (List<Message>) -> Unit) {
+        fireStoreDb.collection("messages")
+                .whereIn("sender", listOf(FirebaseAuth.getInstance().uid.toString())) // Fetch only messages sent by the user
+                .orderBy("timestamp", Query.Direction.DESCENDING) // Sort by recent messages
+                .get()
+                .addOnSuccessListener { result ->
+                    val messages = result.map { document ->
+                        Message(
+                            sender = document.getString("sender") ?: "",
+                            content = document.getString("content") ?: "",
+                            isRead = document.getBoolean("isRead") ?: false
+                        )
+                    }.distinctBy { it.sender } // Get only unique senders
+                    onConversationsLoaded(messages)
+                }
+                .addOnFailureListener {
+                    onConversationsLoaded(emptyList()) // Handle failure
+                }
+        }
+}
+
     /*
     override suspend fun getUser(uid:String): User{
         var user:User
@@ -52,4 +81,3 @@ class AccountRepository(private var fireStoreDb : FirebaseFirestore): UserReposi
     }
     */
 
-}

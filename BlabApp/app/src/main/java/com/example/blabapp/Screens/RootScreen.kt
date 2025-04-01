@@ -2,6 +2,7 @@ package com.example.blabapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.tween
@@ -109,9 +110,10 @@ fun RootScreen(accountRepository: AccountRepository) {
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
                 composable("games") { WordleScreen() }
-                composable("messages_screen") { MessagesScreen(navController) }
+                composable("messages_screen") { MessagesScreen(navController, accountRepository) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
+                    Log.e("errpr", contactName)
                     ChatScreen(navController, contactName, accountRepository)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
