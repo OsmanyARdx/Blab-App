@@ -42,6 +42,7 @@ import com.example.blabapp.Screens.ModuleDetailScreen
 import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
+import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
 
 @Composable
@@ -87,7 +88,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
                 composable("home") { HomeScreen("Home", navController, context = LocalContext.current) }
                 composable("search") { ScreenContent("Search") }
-                composable("reels") { ScreenContent("Reels") }
+                composable("reels") { ReelsScreen(navController) }
                 composable("modules") { ModulesScreen(navController) }
                 composable("moduleDetail/{moduleId}") { backStackEntry ->
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
