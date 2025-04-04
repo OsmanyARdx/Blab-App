@@ -66,7 +66,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3), // Adjust this if needed
+            columns = GridCells.Fixed(3),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
@@ -87,8 +87,8 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth()
-                            .aspectRatio(1.5f) // Adjust aspect ratio for a better card layout
-                            .fillMaxHeight(0.25f), // Optional: Adjust card height
+                            .aspectRatio(1.5f)
+                            .fillMaxHeight(0.25f),
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(8.dp),
                         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -142,27 +142,27 @@ private fun getWordsForLevel(levelId: String): List<Pair<String, String>> {
             "hola" to "hello",
             "adios" to "goodbye",
             "gracias" to "thank you",
-            "perro" to "dog",
-            "gato" to "cat",
-            "amigo" to "friend"
+            "buenos dias" to "good morning",
+            "buenas noches" to "good night",
+            "buenas tardes" to "good afternoon"
         )
         "2" -> listOf(
-            "sol" to "sun",
-            "libro" to "book",
+            "padre" to "father",
+            "madre" to "mother",
             "familia" to "family",
-            "escuela" to "school",
-            "ciudad" to "city",
-            "pais" to "country"
+            "hermano" to "brother",
+            "hermana" to "sister",
+            "mascota" to "pet"
         )
         "3" -> listOf(
-            "mujer" to "woman",
-            "hombre" to "man",
-            "niño" to "child",
-            "animal" to "animal",
-            "comida" to "food",
-            "cielo" to "sky"
+            "comer" to "to eat",
+            "pintar" to "to paint",
+            "correr" to "to run",
+            "leer" to "to read",
+            "jugar" to "to play",
+            "libro" to "book"
         )
-        else -> listOf() // Default empty list if the levelId is invalid
+        else -> listOf()
     }
 }
 
@@ -198,7 +198,6 @@ private fun checkMatch(
     }
 }
 
-// Dialog Composable to display the "Good Job!" message
 @Composable
 fun GoodJobDialog(onDismiss: () -> Unit) {
     AlertDialog(
