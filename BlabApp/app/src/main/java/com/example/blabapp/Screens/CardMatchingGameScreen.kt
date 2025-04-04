@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.blabapp.ui.theme.BlabBlue
-import com.example.blabapp.ui.theme.BlabGreen
 
 @Composable
 fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
@@ -46,8 +43,8 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
     val shuffledCards = remember { (selectedWords + selectedWords.map { it.second to it.first }).shuffled() }
     val matchedPairs = remember { mutableStateOf(mutableSetOf<Int>()) }
     val flippedCards = remember { mutableStateOf<List<Int>>(emptyList()) }
-    val allMatched = remember { mutableStateOf(false) } // Flag for completion
-    val showDialog = remember { mutableStateOf(false) } // To control dialog visibility
+    val allMatched = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
