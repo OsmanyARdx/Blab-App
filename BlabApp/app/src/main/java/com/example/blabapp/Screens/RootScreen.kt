@@ -35,6 +35,7 @@ import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Screens.AddFriendsScreen
 import com.example.blabapp.Screens.CardMatchingGameScreen
 import com.example.blabapp.Screens.FriendsListScreen
+import com.example.blabapp.Screens.GameLevelScreen
 import com.example.blabapp.Screens.GameSelectionScreen
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
@@ -110,9 +111,15 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-                composable("games") { ScreenContent("Games") }
-                composable("game_selection") { GameSelectionScreen(navController) }
-                composable("card_matching_game") { CardMatchingGameScreen(navController) }
+                composable("games") { GameLevelScreen(navController) }
+                composable("game_selection/{levelId}") { backStackEntry ->
+                    val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
+                    GameSelectionScreen(navController, levelId)
+                }
+                composable("card_matching_game/{levelId}") { backStackEntry ->
+                    val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
+                    CardMatchingGameScreen(navController, levelId)
+                }
                 composable("messages_screen") { MessagesScreen(navController) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName") ?: ""

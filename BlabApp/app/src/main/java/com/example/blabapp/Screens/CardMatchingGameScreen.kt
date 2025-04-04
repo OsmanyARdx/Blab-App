@@ -37,17 +37,8 @@ import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
 
 @Composable
-fun CardMatchingGameScreen(navController: NavHostController) {
-    val words = listOf(
-        "hola" to "hello",
-        "adios" to "goodbye",
-        "gracias" to "thank you",
-        "perro" to "dog",
-        "gato" to "cat",
-        "amigo" to "friend",
-        "sol" to "sun",
-        "libro" to "book"
-    )
+fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
+    val words = getWordsForLevel(levelId)
 
     // Randomly select 6 words for the game
     val selectedWords = words.shuffled().take(6)
@@ -66,7 +57,7 @@ fun CardMatchingGameScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Card Matching Game",
+            text = "Card Matching Game (Level $levelId)",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -75,7 +66,7 @@ fun CardMatchingGameScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3), // You can adjust this if needed
+            columns = GridCells.Fixed(3), // Adjust this if needed
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
@@ -96,8 +87,8 @@ fun CardMatchingGameScreen(navController: NavHostController) {
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth()
-                            .aspectRatio(1.5f) // Change aspect ratio to make the card longer horizontally
-                            .fillMaxHeight(0.25f), // Optional: Adjust the card height to fit the screen better
+                            .aspectRatio(1.5f) // Adjust aspect ratio for a better card layout
+                            .fillMaxHeight(0.25f), // Optional: Adjust card height
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(8.dp),
                         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -126,11 +117,10 @@ fun CardMatchingGameScreen(navController: NavHostController) {
                         }
                     }
                 } else {
-                    // Add invisible spacer to maintain grid layout after card disappears
                     Spacer(
                         modifier = Modifier
                             .padding(8.dp)
-                            .aspectRatio(1.5f) // Adjust to the same aspect ratio
+                            .aspectRatio(1.5f)
                             .fillMaxWidth()
                     )
                 }
@@ -140,9 +130,39 @@ fun CardMatchingGameScreen(navController: NavHostController) {
         // Show the dialog when all cards are matched
         if (showDialog.value) {
             GoodJobDialog(onDismiss = {
-                navController.navigate("modules") // Navigate to the next screen after dismiss
+                navController.navigate("games")
             })
         }
+    }
+}
+
+private fun getWordsForLevel(levelId: String): List<Pair<String, String>> {
+    return when (levelId) {
+        "1" -> listOf(
+            "hola" to "hello",
+            "adios" to "goodbye",
+            "gracias" to "thank you",
+            "perro" to "dog",
+            "gato" to "cat",
+            "amigo" to "friend"
+        )
+        "2" -> listOf(
+            "sol" to "sun",
+            "libro" to "book",
+            "familia" to "family",
+            "escuela" to "school",
+            "ciudad" to "city",
+            "pais" to "country"
+        )
+        "3" -> listOf(
+            "mujer" to "woman",
+            "hombre" to "man",
+            "niño" to "child",
+            "animal" to "animal",
+            "comida" to "food",
+            "cielo" to "sky"
+        )
+        else -> listOf() // Default empty list if the levelId is invalid
     }
 }
 
