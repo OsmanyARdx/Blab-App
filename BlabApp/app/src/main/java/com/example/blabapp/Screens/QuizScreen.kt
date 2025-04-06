@@ -81,7 +81,17 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
             for (quizDoc in quizSnapshot.documents) {
                 val subCollectionSnapshot = quizDoc.reference.collection(quizCollection).get().await()
                 val items = subCollectionSnapshot.documents.mapNotNull { doc ->
-                    val type = doc.getString("questionType") ?: "multipleChoice"
+                    val type = if (learningPreference == "EN") {
+                        doc.getString("tipoPregunta")?.let {
+                            when (it.lowercase()) {
+                                "blanco" -> "fillInBlank"
+                                else -> "multipleChoice"
+                            }
+                        } ?: "multipleChoice"
+                    } else {
+                        doc.getString("questionType") ?: "multipleChoice"
+                    }
+
                     if (learningPreference == "EN") {
                         val question = doc.getString("pregunta")
                         val options = (doc.get("opciones") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
@@ -101,6 +111,7 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
                 allQuestions.addAll(items)
             }
 
+            allQuestions.shuffle()
             quizQuestions.value = allQuestions
         } catch (e: Exception) {
             Log.e("Quiz", "Error loading quiz: ${e.message}")
