@@ -47,13 +47,14 @@ import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
+import com.example.blabapp.Screens.ScrambleScreen
 
 @Composable
 fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
 
 
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}")
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}", "games")
 
 
     var selectedScreen by remember { mutableStateOf("home") }
@@ -111,11 +112,9 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-                composable("games") { GameLevelScreen(navController) }
-                composable("game_selection/{levelId}") { backStackEntry ->
-                    val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
-                    GameSelectionScreen(navController, levelId)
-                }
+                composable("games") { GameSelectionScreen(navController) }
+                composable("game1"){ ScrambleScreen(navController) }
+                composable("game2") { GameLevelScreen(navController) }
                 composable("card_matching_game/{levelId}") { backStackEntry ->
                     val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
                     CardMatchingGameScreen(navController, levelId)

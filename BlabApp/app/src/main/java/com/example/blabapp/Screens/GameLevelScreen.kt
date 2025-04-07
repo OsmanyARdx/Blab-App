@@ -40,7 +40,7 @@ fun GameLevelScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { navController.navigate("game_selection/1") },
+                onClick = { navController.navigate("card_matching_game/1") },
                 modifier = Modifier.width(200.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
@@ -55,7 +55,7 @@ fun GameLevelScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate("game_selection/2") },
+                onClick = { navController.navigate("card_matching_game/2") },
                 modifier = Modifier.width(200.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
@@ -70,7 +70,7 @@ fun GameLevelScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate("game_selection/3") },
+                onClick = { navController.navigate("card_matching_game/3") },
                 modifier = Modifier.width(200.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
