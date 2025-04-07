@@ -1,7 +1,17 @@
 package com.example.blabapp.Screens
 
+import android.app.Activity
+import android.content.ContentResolver
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,18 +36,42 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat.startActivityForResult
 import com.example.blabapp.Nav.Module
 import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ui.theme.BlabGreen
+import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Locale
+
+
 
 @Composable
 fun LessonScreen(navController: NavHostController, moduleId: String) {
+
+    val moduleName = remember { mutableStateOf("Loading...") }
+    val selectedModule = remember { mutableStateOf<Module?>(null) } // To store the selected module
+
+    LaunchedEffect(moduleId) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("modules").document(moduleId)
+            .get()
+            .addOnSuccessListener { document ->
+                moduleName.value = document.getString("topic") ?: "Module"
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "Error fetching module name: ${exception.message}")
+            }
+    }
+
 
     Log.d("Tap", "Loaded LessonScreen")
     val lessons = remember { mutableStateOf<List<Lesson>>(emptyList()) }
@@ -192,6 +226,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                     tint = MaterialTheme.colorScheme.onTertiary
                 )
             }
+            Text(text = moduleName.value, fontSize = 20.sp, color = Color.Black)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -275,7 +310,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(50.dp),
-                                        imageVector = Icons.Default.VolumeUp,
+                                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                                         contentDescription = "Play Audio",
                                         tint = Color.Black,
                                     )
@@ -291,7 +326,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
                         modifier = Modifier
@@ -321,6 +356,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                     ) {
                         Text(text = "Back")
                     }
+                    Spacer(modifier = Modifier.width(90.dp))  // Increased space between buttons
 
                     Button(
                         modifier = Modifier
@@ -349,11 +385,20 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                         val nextText = if (wordIndex.value == lessons.value.size - 1 && lessonIndex.value == 2) "Complete" else "Next"
                         Text(text = nextText)
                     }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
                 }
+                DownloadButton(moduleId = moduleId)
+
 
             }
         }
     }
+
+
+
+
 }
 
 @Composable
@@ -372,4 +417,79 @@ fun ModuleName(module: Module) {
     }
 }
 
+@Composable
+fun DownloadButton(moduleId: String) {
+    val moduleName = remember { mutableStateOf("Loading...") }
+    val context = LocalContext.current
+    val showDialog = remember { mutableStateOf(false) } // State to control the dialog visibility
 
+    // Fetch  module name based on  module ID
+    LaunchedEffect(moduleId) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("modules").document(moduleId)
+            .get()
+            .addOnSuccessListener { document ->
+                moduleName.value = document.getString("topic") ?: "Module"
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "Error fetching module name: ${exception.message}")
+            }
+    }
+
+    val storageRef = FirebaseStorage.getInstance().reference.child("pdfs/${moduleName.value}.pdf")
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        uri?.let {
+            val outputStream = context.contentResolver.openOutputStream(uri)
+            storageRef.getBytes(Long.MAX_VALUE)
+                .addOnSuccessListener { bytes ->
+                    outputStream?.use {
+                        it.write(bytes)
+                    }
+                    Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+        }
+    }
+
+    // Show confirmation dialog when download button is clicked
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false }, // Dismiss  dialog if touched outside
+            title = { Text(text = "Download PDF") },
+            text = { Text("Do you want to download the PDF?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        launcher.launch("${moduleName.value}.pdf") // Proceed with download
+                        showDialog.value = false // Close the dialog
+                    }
+                ) {
+                    Text("Download")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog.value = false } // Cancel and close the dialog
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    Button(
+        onClick = {
+            showDialog.value = true // Show  dialog when user clicks  button
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = BlabPurple),
+        modifier = Modifier
+            .padding(13.dp)
+            .width(150.dp)
+            .height(50.dp)
+            .border(2.dp, Color.Black, RoundedCornerShape(50.dp))
+    ) {
+        Text("Download PDF", color = Color.Black)
+    }
+}

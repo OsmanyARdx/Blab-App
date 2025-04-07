@@ -2,25 +2,14 @@ package com.example.blabapp.Screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,20 +29,25 @@ import kotlinx.coroutines.launch
 @Composable
 fun SidebarMenu(navController: NavController) {
     val userName = remember { mutableStateOf("Loading...") }
-    val numFriends = remember { mutableStateOf(0) } // Holds the number of friends
+    val numFriends = remember { mutableStateOf(0) }
     val profileImageUrl = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = auth.currentUser
 
-
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val user = UserRepository.getUser()
-            user?.let {
-                userName.value = it.name ?: "User"
-                profileImageUrl.value = it.imageUrl ?: ""
-                numFriends.value = it.friendList.size ?: 0
-            }
+    // Realtime listener for profile updates
+    LaunchedEffect(currentUser) {
+        currentUser?.uid?.let { uid ->
+            db.collection("users").document(uid)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot != null && snapshot.exists()) {
+                        userName.value = snapshot.getString("name") ?: "User"
+                        profileImageUrl.value = snapshot.getString("imageUrl") ?: ""
+                        val friends = snapshot.get("friendList") as? List<*> ?: emptyList<Any>()
+                        numFriends.value = friends.size
+                    }
+                }
         }
     }
 
@@ -70,26 +64,40 @@ fun SidebarMenu(navController: NavController) {
             Image(
                 painter = rememberAsyncImagePainter(profileImageUrl.value),
                 contentDescription = "Profile Picture",
-                modifier = Modifier.size(120.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
                     .align(Alignment.CenterHorizontally)
             )
-        }else{
+        } else {
             Image(
                 painter = painterResource(id = R.drawable.default_profile_photo),
-                contentDescription = "Profile Picture",
-                modifier = Modifier.size(120.dp).clip(CircleShape).align(Alignment.CenterHorizontally)
+                contentDescription = "Default Profile Picture",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
             )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(userName.value, fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.align(
-            Alignment.CenterHorizontally))
+        Text(
+            userName.value,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Show the number of friends
-        Text("${numFriends.value} Friends", fontSize = 17.sp, color = Color.White, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(
+            "${numFriends.value} Friends",
+            fontSize = 17.sp,
+            color = Color.White,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -98,13 +106,15 @@ fun SidebarMenu(navController: NavController) {
                 Button(
                     onClick = {
                         when (item) {
-                            "Profile" -> {}
+                            "Profile" -> navController.navigate("profile")
                             "Friend List" -> navController.navigate("friends_list")
                             "Settings" -> {}
                             "Saved" -> {}
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
                     Text(item, fontSize = 20.sp, color = Color.White)
                 }
@@ -118,7 +128,9 @@ fun SidebarMenu(navController: NavController) {
                     popUpTo("loginScreen") { inclusive = true }
                 }
             },
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
         ) {
             Text("Log out", fontSize = 14.sp, color = Color.White)
         }

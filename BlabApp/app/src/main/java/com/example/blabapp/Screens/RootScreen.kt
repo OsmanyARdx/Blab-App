@@ -1,9 +1,11 @@
 package com.example.blabapp
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -34,23 +36,27 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Screens.AddFriendsScreen
 import com.example.blabapp.Screens.FriendsListScreen
+import com.example.blabapp.Screens.GameScreen
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
 import com.example.blabapp.Screens.LoginScreen
 import com.example.blabapp.Screens.ModuleDetailScreen
 import com.example.blabapp.Screens.ModulesScreen
+import com.example.blabapp.Screens.ProfileScreen
 import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
+import com.example.blabapp.Screens.WordTypeGame
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
 
 
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}")
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}", "profile", "wordgame")
 
 
     var selectedScreen by remember { mutableStateOf("home") }
@@ -108,7 +114,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-                composable("games") { ScreenContent("Games") }
+                composable("games") { GameScreen(navController) }
                 composable("messages_screen") { MessagesScreen(navController) }
                 composable("chat_screen/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
@@ -116,6 +122,9 @@ fun RootScreen(accountRepository: AccountRepository) {
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
+                composable("profile") { ProfileScreen(navController) }
+                composable("wordgame") { WordTypeGame(navController) }
+
             }
         }
     }
