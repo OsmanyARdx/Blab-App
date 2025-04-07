@@ -47,6 +47,7 @@ import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
+import com.example.blabapp.Screens.ReviewScreen
 import com.example.blabapp.Screens.ScrambleScreen
 
 @Composable
@@ -126,6 +127,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
+                composable("review") { ReviewScreen(navController) }
             }
         }
     }

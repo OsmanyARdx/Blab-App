@@ -1,6 +1,5 @@
 package com.example.blabapp.Screens
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -27,93 +26,40 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import com.example.blabapp.Nav.QuizQuestion
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.blabapp.ViewModels.QuizScreenViewModel
+import com.example.blabapp.ViewModels.calculateScore
+import com.example.blabapp.ViewModels.normalize
 import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
-import java.text.Normalizer
+import com.example.blabapp.ViewModels.saveWrongAnswerToFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun QuizScreen(navController: NavHostController, moduleId: String) {
+fun QuizScreen(
+    navController: NavHostController,
+    moduleId: String,
+    quizViewModel: QuizScreenViewModel = viewModel()
+) {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    val isLoading = quizViewModel.isLoading.value
+    val quizQuestions = quizViewModel.quizQuestions.value
 
     val currentQuestionIndex = rememberSaveable { mutableStateOf(0) }
     val selectedAnswer = rememberSaveable { mutableStateOf<String?>(null) }
-    val showResult = rememberSaveable { mutableStateOf(false) }
     val selectedAnswers = rememberSaveable { mutableStateOf<Map<Int, String>>(emptyMap()) }
+    val showResult = rememberSaveable { mutableStateOf(false) }
     val userInput = rememberSaveable { mutableStateOf("") }
 
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val firestore = FirebaseFirestore.getInstance()
-    val userId = firebaseAuth.currentUser?.uid
-    val quizQuestions = remember { mutableStateOf<List<QuizQuestion>>(emptyList()) }
-    val isLoading = remember { mutableStateOf(true) }
-
     LaunchedEffect(moduleId) {
-        if (userId == null) {
-            isLoading.value = false
-            return@LaunchedEffect
-        }
-
-        selectedAnswers.value = emptyMap()
-        selectedAnswer.value = null
-        showResult.value = false
-        currentQuestionIndex.value = 0
-
-        try {
-            val userDoc = firestore.collection("users").document(userId).get().await()
-            val learningPreference = userDoc.getString("learning") ?: "ES"
-            val quizCollection = if (learningPreference == "ES") "quizForLearningES" else "quizForLearningEN"
-
-            val quizSnapshot = firestore.collection("modules").document(moduleId)
-                .collection("quizes").get().await()
-
-            val allQuestions = mutableListOf<QuizQuestion>()
-
-            for (quizDoc in quizSnapshot.documents) {
-                val subCollectionSnapshot = quizDoc.reference.collection(quizCollection).get().await()
-                val items = subCollectionSnapshot.documents.mapNotNull { doc ->
-                    val type = if (learningPreference == "EN") {
-                        doc.getString("tipoPregunta")?.let {
-                            when (it.lowercase()) {
-                                "blanco" -> "fillInBlank"
-                                else -> "multipleChoice"
-                            }
-                        } ?: "multipleChoice"
-                    } else {
-                        doc.getString("questionType") ?: "multipleChoice"
-                    }
-
-                    if (learningPreference == "EN") {
-                        val question = doc.getString("pregunta")
-                        val options = (doc.get("opciones") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                        val correctAnswer = doc.getString("respuesta")
-                        if (question != null && correctAnswer != null) {
-                            QuizQuestion(question, options, correctAnswer, type)
-                        } else null
-                    } else {
-                        val question = doc.getString("question")
-                        val options = (doc.get("options") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                        val correctAnswer = doc.getString("answer")
-                        if (question != null && correctAnswer != null) {
-                            QuizQuestion(question, options, correctAnswer, type)
-                        } else null
-                    }
-                }
-                allQuestions.addAll(items)
-            }
-
-            allQuestions.shuffle()
-            quizQuestions.value = allQuestions
-        } catch (e: Exception) {
-            Log.e("Quiz", "Error loading quiz: ${e.message}")
-        } finally {
-            isLoading.value = false
+        userId?.let {
+            quizViewModel.loadQuizQuestions(it, moduleId)
         }
     }
 
@@ -123,200 +69,175 @@ fun QuizScreen(navController: NavHostController, moduleId: String) {
             .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
     ) {
-        if (isLoading.value) {
-            CircularProgressIndicator()
-        } else if (quizQuestions.value.isNotEmpty()) {
-            val index = currentQuestionIndex.value
+        when {
+            isLoading -> {
+                CircularProgressIndicator()
+            }
 
-            Crossfade(targetState = index) { questionIndex ->
-                val currentQuestion = quizQuestions.value[questionIndex]
+            quizQuestions.isNotEmpty() -> {
+                Crossfade(targetState = currentQuestionIndex.value) { questionIndex ->
+                    val currentQuestion = quizQuestions[questionIndex]
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Question ${questionIndex + 1}/${quizQuestions.value.size}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = currentQuestion.question,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onTertiary
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    if (currentQuestion.questionType == "fillInBlank") {
-                        OutlinedTextField(
-                            value = userInput.value,
-                            onValueChange = { userInput.value = it },
-                            label = { Text("Your Answer") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            singleLine = true
-                        )
-
-                        Button(
-                            onClick = {
-                                val answer = userInput.value.trim()
-                                selectedAnswer.value = answer
-                                selectedAnswers.value = selectedAnswers.value + (index to answer)
-                                showResult.value = true
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text("Submit")
-                        }
-                    } else {
-                        currentQuestion.options.forEach { option ->
-                            val isSelected = selectedAnswer.value == option
-                            val isCorrect = option == currentQuestion.answer
-
-                            when {
-                                showResult.value && isCorrect -> BlabGreen
-                                showResult.value && isSelected -> Color.Red
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-
-                            Button(
-                                onClick = {
-                                    if (!showResult.value) {
-                                        selectedAnswer.value = option
-                                        selectedAnswers.value = selectedAnswers.value + (index to option)
-                                        showResult.value = true
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                enabled = !showResult.value,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = when {
-                                        showResult.value && isSelected -> if (isCorrect) BlabGreen else Color.Red
-                                        else -> MaterialTheme.colorScheme.primary
-                                    }
-                                )
-                            ) {
-                                Text(text = option, fontSize = 18.sp)
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    if (showResult.value) {
-                        val isCorrect = normalize(selectedAnswer.value.orEmpty()) == normalize(currentQuestion.answer)
-
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = if (isCorrect) "Correct!" else "Wrong! The correct answer is ${currentQuestion.answer}",
+                            text = "Question ${questionIndex + 1}/${quizQuestions.size}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isCorrect) BlabGreen else Color.Red
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button(
-                            onClick = {
-                                showResult.value = false
-                                selectedAnswer.value = null
-                                userInput.value = ""
-                                if (index < quizQuestions.value.size - 1) {
-                                    currentQuestionIndex.value++
-                                } else {
-                                    if (quizQuestions.value.isNotEmpty()) {
-//                                        if (!isCorrect && userId != null) {
-//                                            CoroutineScope(Dispatchers.IO).launch {
-//                                                saveWrongAnswerToFirestore(userId, moduleId, currentQuestion, selectedAnswer.value.orEmpty())
-//                                            }
-//                                        }
-                                        val score = calculateScore(quizQuestions.value, selectedAnswers.value)
-                                        navController.navigate("quiz_score/$score/${quizQuestions.value.size}/${moduleId}")
-                                    }
-                                }
+                        Text(
+                            text = currentQuestion.question,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onTertiary
+                        )
 
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
-                        ) {
-                            Text(
-                                text = if (index < quizQuestions.value.size - 1) "Next" else "Finish",
-                                color = MaterialTheme.colorScheme.onTertiary
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Answer Section
+                        if (currentQuestion.questionType == "fillInBlank") {
+                            OutlinedTextField(
+                                value = userInput.value,
+                                onValueChange = { userInput.value = it },
+                                label = { Text("Your Answer") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                singleLine = true
                             )
+
+                            Button(
+                                onClick = {
+                                    val answer = userInput.value.trim()
+                                    selectedAnswer.value = answer
+                                    selectedAnswers.value =
+                                        selectedAnswers.value + (questionIndex to answer)
+                                    showResult.value = true
+
+                                    val isCorrect =
+                                        normalize(answer) == normalize(currentQuestion.answer)
+                                    if (!isCorrect && userId != null) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            saveWrongAnswerToFirestore(currentQuestion)
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text("Submit")
+                            }
+                        } else {
+                            currentQuestion.options.forEach { option ->
+                                val isSelected = selectedAnswer.value == option
+                                val isCorrect = option == currentQuestion.answer
+
+                                Button(
+                                    onClick = {
+                                        if (!showResult.value) {
+                                            selectedAnswer.value = option
+                                            selectedAnswers.value =
+                                                selectedAnswers.value + (questionIndex to option)
+                                            showResult.value = true
+
+                                            if (!isCorrect && userId != null) {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    saveWrongAnswerToFirestore(currentQuestion)
+                                                }
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    enabled = !showResult.value,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = when {
+                                            showResult.value && isCorrect -> BlabGreen
+                                            showResult.value && isSelected -> Color.Red
+                                            else -> MaterialTheme.colorScheme.primary
+                                        }
+                                    )
+                                ) {
+                                    Text(text = option, fontSize = 18.sp)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        if (showResult.value) {
+                            val isCorrect = normalize(selectedAnswer.value.orEmpty()) == normalize(
+                                currentQuestion.answer
+                            )
+
+                            Text(
+                                text = if (isCorrect) "Correct!" else "Wrong! The correct answer is ${currentQuestion.answer}",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isCorrect) BlabGreen else Color.Red
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = {
+                                    showResult.value = false
+                                    selectedAnswer.value = null
+                                    userInput.value = ""
+                                    if (questionIndex < quizQuestions.size - 1) {
+                                        currentQuestionIndex.value++
+                                    } else {
+                                        val score =
+                                            calculateScore(quizQuestions, selectedAnswers.value)
+                                        navController.navigate("quiz_score/$score/${quizQuestions.size}/$moduleId")
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
+                            ) {
+                                Text(
+                                    text = if (questionIndex < quizQuestions.size - 1) "Next" else "Finish",
+                                    color = MaterialTheme.colorScheme.onTertiary
+                                )
+                            }
                         }
                     }
                 }
             }
-        } else {
-            Column {
-                Text(
-                    text = "No quiz available for this module",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.error
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(50.dp),
-                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary
-                    )
+            else -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(text = "Back", fontSize = 20.sp)
+                    Text(
+                        text = "No quiz available for this module",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(50.dp),
+                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary
+                        )
+                    ) {
+                        Text(text = "Back", fontSize = 20.sp)
+                    }
                 }
             }
         }
     }
 }
-
-fun calculateScore(questions: List<QuizQuestion>, selectedAnswers: Map<Int, String>): Int {
-    var score = 0
-    for ((index, selectedAnswer) in selectedAnswers) {
-        val correctAnswer = questions.getOrNull(index)?.answer
-        if (normalize(selectedAnswer) == normalize(correctAnswer ?: "")) {
-            score++
-        }
-    }
-    return score
-}
-
-fun normalize(text: String): String {
-    return Normalizer.normalize(text, Normalizer.Form.NFD)
-        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
-        .lowercase()
-}
-
-// fun saveWrongAnswerToFirestore(
-//    userId: String,
-//    moduleId: String,
-//    question: QuizQuestion,
-//    userAnswer: String
-//) {
-//    val firestore = FirebaseFirestore.getInstance()
-//    val wrongAnswerData = mapOf(
-//        "question" to question.question,
-//        "correctAnswer" to question.correctAnswer,
-//        "userAnswer" to userAnswer,
-//        "timestamp" to System.currentTimeMillis()
-//    )
-//
-//    firestore.collection("users")
-//        .document(userId)
-//        .collection("wrongAnswers")
-//        .document(moduleId)
-//        .collection("questions")
-//        .add(wrongAnswerData)
-//}
