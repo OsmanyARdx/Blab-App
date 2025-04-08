@@ -38,160 +38,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
-/*
-import coil.compose.rememberAsyncImagePainter
-import com.example.blabapp.Nav.AccountRepository
-import com.example.blabapp.Nav.BlabApp
-import com.example.blabapp.R
-import com.example.blabapp.Repository.ChatRepository
-import com.example.blabapp.Repository.ChatroomPreview
-import com.example.blabapp.Repository.UserRepository
-import com.example.blabapp.ViewModels.ChatViewModel
-import com.example.blabapp.ViewModels.Message
-
-import com.example.blabapp.ui.theme.BlabPurple
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-
-
-
-@Composable
-fun ChatScreen(navController: NavHostController, chatRoomId: String, chatroomPreview: ChatroomPreview) {
-
-
-    val viewModel = viewModel { ChatViewModel() }
-    val messages by viewModel.messages.collectAsState()
-    var messageText by remember { mutableStateOf("") }
-
-
-
-    LaunchedEffect(chatRoomId) {
-        viewModel.loadMessages(chatRoomId)
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(7.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-            }
-            Text(text = chatroomPreview.otherUserName, fontSize = 20.sp, color = Color.White)
-        }
-
-        // Chat Messages
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            items(messages) { message ->
-                ChatBubble(message, chatroomPreview)
-            }
-        }
-
-        // message Input
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = messageText,
-                onValueChange = { messageText = it },
-                modifier = Modifier
-                    .weight(1f),
-                placeholder = { Text("Type a message...") }
-            )
-            IconButton(
-                onClick = {
-                    if (messageText.isNotEmpty()) {
-                        sendMessageToFirebase(chatroomPreview.currentUserId, messageText.toString(), chatroomPreview.otherUserId)
-                        var newMessage = TextFieldValue("")
-                    }
-                },
-            ) {
-                Icon(imageVector = Icons.Default.Send, contentDescription = "Send", tint = MaterialTheme.colorScheme.onTertiary
-                )
-            }
-        }
-    }
-}
-
-fun sendMessageToFirebase(currentUserId: String, toString: String, otherUserId: String) {
-
-}
-
-@Composable
-fun ChatBubble(message: Message, chatroomPreview: ChatroomPreview) {
-    val isUser = message.senderId == chatroomPreview.currentUserId
-    val bubbleColor = if (isUser) BlabPurple else Color.Yellow
-    val textColor = if (isUser) Color.White else Color.Black
-    val alignment = if (isUser) Arrangement.End else Arrangement.Start
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = alignment,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .background(bubbleColor, RoundedCornerShape(24.dp))
-                .padding(horizontal = 18.dp, vertical = 12.dp)
-        ) {
-            Text(text = message.message, fontSize = 16.sp, color = textColor)
-        }
-    }
-}
-
-@Composable
-fun UserImage(imageUrl:String) {
-    if (imageUrl.isNotEmpty()) {
-        Image(
-            painter = rememberAsyncImagePainter(imageUrl),
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple),
-            contentScale = ContentScale.Crop
-        )
-    } else {
-        Image(
-            painter = painterResource(id = R.drawable.default_profile_photo),
-            contentDescription = "Default Profile Picture",
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple)
-        )
-    }
-}
-
-
- */
-
 
 data class Message(
     val senderId: String,
     val message: String,
     val read: Boolean = false,
-    val timeCreated: String = System.currentTimeMillis().toString()
+    val timestamp: Timestamp
 )
+
+
+
 
 @Composable
 fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUserId: String, otherUserImageUrl: String, thisUserImageUrl: String, otherUserName: String ) {
@@ -358,32 +214,3 @@ fun UserImage(profileImageUrl: String) {
         )
     }
 }
-/*
-// Function to load messages from Firebase based on chatRoomId
-fun loadMessagesFromFirebase(chatRoomId: String, onMessagesLoaded: (List<Message>) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-
-    db.collection("chatRooms")
-        .document(chatRoomId)
-        .collection("messages")
-        .orderBy("timeCreated")  // Assuming the messages are ordered by the time they were created
-        .get()
-        .addOnSuccessListener { snapshot ->
-            val loadedMessages = snapshot.documents.map { document ->
-                val senderId = document.getString("senderId") ?: "Unknown"
-                val message = document.getString("message") ?: ""
-                val read = document.getBoolean("read") ?: false
-                val timeCreated = document.getDate("timeCreated")?.toString() ?: "Unknown Time"
-
-                Message(senderId, message, read, timeCreated)
-            }
-            onMessagesLoaded(loadedMessages)  // Pass the messages to the callback
-        }
-        .addOnFailureListener {
-            // Handle failure, like logging or showing an error message
-        }
-}
-
-
-
- */

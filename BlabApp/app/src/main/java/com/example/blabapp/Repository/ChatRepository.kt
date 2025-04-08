@@ -74,10 +74,10 @@ object ChatRepository {
                             val senderId = document.getString("senderId") ?: "Unknown sender"
                             val timeCreated = document.getTimestamp("timeCreated")
 
-                            val msg = Message(senderId,message,read,timeCreated.toString())
+                            val msg = Message(senderId,message,read, timeCreated!!)
                             messagesList.add(msg)
 
-                            Log.d("FirebaseChat", "Message: ${msg.message}, Read: ${msg.read}, Sender: ${msg.senderId}, Time Created: ${msg.timeCreated}")
+                            Log.d("FirebaseChat", "Message: ${msg.message}, Read: ${msg.read}, Sender: ${msg.senderId}, Time Created: ${msg.timestamp}")
                         }
 
                         // Use messagesList as needed (e.g., update UI, pass to a RecyclerView adapter, etc.)
