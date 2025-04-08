@@ -143,7 +143,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     when {
                         firstName.isEmpty() || lastName.isEmpty() -> showToast(context, "Name fields cannot be empty")
                         email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> showToast(context, "Enter a valid email")
-                        phone.isEmpty() || phone.length < 10 -> showToast(context, "Enter a valid phone number")
+                        phone.isEmpty() || !phone.matches(Regex("^\\d{10}$")) -> showToast(context, "Enter a valid 10-digit phone number")
                         password.length < 6 -> showToast(context, "Password must be at least 6 characters")
                         password != confirmPassword -> showToast(context, "Passwords do not match")
                         selectedLanguage == null -> showToast(context, "Please select a language") // Language selection check

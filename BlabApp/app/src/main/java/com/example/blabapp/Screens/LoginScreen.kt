@@ -114,6 +114,9 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                 Button(
                     onClick = {
                         viewModel.loginFirebase(
+                            /*email = email,
+                            password = password,
+                             */
                             email = email,
                             password = password,
                             successfulLoginHandler = {

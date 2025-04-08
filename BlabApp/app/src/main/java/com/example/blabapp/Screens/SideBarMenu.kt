@@ -3,6 +3,15 @@ package com.example.blabapp.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -48,6 +57,7 @@ fun SidebarMenu(navController: NavController) {
                         numFriends.value = friends.size
                     }
                 }
+
         }
     }
 
@@ -58,8 +68,7 @@ fun SidebarMenu(navController: NavController) {
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(150.dp))
-
+        // Profile Image and User Info at the Top
         if (profileImageUrl.value.isNotEmpty()) {
             Image(
                 painter = rememberAsyncImagePainter(profileImageUrl.value),
@@ -73,6 +82,7 @@ fun SidebarMenu(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.default_profile_photo),
                 contentDescription = "Default Profile Picture",
+
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
@@ -92,6 +102,8 @@ fun SidebarMenu(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+
+        // Show the number of friends
         Text(
             "${numFriends.value} Friends",
             fontSize = 17.sp,
@@ -101,20 +113,32 @@ fun SidebarMenu(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            items(listOf("Profile", "Friend List", "Settings", "Saved")) { item ->
+        // Scrollable Menu Items
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            contentPadding = PaddingValues(top = 16.dp) // Add top padding to start from the top
+        ) {
+            items(listOf("Profile", "Friend List", "Settings", "Saved", "Log out")) { item ->
                 Button(
                     onClick = {
                         when (item) {
                             "Profile" -> navController.navigate("profile")
+
                             "Friend List" -> navController.navigate("friends_list")
-                            "Settings" -> {}
-                            "Saved" -> {}
+                            "Settings" -> {} // Navigate to settings screen (if needed)
+                            "Saved" -> {} // Navigate to saved items screen (if needed)
+                            "Log out" -> { FirebaseAuth.getInstance().signOut()
+                                navController.navigate("loginScreen") {
+                                    popUpTo("loginScreen") { inclusive = true }
+                                }}
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
+
+
                 ) {
                     Text(item, fontSize = 20.sp, color = Color.White)
                 }
@@ -134,5 +158,6 @@ fun SidebarMenu(navController: NavController) {
         ) {
             Text("Log out", fontSize = 14.sp, color = Color.White)
         }
+
     }
 }

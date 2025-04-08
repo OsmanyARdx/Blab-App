@@ -18,7 +18,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.LessonScreen
-import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.MessagesScreen
 import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow

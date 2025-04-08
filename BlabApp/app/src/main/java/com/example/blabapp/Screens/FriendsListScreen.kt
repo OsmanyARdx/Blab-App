@@ -1,5 +1,6 @@
 package com.example.blabapp.Screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -60,7 +61,7 @@ fun FriendsListScreen(navController: NavController) {
     val profileImageUrl = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
-
+    // Fetch user profile info (like profile image URL)
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             val user = UserRepository.getUser()
@@ -70,6 +71,7 @@ fun FriendsListScreen(navController: NavController) {
         }
     }
 
+    // Fetch friend list and names from Firestore
     LaunchedEffect(Unit) {
         val firebaseAuth = FirebaseAuth.getInstance()
         val firestore = FirebaseFirestore.getInstance()
@@ -79,13 +81,15 @@ fun FriendsListScreen(navController: NavController) {
             firestore.collection("users").document(userId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
-                        // Assuming the friendsList field is an array of userIds in Firestore
+                        // Get the friendList field from the user document
                         val friends = document.get("friendList") as? List<String>
                         if (friends != null) {
                             friendsList.value = friends // Update the friends list state
 
                             // Query Firestore to get names for each friend in the list
                             val namesList = mutableListOf<String>()
+                            var loadedCount = 0 // Counter to track when all names are loaded
+
                             friends.forEach { friendId ->
                                 firestore.collection("users").document(friendId).get()
                                     .addOnSuccessListener { friendDoc ->
@@ -94,22 +98,29 @@ fun FriendsListScreen(navController: NavController) {
                                             namesList.add(friendName)
                                         }
 
-                                        // After fetching all the names, update the state
-                                        if (namesList.size == friends.size) {
+                                        // After fetching the name, check if all friends are loaded
+                                        loadedCount++
+                                        if (loadedCount == friends.size) {
+                                            // Update the state and log once all names are loaded
                                             friendNames.value = namesList
+                                            Log.d("Namelist", namesList.toString()) // Log the names after all are loaded
                                         }
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("FriendNameError", "Failed to fetch friend name for ID: $friendId")
                                     }
                             }
                         }
                     }
                 }
                 .addOnFailureListener {
-                    // Handle failure (e.g., show a toast or log the error)
+                    Log.e("FirestoreError", "Failed to fetch user document")
                 }
         } else {
             // Handle case when the user is not authenticated
         }
-    }
+
+}
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
@@ -224,6 +235,5 @@ fun FriendsListScreen(navController: NavController) {
         }
     }
 }
-
 
 

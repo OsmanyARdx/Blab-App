@@ -1,11 +1,13 @@
 package com.example.blabapp.Screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,29 +67,56 @@ fun ModulesScreen(navController: NavHostController) {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             if (modules.value.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 LazyColumn {
-                    item { Spacer(modifier = Modifier.height(8.dp)) } // Space before first module
+                    item { Spacer(modifier = Modifier.height(8.dp)) }
                     items(modules.value) { module ->
                         val isCompleted = module.id in completeMod.value
-                        ModuleItem(module, userLearningPreference.value, isCompleted) {
+                        ModuleItem(
+                            navController = navController,
+                            module = module,
+                            userLearningPreference = userLearningPreference.value,
+                            isCompleted = isCompleted
+                        ) {
                             navController.navigate("moduleDetail/${module.id}")
                         }
                     }
                 }
             }
         }
+        Button(
+            onClick = {
+                navController.navigate("review")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(50.dp),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                contentColor = MaterialTheme.colorScheme.onTertiary
+            )
+        ) {
+            Text(text = "Review Items", fontSize = 16.sp)
+        }
     }
 }
 
 
 @Composable
-fun ModuleItem(module: Module, userLearningPreference: String, isCompleted: Boolean, onClick: () -> Unit) {
+fun ModuleItem(
+    navController: NavHostController,
+    module: Module,
+    userLearningPreference: String,
+    isCompleted: Boolean,
+    onClick: () -> Unit
+) {
     val backgroundColor = if (isCompleted) Color.Green else MaterialTheme.colorScheme.primary
     val displayTopic = if (userLearningPreference == "ES") module.topic else module.topicES
 
