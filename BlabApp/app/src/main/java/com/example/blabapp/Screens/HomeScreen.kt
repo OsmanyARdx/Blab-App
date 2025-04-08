@@ -51,7 +51,6 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import com.example.blabapp.MessagesScreen
 import com.example.blabapp.Screens.SidebarMenu
 import com.example.blabapp.ui.theme.BlabYellow
 import com.example.blabapp.ui.theme.Pink80
@@ -78,33 +77,34 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
     val isSpanish = remember { mutableStateOf(true) }
     val isSidebarVisible = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = auth.currentUser
 
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val user = UserRepository.getUser()
-            user?.let {
-                userStreak.value = it.userStreak.toString()
-                userRank.value = it.userRank ?: "Default"
-                userName.value = it.name ?: "User"
-                profileImageUrl.value = it.imageUrl ?: ""
-            }
+    // Realtime listener for profile updates
+    LaunchedEffect(currentUser) {
+        currentUser?.uid?.let { uid ->
+            db.collection("users").document(uid)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot != null && snapshot.exists()) {
+                        userName.value = snapshot.getString("name") ?: "User"
+                        profileImageUrl.value = snapshot.getString("imageUrl") ?: ""
+                        userStreak.value = snapshot.getLong("userStreak")?.toString() ?: "Loading..."
+                        userRank.value = snapshot.getString("userRank") ?: "Loading..."
+                    }
+                }
         }
     }
 
-
-
     Column(Modifier.padding(0.dp)) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background)
-
                 .padding(7.dp)
         ) {
             IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
-                if (!profileImageUrl.value.equals("")) {
+                if (profileImageUrl.value.isNotEmpty()) {
                     Image(
                         painter = rememberAsyncImagePainter(profileImageUrl.value),
                         contentDescription = "Profile Picture",
@@ -126,7 +126,6 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                 }
             }
 
-            // navigate to Messages screen
             IconButton(onClick = { navController.navigate("messages_screen") }, modifier = Modifier.align(Alignment.TopEnd)) {
                 Icon(
                     imageVector = Icons.Default.Email,
@@ -143,7 +142,6 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
             )
         }
 
-        // Main content
         Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
             Column(
                 modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
@@ -224,7 +222,6 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
             }
         }
     }
-
 
     // Sidebar
     if (isSidebarVisible.value) {
