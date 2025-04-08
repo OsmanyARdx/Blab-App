@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
@@ -25,14 +24,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.blabapp.R
 import com.example.blabapp.ViewModels.ChatScreenViewModel
+import com.example.blabapp.ViewModels.MessagesScreenViewModel
 import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.toList
 
 /*
 import coil.compose.rememberAsyncImagePainter
@@ -188,21 +190,22 @@ data class Message(
     val read: Boolean = false,
     val timeCreated: String = System.currentTimeMillis().toString()
 )
-/*
+
 @Composable
 fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUserId: String, otherUserImageUrl: String, thisUserImageUrl: String) {
-    val viewModel = viewModel { ChatScreenViewModel() }
-    val messages by viewModel.messages.collectAsState()
+    val viewModel = viewModel { ChatScreenViewModel()}
+    val messages = viewModel.messages
     var newMessage by remember { mutableStateOf(TextFieldValue("")) }
     val userNames = remember { mutableStateMapOf<String, String>() } // To store userId and userName
     val lazyColumnListState = rememberLazyListState()
 
 
 
+
+
     // Load messages when the chat screen is displayed
     LaunchedEffect(chatRoomId) {
-        viewModel.loadChatLogs(chatRoomId)
-        lazyColumnListState.scrollToItem(messages.size - 1)
+        viewModel.observeChatMessages(chatRoomId)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -226,7 +229,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            reverseLayout = true
+            
         ) {
             items(messages) { message ->
                 val senderName = userNames[message.senderId] ?: "Unknown User"  // Default to "Unknown User" if name not found
@@ -251,7 +254,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
             IconButton(
                 onClick = {
                     if (newMessage.text.isNotEmpty()) {
-                        sendMessageToFirebase(currentUserId, newMessage.text, chatRoomId)
+                        viewModel.sendMessageToFirebase(currentUserId, newMessage.text, chatRoomId)
                         newMessage = TextFieldValue("")  // Clear input field after sending
                     }
                 }
@@ -341,7 +344,7 @@ fun UserImage(profileImageUrl: String) {
         )
     }
 }
-
+/*
 // Function to load messages from Firebase based on chatRoomId
 fun loadMessagesFromFirebase(chatRoomId: String, onMessagesLoaded: (List<Message>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
@@ -367,204 +370,6 @@ fun loadMessagesFromFirebase(chatRoomId: String, onMessagesLoaded: (List<Message
         }
 }
 
-// Function to send a message to Firebase
-fun sendMessageToFirebase(senderId: String, content: String, chatRoomId: String) {
-    val db = FirebaseFirestore.getInstance()
-
-    val message = hashMapOf(
-        "senderId" to senderId,
-        "message" to content,
-        "timeCreated" to Timestamp.now(),  // Use timestamp to sort messages
-        "read" to false
-    )
-
-    db.collection("chatRooms")
-        .document(chatRoomId)
-        .collection("messages")
-        .add(message)
-        .addOnSuccessListener {
-            // Message sent successfully
-            Log.d("DB", "s")
-        }
-        .addOnFailureListener {
-            // Handle error
-            Log.d("DB", "f")
-        }
-}
 
 
  */
-
-
-@Composable
-fun ChatScreen(
-    navController: NavHostController,
-    chatRoomId: String,
-    currentUserId: String,
-    otherUserImageUrl: String,
-    thisUserImageUrl: String
-) {
-    val viewModel: ChatScreenViewModel = viewModel()
-    val messages by viewModel.messages.collectAsState()
-    var newMessage by remember { mutableStateOf(TextFieldValue("")) }
-    val userNames = remember { mutableStateMapOf<String, String>() }
-    val lazyColumnListState = rememberLazyListState()
-
-    LaunchedEffect(chatRoomId) {
-        viewModel.loadChatLogs(chatRoomId)
-    }
-
-    // Scroll to bottom when messages change
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            lazyColumnListState.animateScrollToItem(0)
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Top AppBar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(7.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-            }
-            Text("Chat", fontSize = 20.sp, color = Color.White)
-        }
-
-        // Messages List
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            state = lazyColumnListState,
-            reverseLayout = true
-        ) {
-            items(messages) { message ->
-                val senderName = userNames[message.senderId] ?: "Unknown"
-                ChatBubble(
-                    message = message,
-                    senderName = senderName,
-                    isUser = message.senderId == currentUserId,
-                    thisUserImageUrl = thisUserImageUrl,
-                    otherUserImageUrl = otherUserImageUrl
-                )
-            }
-        }
-
-        // Input field + send
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = newMessage,
-                onValueChange = { newMessage = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Type a message...") },
-            )
-            IconButton(
-                onClick = {
-                    if (newMessage.text.isNotBlank()) {
-                        sendMessageToFirebase(currentUserId, newMessage.text.trim(), chatRoomId)
-                        newMessage = TextFieldValue("")
-                    }
-                }
-            ) {
-                Icon(Icons.Default.Send, contentDescription = "Send")
-            }
-        }
-    }
-}
-@Composable
-fun UserImage(profileImageUrl: String) {
-    if (profileImageUrl.isNotEmpty()) {
-        Image(
-            painter = rememberAsyncImagePainter(profileImageUrl),
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(46.dp)
-                .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple),
-
-            contentScale = ContentScale.Crop
-        )
-    } else {
-
-        Image(
-            painter = painterResource(id = R.drawable.default_profile_photo),
-            contentDescription = "Default Profile Picture",
-            modifier = Modifier
-                .size(46.dp)
-                .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple)
-        )
-    }
-}
-
-@Composable
-fun ChatBubble(message: Message, senderName: String, isUser: Boolean, thisUserImageUrl: String, otherUserImageUrl: String) {
-    val bubbleColor = if (isUser) BlabPurple else Color.Yellow
-    val textColor = if (isUser) Color.White else Color.Black
-    val alignment = if (isUser) Arrangement.End else Arrangement.Start
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = alignment,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (!isUser) {
-            UserImage(otherUserImageUrl)
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .background(bubbleColor, RoundedCornerShape(24.dp))
-                .padding(horizontal = 18.dp, vertical = 12.dp)
-        ) {
-            Text(text = message.message, fontSize = 16.sp, color = textColor)
-        }
-
-        if (isUser) {
-            Log.d("pfpURL", thisUserImageUrl)
-            UserImage(thisUserImageUrl)
-        }
-    }
-}
-fun sendMessageToFirebase(senderId: String, content: String, chatRoomId: String) {
-    val db = FirebaseFirestore.getInstance()
-
-    val message = hashMapOf(
-        "senderId" to senderId,
-        "message" to content,
-        "timeCreated" to Timestamp.now(),  // Use timestamp to sort messages
-        "read" to false
-    )
-
-    db.collection("chatRooms")
-        .document(chatRoomId)
-        .collection("messages")
-        .add(message)
-        .addOnSuccessListener {
-            // Message sent successfully
-            Log.d("DB", "s")
-        }
-        .addOnFailureListener {
-            // Handle error
-            Log.d("DB", "f")
-        }
-}

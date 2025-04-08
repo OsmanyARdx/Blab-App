@@ -53,7 +53,7 @@ object ChatRepository {
     }
     suspend fun loadMessagesFromFirebase(chatRoomId: String): List<Message> {
         val db = FirebaseFirestore.getInstance()
-        val chatRoomRef = db.collection("chatrooms").document(chatRoomId)
+        val chatRoomRef = db.collection("chatRooms").document(chatRoomId)
         val messagesList = mutableListOf<Message>()
 
         chatRoomRef.get().addOnSuccessListener { chatRoomSnapshot ->
