@@ -114,8 +114,11 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                 Button(
                     onClick = {
                         viewModel.loginFirebase(
-                            email = email,
+                            /*email = email,
                             password = password,
+                             */
+                            email = "t@t.com",//REMOVE{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+                            password = "123456",//REMOVE{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
                             successfulLoginHandler = {
                                 navController.navigate("home")
                                 Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()

@@ -1,0 +1,846 @@
+Index: app/src/main/java/com/example/blabapp/Screens/AppNavigation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.*\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavController\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.*\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.example.blabapp.Nav.AccountRepository\r\nimport com.example.blabapp.Screens.LessonScreen\r\nimport com.example.blabapp.Screens.MessagesScreen\r\nimport com.example.blabapp.Screens.ModulesScreen\r\nimport com.example.blabapp.ui.theme.BlabPurple\r\nimport com.example.blabapp.ui.theme.BlabYellow\r\n\r\n@Composable\r\nfun AppNavigation(accountRepository: AccountRepository, navController: NavController) {\r\n    // Initialize NavController here\r\n    val navController = rememberNavController()\r\n\r\n    var selectedScreen by remember { mutableStateOf(\"home\") }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            BottomNavigationBar(navController, selectedScreen) { selectedScreen = it }\r\n        },\r\n        containerColor = BlabYellow\r\n    ) { paddingValues ->\r\n        Box(modifier = Modifier.padding(paddingValues)) {\r\n\r\n        }\r\n    }\r\n}\r\n\r\n\r\n@Composable\r\nfun BottomNavigationBar(\r\n    navController: NavHostController,\r\n    selectedScreen: String,\r\n    onScreenSelected: (String) -> Unit\r\n) {\r\n    val screens = listOf(\r\n        \"home\" to Icons.Default.Home,\r\n        \"search\" to Icons.Default.Search,\r\n        \"reels\" to Icons.Default.PlayArrow,\r\n        \"modules\" to Icons.Default.List,\r\n        \"games\" to Icons.Default.Face\r\n    )\r\n\r\n    NavigationBar(\r\n        modifier = Modifier.background(MaterialTheme.colorScheme.primary),\r\n        containerColor = MaterialTheme.colorScheme.primary\r\n    ) {\r\n        screens.forEach { (screen, icon) ->\r\n            NavigationBarItem(\r\n                selected = screen == selectedScreen,\r\n                onClick = {\r\n                    // Handle navigation logic\r\n                    navController.navigate(screen) {\r\n                        launchSingleTop = true\r\n                        restoreState = true\r\n                    }\r\n                    onScreenSelected(screen)\r\n                },\r\n                icon = {\r\n                    Icon(\r\n                        icon,\r\n                        contentDescription = screen,\r\n                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.secondary else Color.Black\r\n                    )\r\n                },\r\n                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)\r\n            )\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun ScreenContent(title: String) {\r\n    Box(\r\n        modifier = Modifier.fillMaxSize().background(BlabYellow)\r\n    ) {\r\n        Text(\r\n            text = title,\r\n            fontSize = 24.sp,\r\n            modifier = Modifier\r\n                .align(Alignment.TopCenter)\r\n                .padding(top = 16.dp)\r\n        )\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Screens/AppNavigation.kt b/app/src/main/java/com/example/blabapp/Screens/AppNavigation.kt
+--- a/app/src/main/java/com/example/blabapp/Screens/AppNavigation.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Screens/AppNavigation.kt	(date 1741692693881)
+@@ -1,5 +1,8 @@
+ package com.example.blabapp
+ 
++import android.os.Bundle
++import androidx.activity.ComponentActivity
++import androidx.activity.compose.setContent
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.*
+ import androidx.compose.material.icons.Icons
+@@ -9,7 +12,6 @@
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
+ import androidx.navigation.NavController
+@@ -17,38 +19,37 @@
+ import androidx.navigation.compose.*
+ import androidx.navigation.compose.rememberNavController
+ import com.example.blabapp.Nav.AccountRepository
+-import com.example.blabapp.Screens.LessonScreen
+ import com.example.blabapp.Screens.MessagesScreen
+-import com.example.blabapp.Screens.ModulesScreen
+ import com.example.blabapp.ui.theme.BlabPurple
+ import com.example.blabapp.ui.theme.BlabYellow
+ 
++
+ @Composable
+ fun AppNavigation(accountRepository: AccountRepository, navController: NavController) {
+     // Initialize NavController here
+     val navController = rememberNavController()
+-
+     var selectedScreen by remember { mutableStateOf("home") }
+ 
+     Scaffold(
+-        bottomBar = {
+-            BottomNavigationBar(navController, selectedScreen) { selectedScreen = it }
+-        },
++        bottomBar = { BottomNavigationBar(navController, selectedScreen) { selectedScreen = it } },
+         containerColor = BlabYellow
+     ) { paddingValues ->
+         Box(modifier = Modifier.padding(paddingValues)) {
+-
++            NavHost(navController, startDestination = "home") {
++                composable("home") { HomeScreen("Home",navController,"", context = navController.context) }
++                composable("search") { ScreenContent("Search") }
++                composable("reels") { ScreenContent("Reels") }
++                composable("modules") { ScreenContent("Modules") }
++                composable("games") { ScreenContent("Games") }
++                composable("messages") { MessagesScreen(navController) }
++            }
+         }
+     }
+ }
+ 
+ 
+ @Composable
+-fun BottomNavigationBar(
+-    navController: NavHostController,
+-    selectedScreen: String,
+-    onScreenSelected: (String) -> Unit
+-) {
++fun BottomNavigationBar(navController: NavHostController, selectedScreen: String, onScreenSelected: (String) -> Unit) {
+     val screens = listOf(
+         "home" to Icons.Default.Home,
+         "search" to Icons.Default.Search,
+@@ -58,28 +59,19 @@
+     )
+ 
+     NavigationBar(
+-        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+-        containerColor = MaterialTheme.colorScheme.primary
++        modifier = Modifier.background(BlabYellow),
++        containerColor = BlabYellow
+     ) {
+         screens.forEach { (screen, icon) ->
+             NavigationBarItem(
+                 selected = screen == selectedScreen,
+                 onClick = {
+-                    // Handle navigation logic
+-                    navController.navigate(screen) {
+-                        launchSingleTop = true
+-                        restoreState = true
+-                    }
++                    navController.navigate(screen)
+                     onScreenSelected(screen)
+                 },
+-                icon = {
+-                    Icon(
+-                        icon,
+-                        contentDescription = screen,
+-                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.secondary else Color.Black
+-                    )
+-                },
+-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
++                icon = { Icon(icon, contentDescription = screen, tint = if (screen == selectedScreen) BlabPurple else Color.Black) },
++                colors = NavigationBarItemDefaults.colors(
++                    indicatorColor = Color.Transparent)
+             )
+         }
+     }
+@@ -97,5 +89,9 @@
+                 .align(Alignment.TopCenter)
+                 .padding(top = 16.dp)
+         )
++
++
+     }
+-}
+\ No newline at end of file
++}
++
++
+Index: app/src/main/java/com/example/blabapp/Nav/AccountRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp.Nav\r\n\r\n\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport com.google.firebase.firestore.toObject\r\nimport kotlinx.coroutines.tasks.await\r\n\r\ninterface UserRepository{\r\n\r\n    suspend fun getUser(uid: String): User\r\n}\r\n\r\n\r\nclass AccountRepository(private var fireStoreDb : FirebaseFirestore): UserRepository{\r\n\r\n    lateinit var currentUser: User\r\n\r\n    override suspend fun getUser(uid:String): User{\r\n\r\n        val user = fireStoreDb.collection(\"users\").document(uid).get().await()\r\n            .toObject<User>()\r\n\r\n        return user ?: User()\r\n\r\n    }\r\n    /*\r\n    override suspend fun getUser(uid:String): User{\r\n        var user:User\r\n        val userDoc = fireStoreDb.collection(\"users\").document(uid).get().await()\r\n\r\n        if(userDoc!=null){\r\n            val userData = userDoc.data\r\n            if(userData != null) {\r\n                user = User(\r\n                    name = userData[\"name\"].toString(),\r\n                    email = userData[\"email\"].toString(),\r\n                    chatList = userData[\"chatList\"] as MutableList<String>,\r\n                    friendList = userData[\"friendList\"] as MutableList<String>,\r\n                    rank = userData[\"rank\"] as Int,\r\n                    userBio = userData[\"userBio\"].toString(),\r\n                    userId = userData[\"userId\"].toString()\r\n                )\r\n            }\r\n            else{\r\n                user = User()\r\n            }\r\n        }\r\n        else{\r\n            user = User()\r\n        }\r\n        return user\r\n    }\r\n    */\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Nav/AccountRepository.kt b/app/src/main/java/com/example/blabapp/Nav/AccountRepository.kt
+--- a/app/src/main/java/com/example/blabapp/Nav/AccountRepository.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Nav/AccountRepository.kt	(date 1741692693898)
+@@ -1,13 +1,22 @@
+ package com.example.blabapp.Nav
+ 
+ 
++import android.widget.Toast
++import com.example.blabapp.MainActivity
+ import com.google.firebase.firestore.FirebaseFirestore
+ import com.google.firebase.firestore.toObject
+ import kotlinx.coroutines.tasks.await
+ 
++
+ interface UserRepository{
+ 
+     suspend fun getUser(uid: String): User
++
++    suspend fun sendMessage(message: Message): Boolean
++
++    suspend fun getChatRoomMessages(chatRoomId: String): MutableList<Message>
++
++    suspend fun bindChatRoomToMutableList(mutableList: MutableList<Message>,chatRoomId: String)
+ }
+ 
+ 
+@@ -23,6 +32,53 @@
+         return user ?: User()
+ 
+     }
++
++    override suspend fun sendMessage(message: Message): Boolean {
++
++        fireStoreDb.collection("messages").add(message).await()
++
++        return true
++    }
++    
++    override suspend fun bindChatRoomToMutableList(mutableList: MutableList<Message>, chatRoomId: String){
++        fireStoreDb.collection("chatRooms")
++            .document(chatRoomId)
++            .collection("messages").addSnapshotListener { snapshot, error ->
++                if (error != null) {
++                    println("Error: ${error.message}")
++                    return@addSnapshotListener
++                }
++                if (snapshot != null) {
++                    // Iterate through documents
++                    for (documentSnapshot in snapshot.documents) {
++                        val message = documentSnapshot.toObject(Message::class.java)
++                        if (message != null) {
++                            println("New Message: ${message.message}, Timestamp: ${message.timeCreated}")
++                        }
++                    }
++                }
++            }
++    }
++
++    override suspend fun getChatRoomMessages(chatRoomId: String): MutableList<Message> {
++        val messageList = mutableListOf<Message>()
++        fireStoreDb.collection("chatRooms")
++            .document(chatRoomId)
++            .collection("messages").orderBy("TimeCreated").get()
++                .addOnCompleteListener{task ->
++                    if(task.isSuccessful){
++                        val querySnapShot = task.result
++                        if(!querySnapShot.isEmpty){
++                            for (doc in querySnapShot.documents){
++                                doc.toObject<Message>()?.let { messageList.add(it) }
++                            }
++                        }
++                    }
++                }.await()
++        return messageList
++    }
++
++
+     /*
+     override suspend fun getUser(uid:String): User{
+         var user:User
+Index: app/src/main/java/com/example/blabapp/Screens/MessagesScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp.Screens\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.ArrowBack\r\nimport androidx.compose.material3.Icon\r\n\r\nimport androidx.compose.material3.IconButton\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport com.example.blabapp.ui.theme.Purple40\r\nimport java.net.URLEncoder\r\n\r\n\r\n@Composable\r\nfun MessagesScreen(navController: NavHostController) {\r\n    // Sample conversations (Replace with Firebase data)\r\n    val conversations = remember {\r\n        mutableStateListOf(\r\n            Message(\"John\", \"O sea, ¡sí! ¿Quién no?\", false),\r\n            Message(\"Alice\", \"¡Quedamos mañana!\", false),\r\n            Message(\"Bob\", \"¿Terminaste el proyecto?\", true) // Already read\r\n        )\r\n    }\r\n\r\n    Box(\r\n        modifier = Modifier\r\n            .fillMaxSize()\r\n            .background(MaterialTheme.colorScheme.surface)\r\n    ) {\r\n        Column(modifier = Modifier.fillMaxSize()) {\r\n            // Header\r\n            Row(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .background(MaterialTheme.colorScheme.background)\r\n                    .padding(7.dp),\r\n                verticalAlignment = Alignment.CenterVertically\r\n            ) {\r\n                IconButton(onClick = { navController.popBackStack() }) {\r\n                    Icon(\r\n                        imageVector = Icons.Default.ArrowBack,\r\n                        contentDescription = \"Back\",\r\n                        tint = Color.White\r\n                    )\r\n                }\r\n                Text(\r\n                    text = \"Messages\",\r\n                    fontSize = 20.sp,\r\n                    color = Color.White,\r\n                    modifier = Modifier.padding(start = 16.dp)\r\n                )\r\n            }\r\n\r\n            // Message List\r\n            LazyColumn(modifier = Modifier.padding(16.dp)) {\r\n                items(conversations) { conversation ->\r\n                    Row(\r\n                        modifier = Modifier\r\n                            .fillMaxWidth()\r\n                            .padding(vertical = 8.dp)\r\n                            .clickable {\r\n                                conversation.isRead = true\r\n                                val encodedName = URLEncoder.encode(conversation.sender, \"UTF-8\")\r\n                                navController.navigate(\"chat_screen/$encodedName\") // navigate to Chat screen\r\n                            },\r\n                        verticalAlignment = Alignment.CenterVertically\r\n                    ) {\r\n                        // Message sender image (Placeholder)\r\n                        Box(\r\n                            modifier = Modifier\r\n                                .size(60.dp)\r\n                                .clip(CircleShape)\r\n                                .background(Color.Blue)\r\n                        )\r\n\r\n                        // Message text content\r\n                        Column(modifier = Modifier.padding(start = 16.dp)) {\r\n                            Text(\r\n                                text = conversation.sender,\r\n                                fontSize = 18.sp,\r\n                                fontWeight = FontWeight.Bold,\r\n                                color = MaterialTheme.colorScheme.secondary\r\n                            )\r\n                            Text(\r\n                                text = conversation.content,\r\n                                fontSize = 14.sp,\r\n                                fontWeight = if (conversation.isRead) FontWeight.Normal else FontWeight.Bold, // Bold if unread\r\n                                color = MaterialTheme.colorScheme.secondary\r\n                            )\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Screens/MessagesScreen.kt b/app/src/main/java/com/example/blabapp/Screens/MessagesScreen.kt
+--- a/app/src/main/java/com/example/blabapp/Screens/MessagesScreen.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Screens/MessagesScreen.kt	(date 1741701734078)
+@@ -1,43 +1,50 @@
+ package com.example.blabapp.Screens
+ 
++import android.util.Log
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.clickable
+-import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
+ import androidx.compose.foundation.lazy.LazyColumn
+-import androidx.compose.foundation.lazy.items
++import androidx.compose.foundation.lazy.LazyItemScope
+ import androidx.compose.foundation.shape.CircleShape
+ import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.automirrored.filled.ArrowBack
+ import androidx.compose.material.icons.filled.ArrowBack
+ import androidx.compose.material3.Icon
+-
+ import androidx.compose.material3.IconButton
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.Text
+-
+ import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.mutableStateListOf
+-import androidx.compose.runtime.remember
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.SideEffect
++import androidx.compose.runtime.collectAsState
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.draw.clip
+ import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
+ import androidx.navigation.NavHostController
+-import com.example.blabapp.ui.theme.Purple40
++import com.example.blabapp.Nav.AccountRepository
++import com.example.blabapp.ViewModels.MessagesScreenViewModel
++import com.example.blabapp.ui.theme.BlabYellow
+ import java.net.URLEncoder
+ 
+ 
++
+ @Composable
+-fun MessagesScreen(navController: NavHostController) {
+-    // Sample conversations (Replace with Firebase data)
+-    val conversations = remember {
+-        mutableStateListOf(
+-            Message("John", "O sea, ¡sí! ¿Quién no?", false),
+-            Message("Alice", "¡Quedamos mañana!", false),
+-            Message("Bob", "¿Terminaste el proyecto?", true) // Already read
+-        )
++fun MessagesScreen(navController: NavHostController, userId: String, messagesScreenViewModel: MessagesScreenViewModel, accountRepository: AccountRepository) {
++    val user = accountRepository.currentUser
++    val messages = messagesScreenViewModel.messages.collectAsState()
++    var conversations = mutableListOf<String>()
++    LaunchedEffect(userId) {
++        conversations = messagesScreenViewModel.getConverstationIds(user.friendList)
+     }
+ 
+     Box(
+@@ -77,7 +84,6 @@
+                             .fillMaxWidth()
+                             .padding(vertical = 8.dp)
+                             .clickable {
+-                                conversation.isRead = true
+                                 val encodedName = URLEncoder.encode(conversation.sender, "UTF-8")
+                                 navController.navigate("chat_screen/$encodedName") // navigate to Chat screen
+                             },
+@@ -90,7 +96,34 @@
+                                 .clip(CircleShape)
+                                 .background(Color.Blue)
+                         )
++    Box(modifier = Modifier.fillMaxSize().background(BlabYellow)) {
++        // Back Arrow Icon inside Box with correct alignment
++        Column(modifier = Modifier.fillMaxSize()) {
++        Icon(
++            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
++            contentDescription = "Back",
++            modifier = Modifier
++                .padding(16.dp)
++                .clickable { navController.popBackStack() }
++        )
+ 
++            LazyColumn {
++                items(messages, key = { item -> item.hashCode() }) { item ->
++                    MessageItem(item)
++                }
++            }
++        }
++    }
++}
++
++@Composable
++fun MessageItem(message: Message) {
++    Column {
++        Text(text = message.message, style = MaterialTheme.typography.bodyLarge)
++        Text(
++            text = "${message.message.timeCreated.toDate()}",
++            style = MaterialTheme.typography.bodySmall
++        )
+                         // Message text content
+                         Column(modifier = Modifier.padding(start = 16.dp)) {
+                             Text(
+Index: app/src/main/java/com/example/blabapp/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp\r\n\r\nimport android.content.Context\r\nimport android.os.Bundle\r\nimport android.view.inputmethod.InputMethodManager\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport com.example.blabapp.Nav.BlabApp\r\nimport com.example.blabapp.Nav.BlabApp.Companion.accountRepository\r\nimport com.example.blabapp.ui.theme.BlabAppTheme\r\n\r\nclass MainActivity : ComponentActivity() {\r\n    private lateinit var imm: InputMethodManager\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n\r\n        setContent {\r\n            imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager\r\n            BlabAppTheme {\r\n                RootScreen(accountRepository)\r\n            }\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/MainActivity.kt b/app/src/main/java/com/example/blabapp/MainActivity.kt
+--- a/app/src/main/java/com/example/blabapp/MainActivity.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/MainActivity.kt	(date 1741692920691)
+@@ -5,15 +5,22 @@
+ import android.view.inputmethod.InputMethodManager
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
++import androidx.lifecycle.viewModelScope
+ import com.example.blabapp.Nav.BlabApp
+ import com.example.blabapp.Nav.BlabApp.Companion.accountRepository
+ import com.example.blabapp.ui.theme.BlabAppTheme
++import com.google.firebase.auth.FirebaseAuth
++import kotlinx.coroutines.coroutineScope
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.tasks.await
+ 
+ class MainActivity : ComponentActivity() {
+     private lateinit var imm: InputMethodManager
++
++
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+-
++        autoLogin() //TEST REMOVE <------------------------------------------------------------BAD}{}{}{}{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+         setContent {
+             imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+             BlabAppTheme {
+@@ -21,4 +28,9 @@
+             }
+         }
+     }
+-}
+\ No newline at end of file
++}
++
++
++fun autoLogin(){
++    FirebaseAuth.getInstance().signInWithEmailAndPassword("t@t.com", "123456")
++}
+Index: app/src/main/java/com/example/blabapp/ViewModels/MessagesScreenViewModel.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/ViewModels/MessagesScreenViewModel.kt b/app/src/main/java/com/example/blabapp/ViewModels/MessagesScreenViewModel.kt
+new file mode 100644
+--- /dev/null	(date 1741702249412)
++++ b/app/src/main/java/com/example/blabapp/ViewModels/MessagesScreenViewModel.kt	(date 1741702249412)
+@@ -0,0 +1,50 @@
++package com.example.blabapp.ViewModels
++
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import com.example.blabapp.Nav.Message
++import com.example.blabapp.Nav.MessageRepository
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.StateFlow
++import kotlinx.coroutines.launch
++
++class MessagesScreenViewModel(private var messageRepository: MessageRepository): ViewModel() {
++
++    // Mutable StateFlow to hold the list of messages
++    private val _messages = MutableStateFlow<List<Message>>(emptyList())
++    val messages: StateFlow<List<Message>> get() = _messages
++
++//    private val _conversations = MutableStateFlow<List<Message>>(emptyList())
++    var conversation = ""
++
++    // Load messages once (for example, when the app starts)
++    fun loadMessagesOnce(chatRoomId: String) {
++        viewModelScope.launch {
++            _messages.value = messageRepository.fetchMessagesOnce(chatRoomId)
++        }
++    }
++
++    // Observe messages in real-time using Flow
++    fun observeMessages(chatRoomId: String) {
++        viewModelScope.launch {
++            messageRepository.getMessages(chatRoomId).collect { newMessages ->
++                _messages.value += newMessages
++            }
++        }
++    }
++
++    fun sendMessage(chatRoomId: String, message: Message){
++        viewModelScope.launch {
++            messageRepository.sendMessage(chatRoomId, message)
++        }
++    }
++
++    fun getConverstationIds(friendId): String{
++
++        viewModelScope.launch {
++            conversation = messageRepository.getConversation(friendId)
++        }
++        return conversations
++    }
++
++}
+Index: app/src/main/java/com/example/blabapp/Nav/BlabApp.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp.Nav\r\n\r\nimport android.app.Application\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.runBlocking\r\n\r\nclass BlabApp : Application() {\r\n    companion object{\r\n        lateinit var accountRepository: AccountRepository\r\n    }\r\n\r\n    override fun onCreate() {\r\n        super.onCreate()\r\n\r\n        lateinit var firestoreDB: FirebaseFirestore\r\n\r\n        runBlocking(Dispatchers.IO) {\r\n            firestoreDB = FirebaseFirestore.getInstance()\r\n            accountRepository = AccountRepository(firestoreDB)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Nav/BlabApp.kt b/app/src/main/java/com/example/blabapp/Nav/BlabApp.kt
+--- a/app/src/main/java/com/example/blabapp/Nav/BlabApp.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Nav/BlabApp.kt	(date 1741692920700)
+@@ -8,6 +8,7 @@
+ class BlabApp : Application() {
+     companion object{
+         lateinit var accountRepository: AccountRepository
++        lateinit var messageRepository: MessageRepository
+     }
+ 
+     override fun onCreate() {
+@@ -18,6 +19,7 @@
+         runBlocking(Dispatchers.IO) {
+             firestoreDB = FirebaseFirestore.getInstance()
+             accountRepository = AccountRepository(firestoreDB)
++            messageRepository = MessageRepository(firestoreDB)
+         }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/blabapp/Screens/RootScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp\r\n\r\nimport android.annotation.SuppressLint\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.compose.animation.core.tween\r\nimport androidx.compose.animation.slideInHorizontally\r\nimport androidx.compose.animation.slideOutHorizontally\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.*\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.navigation.NavController\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.*\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.example.blabapp.Nav.AccountRepository\r\nimport com.example.blabapp.Screens.ChatScreen\r\nimport com.example.blabapp.Screens.MessagesScreen\r\nimport com.example.blabapp.ui.theme.BlabPurple\r\nimport com.example.blabapp.ui.theme.BlabYellow\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.text.TextStyle\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport com.example.blabapp.Nav.BlabApp\r\nimport com.example.blabapp.Screens.AddFriendsScreen\r\nimport com.example.blabapp.Screens.FriendsListScreen\r\nimport com.example.blabapp.Screens.LessonScreen\r\nimport com.example.blabapp.Screens.SplashScreen\r\nimport com.example.blabapp.Screens.StartupScreen\r\nimport com.example.blabapp.Screens.LoginScreen\r\nimport com.example.blabapp.Screens.ModuleDetailScreen\r\nimport com.example.blabapp.Screens.ModulesScreen\r\nimport com.example.blabapp.Screens.QuizScoreScreen\r\nimport com.example.blabapp.Screens.QuizScreen\r\nimport com.example.blabapp.Screens.RegisterScreen\r\n\r\n@Composable\r\nfun RootScreen(accountRepository: AccountRepository) {\r\n    val navController = rememberNavController()\r\n\r\n    val screensWithNavBar = listOf(\"home\", \"search\", \"reels\", \"modules\", \"games\", \"friends_list\", \"add_friends\", \"lesson/{moduleId}\", \"moduleDetail/{moduleId}\", \"quiz/{moduleId}\", \"quiz_score/{score}/{totalQuestions}\")\r\n\r\n    var selectedScreen by remember { mutableStateOf(\"home\") }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route\r\n            if (currentRoute in screensWithNavBar) {\r\n                BottomNavigationBar(navController, selectedScreen) { route ->\r\n                    selectedScreen = route\r\n                    navController.navigate(route) {\r\n                        launchSingleTop = true\r\n                        restoreState = true\r\n                    }\r\n                }\r\n            }\r\n        },\r\n        modifier = Modifier.fillMaxSize()\r\n    ) { paddingValues ->\r\n        Box(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .background(MaterialTheme.colorScheme.background)\r\n                .padding(paddingValues)\r\n        ) {\r\n            NavHost(\r\n                navController = navController,\r\n                startDestination = \"splashScreen\",\r\n                modifier = Modifier.fillMaxSize()\r\n            ) {\r\n                // Handle all your screens here in a single NavHost\r\n                composable(\"splashScreen\") { SplashScreen(navController) }\r\n                composable(\"startupScreen\") { StartupScreen(navController) }\r\n                composable(\"loginScreen\") { LoginScreen(BlabApp.accountRepository, navController) }\r\n                composable(\"registerScreen\") { RegisterScreen(BlabApp.accountRepository, navController) }\r\n                composable(\"home\") { HomeScreen(\"Home\", navController, profileImageUrl = \"\", context = LocalContext.current) }\r\n                composable(\"search\") { ScreenContent(\"Search\") }\r\n                composable(\"reels\") { ScreenContent(\"Reels\") }\r\n                composable(\"modules\") { ModulesScreen(navController) }\r\n                composable(\"moduleDetail/{moduleId}\") { backStackEntry ->\r\n                    val moduleId = backStackEntry.arguments?.getString(\"moduleId\") ?: \"\"\r\n                    ModuleDetailScreen(navController, moduleId)\r\n                }\r\n                composable(\"lesson/{moduleId}\") { backStackEntry ->\r\n                    val moduleId = backStackEntry.arguments?.getString(\"moduleId\") ?: \"\"\r\n                    LessonScreen(navController, moduleId)\r\n                }\r\n                composable(\"quiz/{moduleId}\") { backStackEntry ->\r\n                    val moduleId = backStackEntry.arguments?.getString(\"moduleId\") ?: \"\"\r\n                    QuizScreen(navController, moduleId)\r\n                }\r\n                composable(\"quiz_score/{score}/{totalQuestions}\") { backStackEntry ->\r\n                    val score = backStackEntry.arguments?.getString(\"score\")?.toInt() ?: 0\r\n                    val totalQuestions = backStackEntry.arguments?.getString(\"totalQuestions\")?.toInt() ?: 0\r\n                    QuizScoreScreen(navController, score, totalQuestions)\r\n                }\r\n                composable(\"games\") { ScreenContent(\"Games\") }\r\n                composable(\"messages_screen\") { MessagesScreen(navController) }\r\n                composable(\"chat_screen/{contactName}\") { backStackEntry ->\r\n                    val contactName = backStackEntry.arguments?.getString(\"contactName\") ?: \"\"\r\n                    ChatScreen(navController, contactName)\r\n                }\r\n                composable(\"friends_list\") { FriendsListScreen(navController) }\r\n                composable(\"add_friends\") { AddFriendsScreen(navController) }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Screens/RootScreen.kt b/app/src/main/java/com/example/blabapp/Screens/RootScreen.kt
+--- a/app/src/main/java/com/example/blabapp/Screens/RootScreen.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Screens/RootScreen.kt	(date 1741692921014)
+@@ -1,118 +1,108 @@
+-package com.example.blabapp
++package com.example.blabapp.Screens
+ 
+-import android.annotation.SuppressLint
+-import android.os.Bundle
+-import androidx.activity.ComponentActivity
+-import androidx.activity.compose.setContent
+-import androidx.compose.animation.core.tween
+-import androidx.compose.animation.slideInHorizontally
+-import androidx.compose.animation.slideOutHorizontally
+-import androidx.compose.foundation.background
+-import androidx.compose.foundation.layout.*
++import android.widget.Toast
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.padding
+ import androidx.compose.material.icons.Icons
+-import androidx.compose.material.icons.filled.*
+-import androidx.compose.material3.*
+-import androidx.compose.runtime.*
++import androidx.compose.material.icons.filled.Home
++import androidx.compose.material.icons.outlined.Home
++import androidx.compose.material3.Icon
++import androidx.compose.material3.NavigationBar
++import androidx.compose.material3.NavigationBarItem
++import androidx.compose.material3.Scaffold
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableIntStateOf
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Modifier
+-import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.unit.dp
+-import androidx.navigation.NavController
+-import androidx.navigation.NavHostController
+-import androidx.navigation.compose.*
+-import androidx.navigation.compose.rememberNavController
+-import com.example.blabapp.Nav.AccountRepository
+-import com.example.blabapp.Screens.ChatScreen
+-import com.example.blabapp.Screens.MessagesScreen
+-import com.example.blabapp.ui.theme.BlabPurple
+-import com.example.blabapp.ui.theme.BlabYellow
+-import androidx.compose.ui.unit.dp
+-import androidx.compose.ui.unit.sp
+-import androidx.compose.ui.Alignment
+ import androidx.compose.ui.platform.LocalContext
+-import androidx.compose.ui.text.TextStyle
+-import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.unit.sp
++import androidx.navigation.compose.NavHost
++import androidx.navigation.compose.composable
++import androidx.navigation.compose.rememberNavController
+ import com.example.blabapp.Nav.BlabApp
+-import com.example.blabapp.Screens.AddFriendsScreen
+-import com.example.blabapp.Screens.FriendsListScreen
+-import com.example.blabapp.Screens.LessonScreen
++import com.example.blabapp.Nav.MyNavItem
+ import com.example.blabapp.Screens.SplashScreen
+ import com.example.blabapp.Screens.StartupScreen
+-import com.example.blabapp.Screens.LoginScreen
+-import com.example.blabapp.Screens.ModuleDetailScreen
+-import com.example.blabapp.Screens.ModulesScreen
+-import com.example.blabapp.Screens.QuizScoreScreen
+-import com.example.blabapp.Screens.QuizScreen
+-import com.example.blabapp.Screens.RegisterScreen
++import com.example.blabapp.AppNavigation
++
+ 
+ @Composable
+-fun RootScreen(accountRepository: AccountRepository) {
++fun RootScreen(){
++    Text("Root Screen", fontSize=30.sp)
++    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
++    val navItemsList = listOf(
++        MyNavItem(title="Home",
++            iconSelected = Icons.Filled.Home,
++            iconUnselected = Icons.Outlined.Home,
++            route="LoginScreen"
++        )
++    )
++    val context = LocalContext.current
+     val navController = rememberNavController()
+-
+-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}")
+-
+-    var selectedScreen by remember { mutableStateOf("home") }
+-
+-    Scaffold(
+-        bottomBar = {
+-            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+-            if (currentRoute in screensWithNavBar) {
+-                BottomNavigationBar(navController, selectedScreen) { route ->
+-                    selectedScreen = route
+-                    navController.navigate(route) {
+-                        launchSingleTop = true
+-                        restoreState = true
+-                    }
+-                }
+-            }
+-        },
+-        modifier = Modifier.fillMaxSize()
+-    ) { paddingValues ->
+-        Box(
+-            modifier = Modifier
+-                .fillMaxSize()
+-                .background(MaterialTheme.colorScheme.background)
+-                .padding(paddingValues)
+-        ) {
+-            NavHost(
+-                navController = navController,
+-                startDestination = "splashScreen",
+-                modifier = Modifier.fillMaxSize()
+-            ) {
+-                // Handle all your screens here in a single NavHost
+-                composable("splashScreen") { SplashScreen(navController) }
+-                composable("startupScreen") { StartupScreen(navController) }
+-                composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
+-                composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
+-                composable("home") { HomeScreen("Home", navController, profileImageUrl = "", context = LocalContext.current) }
+-                composable("search") { ScreenContent("Search") }
+-                composable("reels") { ScreenContent("Reels") }
+-                composable("modules") { ModulesScreen(navController) }
+-                composable("moduleDetail/{moduleId}") { backStackEntry ->
+-                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+-                    ModuleDetailScreen(navController, moduleId)
+-                }
+-                composable("lesson/{moduleId}") { backStackEntry ->
+-                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+-                    LessonScreen(navController, moduleId)
++    var isVisible by rememberSaveable { mutableStateOf(false) }
++    Scaffold (
++        bottomBar = {if(isVisible){
++            NavigationBar {
++                navItemsList.forEachIndexed { index, item ->
++                    NavigationBarItem(
++                        selected = (selectedItemIndex == index),
++                        onClick = {
++                            selectedItemIndex = index
++                            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
++                            if(item.route=="LoginScreen"){
++                                navController.navigate(item.route)
++                            }
++                            else{
++                                navController.popBackStack()
++                            }
++
++                        },
++                        label = { Text(text = item.title) },
++                        icon = {
++                            Icon(
++                                contentDescription = item.title,
++                                imageVector =
++                                if (index == selectedItemIndex) item.iconSelected
++                                else item.iconUnselected
++                            )
++                        }
++                    )
+                 }
+-                composable("quiz/{moduleId}") { backStackEntry ->
+-                    val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
+-                    QuizScreen(navController, moduleId)
+-                }
+-                composable("quiz_score/{score}/{totalQuestions}") { backStackEntry ->
+-                    val score = backStackEntry.arguments?.getString("score")?.toInt() ?: 0
+-                    val totalQuestions = backStackEntry.arguments?.getString("totalQuestions")?.toInt() ?: 0
+-                    QuizScoreScreen(navController, score, totalQuestions)
+-                }
+-                composable("games") { ScreenContent("Games") }
+-                composable("messages_screen") { MessagesScreen(navController) }
+-                composable("chat_screen/{contactName}") { backStackEntry ->
+-                    val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
+-                    ChatScreen(navController, contactName)
+-                }
+-                composable("friends_list") { FriendsListScreen(navController) }
+-                composable("add_friends") { AddFriendsScreen(navController) }
+-            }
+-        }
+-    }
+-}
++            }
++        }
++        }
++    )
++    { padding ->
++        Column(
++            modifier = Modifier.padding(padding)
++        ) {
++            NavHost(navController=navController, startDestination="SplashScreen"){
++
++                composable(route="SplashScreen"){
++                    isVisible=false
++                    SplashScreen(navController)
++                }
++                composable(route="StartupScreen"){
++                    isVisible=false
++                    StartupScreen(navController)
++                }
++                composable(route="LoginScreen"){
++                    isVisible=false
++                    LoginScreen(BlabApp.accountRepository, navController)
++                }
++                composable(route="RegisterScreen"){
++                    isVisible=false
++                    RegisterScreen(BlabApp.accountRepository, navController)
++                }
++                composable(route="HomeScreen"){
++                    isVisible=false
++                    AppNavigation(BlabApp.accountRepository, navController)
++                }
++            }
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/blabapp/Nav/Message.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Nav/Message.kt b/app/src/main/java/com/example/blabapp/Nav/Message.kt
+new file mode 100644
+--- /dev/null	(date 1741692920695)
++++ b/app/src/main/java/com/example/blabapp/Nav/Message.kt	(date 1741692920695)
+@@ -0,0 +1,18 @@
++package com.example.blabapp.Nav
++
++import android.support.v4.os.IResultReceiver
++import android.support.v4.os.ResultReceiver
++import com.google.firebase.Timestamp
++import io.ktor.client.plugins.api.Send
++
++data class Message(
++    val message: String="",
++    var read: Boolean =false,
++    val senderId: String = "null sender",
++    val receiverId: String = "null receiver",
++    val chatRoomId: String = "null chatRoom",
++    val audioFile: String = "null audio file",
++    val timeCreated: Timestamp = Timestamp.now()
++){
++
++}
+Index: app/src/main/java/com/example/blabapp/Nav/MessageRepository.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Nav/MessageRepository.kt b/app/src/main/java/com/example/blabapp/Nav/MessageRepository.kt
+new file mode 100644
+--- /dev/null	(date 1741702431288)
++++ b/app/src/main/java/com/example/blabapp/Nav/MessageRepository.kt	(date 1741702431288)
+@@ -0,0 +1,52 @@
++package com.example.blabapp.Nav
++
++import com.google.firebase.firestore.FirebaseFirestore
++import com.google.firebase.firestore.QuerySnapshot
++import com.google.firebase.firestore.toObject
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.channelFlow
++import kotlinx.coroutines.tasks.await
++
++class MessageRepository(private val db: FirebaseFirestore) {
++
++
++    fun getMessages(chatRoomId: String): Flow<List<Message>> = channelFlow {
++        val messagesRef = db.collection("chatRooms").document(chatRoomId).collection("messages")
++
++        messagesRef.addSnapshotListener { snapshot, error ->
++            if (error != null) {
++                close(error)
++            }
++
++            snapshot?.let {
++                val messages = it.documents.mapNotNull { doc ->
++                    doc.toObject<Message>()
++                }
++                trySend(messages)
++            }
++        }
++    }
++
++    suspend fun fetchMessagesOnce(chatRoomId: String): List<Message> {
++        val messagesRef = db.collection("chatRooms").document(chatRoomId).collection("messages")
++        val snapshot: QuerySnapshot = messagesRef.orderBy("timeCreated").get().await()
++
++        return snapshot.documents.mapNotNull { doc ->
++            doc.toObject<Message>()
++        }
++    }
++
++    suspend fun sendMessage(chatRoomId: String, message: Message){
++        db.collection("chatRooms").document(chatRoomId).collection("messages").add(Message()).await()
++    }
++
++
++    suspend fun getConversation(friendId: String): String {
++        var conversationId = ""
++        val conversationRefs = db.collection("chatRooms")
++            .where("members",)
++
++        return conversationList
++    }
++
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/blabapp/Screens/ChatScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.blabapp.Screens\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.ArrowBack\r\nimport androidx.compose.material.icons.filled.Send\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.input.TextFieldValue\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport com.example.blabapp.ui.theme.BlabPurple\r\n\r\ndata class Message(val sender: String, val content: String, var isRead: Boolean = false)\r\n\r\n@Composable\r\nfun ChatScreen(navController: NavHostController, contactName: String) {\r\n    val messages = remember { mutableStateListOf<Message>() }\r\n    var newMessage by remember { mutableStateOf(TextFieldValue(\"\")) }\r\n    val isSidebarVisible = remember { mutableStateOf(false) }\r\n\r\n\r\n    // Placeholder: load messages from Firebase\r\n    LaunchedEffect(contactName) {\r\n        loadMessagesFromFirebase(contactName) { loadedMessages ->\r\n            messages.clear()\r\n            messages.addAll(loadedMessages)\r\n        }\r\n    }\r\n\r\n    Column(modifier = Modifier.fillMaxSize()) {\r\n\r\n        Row(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .background(MaterialTheme.colorScheme.background)\r\n                .padding(7.dp),\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            IconButton(onClick = { navController.popBackStack() }) {\r\n                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = \"Back\", tint = Color.White)\r\n            }\r\n            Text(text = contactName, fontSize = 20.sp, color = Color.White)\r\n        }\r\n\r\n        // Chat Messages\r\n        LazyColumn(\r\n            modifier = Modifier\r\n                .weight(1f)\r\n                .background(MaterialTheme.colorScheme.surface)\r\n                .padding(horizontal = 12.dp, vertical = 8.dp)\r\n        ) {\r\n            items(messages) { message ->\r\n                ChatBubble(message)\r\n            }\r\n        }\r\n\r\n        // message Input\r\n        Row(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .background(MaterialTheme.colorScheme.surface)\r\n                .padding(8.dp),\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            TextField(\r\n                value = newMessage,\r\n                onValueChange = { newMessage = it },\r\n                modifier = Modifier\r\n                    .weight(1f),\r\n                placeholder = { Text(\"Type a message...\") }\r\n            )\r\n            IconButton(\r\n                onClick = {\r\n                    if (newMessage.text.isNotEmpty()) {\r\n                        sendMessageToFirebase(\"You\", newMessage.text, contactName)\r\n                        newMessage = TextFieldValue(\"\")\r\n                    }\r\n                },\r\n            ) {\r\n                Icon(imageVector = Icons.Default.Send, contentDescription = \"Send\", tint = MaterialTheme.colorScheme.onTertiary\r\n                )\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun ChatBubble(message: Message) {\r\n    val isUser = message.sender == \"You\"\r\n    val bubbleColor = if (isUser) BlabPurple else Color.Yellow\r\n    val textColor = if (isUser) Color.White else Color.Black\r\n    val alignment = if (isUser) Arrangement.End else Arrangement.Start\r\n\r\n    Row(\r\n        modifier = Modifier\r\n            .fillMaxWidth()\r\n            .padding(vertical = 8.dp),\r\n        horizontalArrangement = alignment,\r\n        verticalAlignment = Alignment.CenterVertically\r\n    ) {\r\n        if (!isUser) {\r\n            UserImage()\r\n        }\r\n\r\n        Box(\r\n            modifier = Modifier\r\n                .padding(horizontal = 8.dp)\r\n                .background(bubbleColor, RoundedCornerShape(24.dp))\r\n                .padding(horizontal = 18.dp, vertical = 12.dp)\r\n        ) {\r\n            Text(text = message.content, fontSize = 16.sp, color = textColor)\r\n        }\r\n\r\n        if (isUser) {\r\n            UserImage()\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun UserImage() {\r\n    Box(\r\n        modifier = Modifier\r\n            .size(40.dp)\r\n            .background(Color.Gray, shape = CircleShape)\r\n            .padding(4.dp)\r\n    ) {\r\n        // Placeholder for user image\r\n    }\r\n}\r\n\r\n// Placeholder: load messages from Firebase\r\nfun loadMessagesFromFirebase(contactName: String, onMessagesLoaded: (List<Message>) -> Unit) {\r\n    // TODO: Replace with actual Firebase  logic\r\n    val sampleMessages = listOf(\r\n        Message(\"You\", \"¡Hey! ¿Cómo te va?\"),\r\n        Message(contactName, \"¡Todo bien! ¿Y tú?\"),\r\n        Message(\"You\", \"Igual por aquí, solo relajándome.\"),\r\n        Message(\"You\", \"¿Has jugado Mario Kart antes?\"),\r\n        Message(contactName, \"O sea, ¡sí! ¿Quién no?\")\r\n    )\r\n    onMessagesLoaded(sampleMessages) // Simulate Firebase callback\r\n}\r\n\r\n// Placeholder: send messages to Firebase\r\nfun sendMessageToFirebase(sender: String, content: String, contactName: String) {\r\n    // TODO: Replace with actual Firebase  logic\r\n}\r\n
+===================================================================
+diff --git a/app/src/main/java/com/example/blabapp/Screens/ChatScreen.kt b/app/src/main/java/com/example/blabapp/Screens/ChatScreen.kt
+--- a/app/src/main/java/com/example/blabapp/Screens/ChatScreen.kt	(revision 0a03aeeda71b6514648606f904e8a9642fbe6430)
++++ b/app/src/main/java/com/example/blabapp/Screens/ChatScreen.kt	(date 1741702249381)
+@@ -18,23 +18,27 @@
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
+ import androidx.navigation.NavHostController
++import com.example.blabapp.Nav.AccountRepository
++import com.example.blabapp.Nav.Message
++import com.example.blabapp.Nav.MessageRepository
++import com.example.blabapp.ViewModels.MessagesScreenViewModel
+ import com.example.blabapp.ui.theme.BlabPurple
+ 
+-data class Message(val sender: String, val content: String, var isRead: Boolean = false)
++
+ 
+ @Composable
+-fun ChatScreen(navController: NavHostController, contactName: String) {
+-    val messages = remember { mutableStateListOf<Message>() }
++fun ChatScreen(navController: NavHostController, contactId: String, accountRepository: AccountRepository, messagesScreenViewModel: MessagesScreenViewModel) {
++
+     var newMessage by remember { mutableStateOf(TextFieldValue("")) }
+     val isSidebarVisible = remember { mutableStateOf(false) }
+ 
+ 
+     // Placeholder: load messages from Firebase
+-    LaunchedEffect(contactName) {
+-        loadMessagesFromFirebase(contactName) { loadedMessages ->
+-            messages.clear()
+-            messages.addAll(loadedMessages)
+-        }
++    val user = accountRepository.currentUser
++    val messages = messagesScreenViewModel.messages.collectAsState()
++
++    LaunchedEffect(contactId) {
++        messagesScreenViewModel.loadMessagesOnce()
+     }
+ 
+     Column(modifier = Modifier.fillMaxSize()) {
+@@ -60,7 +64,7 @@
+                 .padding(horizontal = 12.dp, vertical = 8.dp)
+         ) {
+             items(messages) { message ->
+-                ChatBubble(message)
++                ChatBubble(message, message.senderId==accountRepository.currentUser.userId)
+             }
+         }
+ 
+@@ -95,8 +99,8 @@
+ }
+ 
+ @Composable
+-fun ChatBubble(message: Message) {
+-    val isUser = message.sender == "You"
++fun ChatBubble(message: Message, sent: Boolean) {
++    val isUser = sent
+     val bubbleColor = if (isUser) BlabPurple else Color.Yellow
+     val textColor = if (isUser) Color.White else Color.Black
+     val alignment = if (isUser) Arrangement.End else Arrangement.Start
+@@ -118,7 +122,7 @@
+                 .background(bubbleColor, RoundedCornerShape(24.dp))
+                 .padding(horizontal = 18.dp, vertical = 12.dp)
+         ) {
+-            Text(text = message.content, fontSize = 16.sp, color = textColor)
++            Text(text = message.message, fontSize = 16.sp, color = textColor)
+         }
+ 
+         if (isUser) {

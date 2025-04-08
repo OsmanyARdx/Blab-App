@@ -1,6 +1,7 @@
 package com.example.blabapp.Repository
 
 import com.example.blabapp.Nav.User
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -27,4 +28,5 @@ object UserRepository {
         val document = fireStoreDb.collection("users").document(uid).get().await()
         return document.toObject<User>() ?: User()
     }
+
 }

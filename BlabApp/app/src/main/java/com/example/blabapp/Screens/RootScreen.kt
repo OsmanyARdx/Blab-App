@@ -2,6 +2,7 @@ package com.example.blabapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.tween
@@ -22,7 +23,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.ChatScreen
-import com.example.blabapp.Screens.MessagesScreen
+import com.example.blabapp.MessagesScreen
 import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.BlabYellow
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
 import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
+import com.example.blabapp.Screens.WordleScreen
 import com.example.blabapp.Screens.ReviewScreen
 import com.example.blabapp.Screens.ScrambleScreen
 
@@ -113,6 +115,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
+
                 composable("games") { GameSelectionScreen(navController) }
                 composable("game1"){ ScrambleScreen(navController) }
                 composable("game2") { GameLevelScreen(navController) }
