@@ -44,6 +44,7 @@ import com.example.blabapp.ui.theme.BlabPurple
 import com.example.blabapp.ui.theme.Purple40
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
@@ -104,7 +105,9 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .clickable {
-                                navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}") // navigate to Chat screen
+                                val currentEncodedUrl = URLEncoder.encode(conversation.currentUserImage, StandardCharsets.UTF_8.toString())
+                                val otherEncodedUrl = URLEncoder.encode(conversation.otherUserImage, StandardCharsets.UTF_8.toString())
+                                navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}") // navigate to Chat screen
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {

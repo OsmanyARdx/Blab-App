@@ -1,8 +1,9 @@
 package com.example.blabapp.Repository
 
 import android.util.Log
+import com.example.blabapp.Screens.Message
 
-import com.example.blabapp.ViewModels.Message
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -14,7 +15,9 @@ object ChatRepository {
     private val auth = FirebaseAuth.getInstance()
 
     suspend fun getUserChatrooms(): List<ChatroomPreview> {
-        val userId = UserRepository.getUser()!!.userId
+        val user = UserRepository.getUser()
+        val userId = user!!.userId
+        val userImage = user.imageUrl
         val userDoc = db.collection("users").document(userId).get().await()
 
         val chatList = userDoc.get("chatList") as? List<String> ?: emptyList()
@@ -43,15 +46,15 @@ object ChatRepository {
 
             val lastMessage = lastMessageQuery.documents.firstOrNull()?.getString("text") ?: "No messages"
 
-            chatrooms.add(ChatroomPreview(chatroomId, otherUserId, otherUserName, otherUserImage, lastMessage, userId))
+            chatrooms.add(ChatroomPreview(chatroomId, otherUserId, otherUserName, otherUserImage, lastMessage, userId, userImage))
         }
 
         return chatrooms
     }
-    suspend fun loadMessagesFromFirebase(chatRoomId: String) {
+    suspend fun loadMessagesFromFirebase(chatRoomId: String): List<Message> {
         val db = FirebaseFirestore.getInstance()
         val chatRoomRef = db.collection("chatrooms").document(chatRoomId)
-
+        val messagesList = mutableListOf<Message>()
 
         chatRoomRef.get().addOnSuccessListener { chatRoomSnapshot ->
             if (chatRoomSnapshot.exists()) {
@@ -63,7 +66,7 @@ object ChatRepository {
                     .orderBy("timeCreated", Query.Direction.ASCENDING)
                     .get()
                     .addOnSuccessListener { messagesSnapshot ->
-                        val messagesList = mutableListOf<Message>()
+
 
                         for (document in messagesSnapshot) {
                             val message = document.getString("message") ?: "No message"
@@ -71,7 +74,7 @@ object ChatRepository {
                             val senderId = document.getString("senderId") ?: "Unknown sender"
                             val timeCreated = document.getTimestamp("timeCreated")
 
-                            val msg = Message(message, read, senderId, timeCreated)
+                            val msg = Message(senderId,message,read,timeCreated.toString())
                             messagesList.add(msg)
 
                             Log.d("FirebaseChat", "Message: ${msg.message}, Read: ${msg.read}, Sender: ${msg.senderId}, Time Created: ${msg.timeCreated}")
@@ -88,8 +91,10 @@ object ChatRepository {
         }.addOnFailureListener { exception ->
             Log.e("FirebaseChat", "Error loading chatroom", exception)
         }
+        return messagesList
     }
 }
+
 
 data class ChatroomPreview(
     val chatroomId: String,
@@ -97,6 +102,8 @@ data class ChatroomPreview(
     val otherUserName: String,
     val otherUserImage: String,
     val lastMessage: String,
-    val currentUserId: String
-)
+    val currentUserId: String,
+    val currentUserImage: String
+) {
+}
 
