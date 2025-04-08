@@ -117,8 +117,8 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                             /*email = email,
                             password = password,
                              */
-                            email = "t@t.com",//REMOVE{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-                            password = "123456",//REMOVE{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+                            email = email,
+                            password = password,
                             successfulLoginHandler = {
                                 navController.navigate("home")
                                 Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()

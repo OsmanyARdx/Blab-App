@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
@@ -35,6 +36,7 @@ import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 
 /*
 import coil.compose.rememberAsyncImagePainter
@@ -200,12 +202,14 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
     val lazyColumnListState = rememberLazyListState()
 
 
-
-
-
     // Load messages when the chat screen is displayed
     LaunchedEffect(chatRoomId) {
         viewModel.observeChatMessages(chatRoomId)
+    }
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            lazyColumnListState.animateScrollToItem(messages.lastIndex)
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -218,7 +222,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
             }
             Text(text = "Chat", fontSize = 20.sp, color = Color.White) // Static title, can be dynamic later
         }
@@ -229,7 +233,8 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            
+            state = lazyColumnListState
+
         ) {
             items(messages) { message ->
                 val senderName = userNames[message.senderId] ?: "Unknown User"  // Default to "Unknown User" if name not found

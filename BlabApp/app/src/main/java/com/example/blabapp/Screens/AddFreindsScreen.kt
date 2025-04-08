@@ -212,16 +212,88 @@ fun addFriend(userId: String) {
         firestore.collection("users").document(currentUserId)
             .update("friendList", FieldValue.arrayUnion(userId)) // Add userId to friends list
             .addOnSuccessListener {
-                val coroutineScope = CoroutineScope(Dispatchers.IO)
-                coroutineScope.launch {
-                    refreshUser()
-                }
+                // Create a chat room for the new connection
+                createChatRoom(currentUserId, userId)
             }
             .addOnFailureListener { e ->
                 // Handle failure (e.g., show an error message)
             }
     }
 }
+
+fun createChatRoom(currentUserId: String, friendUserId: String) {
+    val firestore = FirebaseFirestore.getInstance()
+
+    // Create a new document in the chatRooms collection. Firebase will automatically generate a unique document ID
+    val chatRoomData = hashMapOf(
+        "members" to listOf(currentUserId, friendUserId) // Add both users to the members array
+    )
+
+    firestore.collection("chatRooms")
+        .add(chatRoomData)  // Firebase auto-generates a unique ID for this document
+        .addOnSuccessListener { documentReference ->
+            val chatRoomId = documentReference.id  // Firebase auto-generated document ID
+
+            // Now add the chatRoomId explicitly in the document
+            firestore.collection("chatRooms").document(chatRoomId)
+                .update("chatRoomId", chatRoomId)  // Add chatRoomId field with the document ID
+                .addOnSuccessListener {
+                    // The chat room was created successfully with chatRoomId added to the document
+                    // Now, initialize the "messages" subcollection for the chat room
+                    initializeMessagesSubcollection(chatRoomId)
+
+                    updateUserChatList(currentUserId, chatRoomId)
+                    updateUserChatList(friendUserId, chatRoomId)
+                }
+                .addOnFailureListener { e ->
+                    // Handle failure (e.g., show an error message)
+                }
+        }
+        .addOnFailureListener { e ->
+            // Handle failure in creating chat room (e.g., show an error message)
+        }
+}
+
+fun updateUserChatList(userId: String, chatRoomId: String) {
+    val firestore = FirebaseFirestore.getInstance()
+
+    // Update the user's chatList with the new chatRoomId
+    firestore.collection("users").document(userId)
+        .update("chatList", FieldValue.arrayUnion(chatRoomId))  // Add the chatRoomId to the chatList array
+        .addOnSuccessListener {
+            // Handle success (e.g., log the success)
+        }
+        .addOnFailureListener { e ->
+            // Handle failure (e.g., show an error message)
+        }
+}
+
+
+fun initializeMessagesSubcollection(chatRoomId: String) {
+    val firestore = FirebaseFirestore.getInstance()
+
+    // Initialize the "messages" subcollection with a sample message document
+    val messageData = hashMapOf(
+        "message" to "f",  // Placeholder for the message content
+        "read" to false,    // Message read status
+        "senderId" to "",   // Placeholder for sender's ID (empty for now)
+        "timeCreated" to FieldValue.serverTimestamp()  // Automatically set the creation timestamp
+    )
+
+    // Create the first document in the "messages" subcollection
+    firestore.collection("chatRooms").document(chatRoomId)
+        .collection("messages")
+        .add(messageData)  // Adding the placeholder message
+        .addOnSuccessListener {
+            // The "messages" subcollection was successfully initialized
+            // Optionally log or show a success message
+        }
+        .addOnFailureListener { e ->
+            // Handle failure in creating messages subcollection (e.g., show an error message)
+        }
+}
+
+
 
 data class User(val name: String, val userId: String)
 

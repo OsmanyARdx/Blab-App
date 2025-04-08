@@ -123,10 +123,13 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
                     CardMatchingGameScreen(navController, levelId)
                 }
-                composable("messages_screen") { MessagesScreen(navController) }
-                composable("chat_screen/{contactName}") { backStackEntry ->
-                    val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
-                    ChatScreen(navController, contactName)
+                composable("messages_screen") { MessagesScreen(navController, accountRepository) }
+                composable("ChatScreen/{chatRoomId}/{currentUserId}/{otherUserImage}/{currentUserImage}") { backStackEntry ->
+                    val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: ""
+                    val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
+                    val otherUserImage = backStackEntry.arguments?.getString("otherUserImage") ?: ""
+                    val currentUserImage = backStackEntry.arguments?.getString("currentUserImage") ?: ""
+                    ChatScreen(navController, chatRoomId, currentUserId,currentUserImage,otherUserImage)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
