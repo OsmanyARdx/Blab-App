@@ -86,6 +86,12 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.4.0")
     implementation("androidx.compose.material3:material3:1.0.0")
     implementation("androidx.compose.foundation:foundation:1.4.0")
+    implementation("androidx.media3:media3-exoplayer:1.6.0")
+    implementation("androidx.media3:media3-ui:1.6.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+
+    implementation ("androidx.compose.foundation:foundation:1.4.0") // or whatever the latest stable version is
+    implementation ("androidx.compose.material3:material3:1.0.0")
 
 
     testImplementation(libs.junit)

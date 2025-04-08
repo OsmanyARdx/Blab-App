@@ -34,7 +34,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.blabapp.Nav.BlabApp
 import com.example.blabapp.Screens.AddFriendsScreen
+import com.example.blabapp.Screens.CardMatchingGameScreen
 import com.example.blabapp.Screens.FriendsListScreen
+import com.example.blabapp.Screens.GameLevelScreen
+import com.example.blabapp.Screens.GameSelectionScreen
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.Screens.SplashScreen
 import com.example.blabapp.Screens.StartupScreen
@@ -43,15 +46,18 @@ import com.example.blabapp.Screens.ModuleDetailScreen
 import com.example.blabapp.Screens.ModulesScreen
 import com.example.blabapp.Screens.QuizScoreScreen
 import com.example.blabapp.Screens.QuizScreen
+import com.example.blabapp.Screens.ReelsScreen
 import com.example.blabapp.Screens.RegisterScreen
 import com.example.blabapp.Screens.WordleScreen
+import com.example.blabapp.Screens.ReviewScreen
+import com.example.blabapp.Screens.ScrambleScreen
 
 @Composable
 fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
 
 
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}")
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}", "games")
 
 
     var selectedScreen by remember { mutableStateOf("home") }
@@ -89,7 +95,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
                 composable("home") { HomeScreen("Home", navController, context = LocalContext.current) }
                 composable("search") { ScreenContent("Search") }
-                composable("reels") { ScreenContent("Reels") }
+                composable("reels") { ReelsScreen(navController) }
                 composable("modules") { ModulesScreen(navController) }
                 composable("moduleDetail/{moduleId}") { backStackEntry ->
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
@@ -109,18 +115,22 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-                composable("games") { WordleScreen() }
-                composable("messages_screen") { MessagesScreen(navController, accountRepository) }
-//                              ("ChatScreen/{chatroomId}/{currentUserId}/{otherUserImage}/{currentUserImage}") // navigate to Chat screen
-                composable("ChatScreen/{chatRoomId}/{currentUserId}/{otherUserImage}/{currentUserImage}") { backStackEntry ->
-                    val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: ""
-                    val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
-                    val otherUserImage = backStackEntry.arguments?.getString("otherUserImage") ?: ""
-                    val currentUserImage = backStackEntry.arguments?.getString("currentUserImage") ?: ""
-                    ChatScreen(navController, chatRoomId, currentUserId,currentUserImage,otherUserImage)
+
+                composable("games") { GameSelectionScreen(navController) }
+                composable("game1"){ ScrambleScreen(navController) }
+                composable("game2") { GameLevelScreen(navController) }
+                composable("card_matching_game/{levelId}") { backStackEntry ->
+                    val levelId = backStackEntry.arguments?.getString("levelId") ?: throw IllegalArgumentException("Level ID is required")
+                    CardMatchingGameScreen(navController, levelId)
+                }
+                composable("messages_screen") { MessagesScreen(navController) }
+                composable("chat_screen/{contactName}") { backStackEntry ->
+                    val contactName = backStackEntry.arguments?.getString("contactName") ?: ""
+                    ChatScreen(navController, contactName)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
+                composable("review") { ReviewScreen(navController) }
             }
         }
     }

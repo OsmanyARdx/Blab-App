@@ -104,7 +104,7 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                 .padding(7.dp)
         ) {
             IconButton(onClick = { isSidebarVisible.value = !isSidebarVisible.value }, modifier = Modifier.align(Alignment.TopStart)) {
-                if (profileImageUrl.value.isNotEmpty()) {
+                if (!profileImageUrl.value.equals("")) {
                     Image(
                         painter = rememberAsyncImagePainter(profileImageUrl.value),
                         contentDescription = "Profile Picture",
