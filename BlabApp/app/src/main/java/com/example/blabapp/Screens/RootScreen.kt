@@ -142,6 +142,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("review") { ReviewScreen(navController) }
                 composable("profile") { ProfileScreen(navController) }
                 composable("game3") { WordTypeGame(navController) }
+                composable("game4") { WordleScreen() }
 
             }
         }

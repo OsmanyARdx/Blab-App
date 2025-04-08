@@ -64,7 +64,7 @@ fun GameSelectionScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.spacedBy(8.dp), // Reduced spacing
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Reduced spacing
     ) {
-        items(3) { index ->
+        items(4) { index ->
             Box(
                 modifier = Modifier
                     .fillMaxSize() // Make each item fill available space
