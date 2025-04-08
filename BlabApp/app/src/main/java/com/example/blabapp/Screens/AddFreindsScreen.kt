@@ -4,40 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -52,8 +28,7 @@ import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,17 +39,17 @@ fun AddFriendsScreen(navController: NavController) {
     val profileImageUrl = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    var currentFriendList by remember { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(searchQuery) {
         coroutineScope.launch {
             val user = UserRepository.getUser()
             user?.let {
                 profileImageUrl.value = it.imageUrl ?: ""
+                currentFriendList = it.friendList ?: emptyList()
             }
         }
 
-
-        // Only query Firestore if the search query is not empty
         if (searchQuery.isNotEmpty()) {
             val firestore = FirebaseFirestore.getInstance()
             firestore.collection("users")
@@ -92,7 +67,7 @@ fun AddFriendsScreen(navController: NavController) {
                     }
                     filteredUsers.value = users
                 }
-                .addOnFailureListener { e -> }
+                .addOnFailureListener { }
         } else {
             filteredUsers.value = emptyList()
         }
@@ -161,11 +136,24 @@ fun AddFriendsScreen(navController: NavController) {
                         items(filteredUsers.value) { user ->
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(user.name, fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
-                                Button(onClick = { addFriend(user.userId) }) {
-                                    Text("Add")
+                                if (!currentFriendList.contains(user.userId)) {
+                                    Button(onClick = {
+                                        coroutineScope.launch {
+                                            addFriend(user.userId, navController)
+                                        }
+                                    }) {
+                                        Text("Add")
+                                    }
+                                }else{
+                                    Text(
+                                        "Already Friends",
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.tertiary
+                                    )
                                 }
                             }
                         }
@@ -202,99 +190,59 @@ fun AddFriendsScreen(navController: NavController) {
     }
 }
 
-fun addFriend(userId: String) {
+suspend fun addFriend(userId: String, navController: NavController) {
     val firestore = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
-    val currentUserId = firebaseAuth.currentUser?.uid
+    val currentUserId = firebaseAuth.currentUser?.uid ?: return
 
-    if (currentUserId != null) {
-        // Update the current user's friends list with userId
-        firestore.collection("users").document(currentUserId)
-            .update("friendList", FieldValue.arrayUnion(userId)) // Add userId to friends list
-            .addOnSuccessListener {
-                // Create a chat room for the new connection
-                createChatRoom(currentUserId, userId)
-            }
-            .addOnFailureListener { e ->
-                // Handle failure (e.g., show an error message)
-            }
-    }
+    firestore.collection("users").document(currentUserId)
+        .update("friendList", FieldValue.arrayUnion(userId))
+        .addOnSuccessListener {
+            createChatRoom(currentUserId, userId)
+        }
+        .addOnFailureListener { }
+
+    delay(500) // Let Firestore sync up before refreshing
+
+    UserRepository.refreshUser()
+    navController.popBackStack()
 }
 
 fun createChatRoom(currentUserId: String, friendUserId: String) {
     val firestore = FirebaseFirestore.getInstance()
-
-    // Create a new document in the chatRooms collection. Firebase will automatically generate a unique document ID
-    val chatRoomData = hashMapOf(
-        "members" to listOf(currentUserId, friendUserId) // Add both users to the members array
-    )
+    val chatRoomData = hashMapOf("members" to listOf(currentUserId, friendUserId))
 
     firestore.collection("chatRooms")
-        .add(chatRoomData)  // Firebase auto-generates a unique ID for this document
+        .add(chatRoomData)
         .addOnSuccessListener { documentReference ->
-            val chatRoomId = documentReference.id  // Firebase auto-generated document ID
-
-            // Now add the chatRoomId explicitly in the document
+            val chatRoomId = documentReference.id
             firestore.collection("chatRooms").document(chatRoomId)
-                .update("chatRoomId", chatRoomId)  // Add chatRoomId field with the document ID
+                .update("chatRoomId", chatRoomId)
                 .addOnSuccessListener {
-                    // The chat room was created successfully with chatRoomId added to the document
-                    // Now, initialize the "messages" subcollection for the chat room
                     initializeMessagesSubcollection(chatRoomId)
-
                     updateUserChatList(currentUserId, chatRoomId)
                     updateUserChatList(friendUserId, chatRoomId)
                 }
-                .addOnFailureListener { e ->
-                    // Handle failure (e.g., show an error message)
-                }
-        }
-        .addOnFailureListener { e ->
-            // Handle failure in creating chat room (e.g., show an error message)
         }
 }
 
 fun updateUserChatList(userId: String, chatRoomId: String) {
-    val firestore = FirebaseFirestore.getInstance()
-
-    // Update the user's chatList with the new chatRoomId
-    firestore.collection("users").document(userId)
-        .update("chatList", FieldValue.arrayUnion(chatRoomId))  // Add the chatRoomId to the chatList array
-        .addOnSuccessListener {
-            // Handle success (e.g., log the success)
-        }
-        .addOnFailureListener { e ->
-            // Handle failure (e.g., show an error message)
-        }
+    FirebaseFirestore.getInstance().collection("users").document(userId)
+        .update("chatList", FieldValue.arrayUnion(chatRoomId))
 }
-
 
 fun initializeMessagesSubcollection(chatRoomId: String) {
     val firestore = FirebaseFirestore.getInstance()
-
-    // Initialize the "messages" subcollection with a sample message document
     val messageData = hashMapOf(
-        "message" to "f",  // Placeholder for the message content
-        "read" to false,    // Message read status
-        "senderId" to "",   // Placeholder for sender's ID (empty for now)
-        "timeCreated" to FieldValue.serverTimestamp()  // Automatically set the creation timestamp
+        "message" to "f",
+        "read" to false,
+        "senderId" to "",
+        "timeCreated" to FieldValue.serverTimestamp()
     )
 
-    // Create the first document in the "messages" subcollection
     firestore.collection("chatRooms").document(chatRoomId)
         .collection("messages")
-        .add(messageData)  // Adding the placeholder message
-        .addOnSuccessListener {
-            // The "messages" subcollection was successfully initialized
-            // Optionally log or show a success message
-        }
-        .addOnFailureListener { e ->
-            // Handle failure in creating messages subcollection (e.g., show an error message)
-        }
+        .add(messageData)
 }
 
-
-
-data class User(val name: String, val userId: String)
-
-
+data class User(val name: String = "", val userId: String = "", val friendList: List<String>? = null)

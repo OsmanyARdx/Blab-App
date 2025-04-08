@@ -194,7 +194,7 @@ data class Message(
 )
 
 @Composable
-fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUserId: String, otherUserImageUrl: String, thisUserImageUrl: String) {
+fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUserId: String, otherUserImageUrl: String, thisUserImageUrl: String, otherUserName: String ) {
     val viewModel = viewModel { ChatScreenViewModel()}
     val messages = viewModel.messages
     var newMessage by remember { mutableStateOf(TextFieldValue("")) }
@@ -222,9 +222,18 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
             }
-            Text(text = "Chat", fontSize = 20.sp, color = Color.White) // Static title, can be dynamic later
+
+            Text(
+                text = otherUserName,
+                fontSize = 20.sp,
+                color = Color.White
+            )
         }
 
         // Chat Messages

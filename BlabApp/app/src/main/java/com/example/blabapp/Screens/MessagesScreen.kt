@@ -107,7 +107,7 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                             .clickable {
                                 val currentEncodedUrl = URLEncoder.encode(conversation.currentUserImage, StandardCharsets.UTF_8.toString())
                                 val otherEncodedUrl = URLEncoder.encode(conversation.otherUserImage, StandardCharsets.UTF_8.toString())
-                                navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}") // navigate to Chat screen
+                                navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}/${conversation.otherUserName}") // navigate to Chat screen
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {

@@ -129,12 +129,13 @@ fun RootScreen(accountRepository: AccountRepository) {
                     CardMatchingGameScreen(navController, levelId)
                 }
                 composable("messages_screen") { MessagesScreen(navController, accountRepository) }
-                composable("ChatScreen/{chatRoomId}/{currentUserId}/{otherUserImage}/{currentUserImage}") { backStackEntry ->
+                composable("ChatScreen/{chatRoomId}/{currentUserId}/{otherUserImage}/{currentUserImage}/{currentUserName}") { backStackEntry ->
                     val chatRoomId = backStackEntry.arguments?.getString("chatRoomId") ?: ""
                     val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
                     val otherUserImage = backStackEntry.arguments?.getString("otherUserImage") ?: ""
                     val currentUserImage = backStackEntry.arguments?.getString("currentUserImage") ?: ""
-                    ChatScreen(navController, chatRoomId, currentUserId,currentUserImage,otherUserImage)
+                    val currentUserName = backStackEntry.arguments?.getString("currentUserName") ?: ""
+                    ChatScreen(navController, chatRoomId, currentUserId,currentUserImage,otherUserImage, currentUserName)
                 }
                 composable("friends_list") { FriendsListScreen(navController) }
                 composable("add_friends") { AddFriendsScreen(navController) }
