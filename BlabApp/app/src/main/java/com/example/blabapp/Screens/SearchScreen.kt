@@ -132,7 +132,7 @@ fun SearchScreen(navController: NavHostController) {
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = if (userLearning == "ES") "Buscando..." else "Searching...",
+                            text = if (userLearning == "EN") "Buscando..." else "Searching...",
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -173,8 +173,18 @@ fun SearchScreen(navController: NavHostController) {
                                 Column(
                                     modifier = Modifier.padding(16.dp)
                                 ) {
+
+                                    var translatedSearchWord by remember { mutableStateOf(entry.word) }
+
+                                    if(userLearning == "ES"){
+                                        LaunchedEffect(translatedSearchWord) {
+                                            translateSentence(translatedSearchWord) { translated ->
+                                                translatedSearchWord = translated
+                                            }
+                                        }
+                                    }
                                     Text(
-                                        text = "$wordLabel ${entry.word}",
+                                        text = "$wordLabel ${translatedSearchWord}",
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.primary
                                     )
@@ -198,8 +208,14 @@ fun SearchScreen(navController: NavHostController) {
                                                     }
                                                 }
                                                 def.example?.let { example ->
+                                                    LaunchedEffect(example){
+                                                            translatedExample = example
+                                                    }
+                                                }
+                                            }else{
+                                                def.example?.let { example ->
                                                     LaunchedEffect(example) {
-                                                        translateSentenceFromEStoEN(example) { translated ->
+                                                        translateSentence(example) { translated ->
                                                             translatedExample = translated
                                                         }
                                                     }
