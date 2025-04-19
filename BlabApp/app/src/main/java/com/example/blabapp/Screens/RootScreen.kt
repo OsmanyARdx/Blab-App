@@ -54,6 +54,7 @@ import com.example.blabapp.Screens.RegisterScreen
 import com.example.blabapp.Screens.WordleScreen
 import com.example.blabapp.Screens.ReviewScreen
 import com.example.blabapp.Screens.ScrambleScreen
+import com.example.blabapp.Screens.SearchScreen
 import com.example.blabapp.Screens.WordTypeGame
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -99,7 +100,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
                 composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
                 composable("home") { HomeScreen("Home", navController, context = LocalContext.current) }
-                composable("search") { ScreenContent("Search") }
+                composable("search") { SearchScreen(navController) }
                 composable("reels") { ReelsScreen(navController) }
                 composable("modules") { ModulesScreen(navController) }
                 composable("moduleDetail/{moduleId}") { backStackEntry ->

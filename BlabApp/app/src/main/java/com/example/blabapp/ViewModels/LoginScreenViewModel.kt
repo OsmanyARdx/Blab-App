@@ -30,6 +30,8 @@ class LoginScreenViewModel(private var accountRepository: AccountRepository): Vi
                 // Update last login and streak
                 updateLoginStreak(userId)
 
+                UserRepository.refreshUser()
+
                 successfulLoginHandler()
             } catch (e: Exception) {
                 unsuccessfulLoginHandler()

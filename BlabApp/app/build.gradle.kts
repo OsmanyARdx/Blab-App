@@ -81,6 +81,11 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.3")
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // For making network requests
 
     implementation("androidx.compose.ui:ui:1.4.0")
@@ -90,7 +95,7 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.6.0")
     implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
 
-    implementation ("androidx.compose.foundation:foundation:1.4.0") // or whatever the latest stable version is
+    implementation ("androidx.compose.foundation:foundation:1.4.0")
     implementation ("androidx.compose.material3:material3:1.0.0")
 
 
