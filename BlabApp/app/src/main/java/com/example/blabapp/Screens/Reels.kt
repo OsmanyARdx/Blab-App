@@ -143,14 +143,14 @@ fun InteractionBar(
 fun ReelsScreen(navController: NavHostController, userId: String) {
     var videos by remember { mutableStateOf(listOf<VideoData>()) }
     var isLoading by remember { mutableStateOf(true) }
-    var currentlyPlayingIndex by remember { mutableStateOf(0) }  // Start at the first video (index 0)
-    var expandedComments by remember { mutableStateOf<String?>(null) }
+    var currentlyPlayingIndex by remember { mutableStateOf(0) } // Start at the first video (index 0)
+    var expandedComments by remember { mutableStateOf<String?>(null) }  // Track the expanded comment section for a single video
 
-    // Fetch videos from Firebase when screen is first loaded
     LaunchedEffect(Unit) {
         fetchVideosFromFirebase { loadedVideos ->
             videos = loadedVideos
             isLoading = false
+            Log.d("Video", videos.toString())
         }
     }
 
@@ -184,39 +184,16 @@ fun ReelsScreen(navController: NavHostController, userId: String) {
                         },
                         userId = userId,
                         onCommentClick = {
+                            // Toggle comment section for the current video
                             expandedComments = if (expandedComments == video.id) null else video.id
                         },
                         expandedComments = expandedComments,
                         setExpandedComments = { expandedComments = it }
                     )
-
-                    // Show the comment section
-                    AnimatedVisibility(visible = expandedComments == video.id) {
-                        Box (
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color(0x80000000)),
-                            contentAlignment = Alignment.BottomCenter
-                        ){
-                            CommentSection(
-                                videoId = video.id,
-                                userId = userId,
-                                onBack = { expandedComments = null },
-                                onSubmitComment = { commentText ->
-                                    postCommentToFirestore(
-                                        videoId = video.id,
-                                        userId = userId,
-                                        commentText = commentText,
-                                        onSuccess = { },
-                                        onFailure = { }
-                                    )
-                                }
-                            )
-                        }
-                    }
                 }
             }
         }
+
         // Update the currently playing video index based on scrolling
         LaunchedEffect(listState.firstVisibleItemIndex) {
             val firstVisibleIndex = listState.firstVisibleItemIndex
@@ -247,17 +224,18 @@ fun VideoPlayer(
         }
     }
 
+    // Ensure that the ExoPlayer reacts to play/pause state
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
             exoPlayer.play()
-            onPlay()
+            onPlay() // Notify that the video is playing
         } else {
             exoPlayer.pause()
-            onPause()
+            onPause() // Notify that the video is paused
         }
     }
 
-
+    // Ensures the player is properly disposed of when the screen is changed
     DisposableEffect(context) {
         onDispose {
             exoPlayer.release()
@@ -270,13 +248,14 @@ fun VideoPlayer(
                 .fillMaxWidth()
                 .height(700.dp)
         ) {
-            // Video player
+
+            // Display the player view
             AndroidView(factory = {
                 PlayerView(it).apply {
                     player = exoPlayer
-                    useController = false
+                    useController = false // Hide controls
                 }
-            }, modifier = Modifier.fillMaxSize())
+            }, modifier = Modifier.fillMaxWidth().height(700.dp))
 
             // Comment section overlays bottom half of video
             AnimatedVisibility(
@@ -284,13 +263,13 @@ fun VideoPlayer(
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it }),
                 modifier = Modifier
-                    .align(Alignment.BottomCenter) // Animate in place at bottom
+                    .align(Alignment.BottomCenter)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(350.dp)
-                        .background(Color(0x80000000)), // semi-transparent overlay
+                        .background(Color(0x80000000)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     CommentSection(
