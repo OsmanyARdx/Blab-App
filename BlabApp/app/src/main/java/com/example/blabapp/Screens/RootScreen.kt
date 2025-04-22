@@ -56,6 +56,7 @@ import com.example.blabapp.Screens.ReviewScreen
 import com.example.blabapp.Screens.ScrambleScreen
 import com.example.blabapp.Screens.SearchScreen
 import com.example.blabapp.Screens.WordTypeGame
+import com.example.blabapp.Settings.SettingsPage
 import com.google.firebase.auth.FirebaseAuth
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -64,7 +65,9 @@ fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
 
 
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list", "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}", "quiz_score/{score}/{totalQuestions}", "games", "profile")
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list",
+        "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}",
+        "quiz_score/{score}/{totalQuestions}", "games", "profile", "settings")
 
 
     var selectedScreen by remember { mutableStateOf("home") }
@@ -148,6 +151,9 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("profile") { ProfileScreen(navController) }
                 composable("game3") { WordTypeGame(navController) }
                 composable("game4") { WordleScreen() }
+                composable("settings") { SettingsPage(navController) }
+
+
 
             }
         }
