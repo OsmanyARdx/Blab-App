@@ -57,6 +57,7 @@ import com.example.blabapp.Screens.ScrambleScreen
 import com.example.blabapp.Screens.SearchScreen
 import com.example.blabapp.Screens.WordTypeGame
 import com.example.blabapp.Settings.SettingsPage
+import com.google.firebase.auth.FirebaseAuth
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -104,7 +105,10 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("registerScreen") { RegisterScreen(BlabApp.accountRepository, navController) }
                 composable("home") { HomeScreen("Home", navController, context = LocalContext.current) }
                 composable("search") { SearchScreen(navController) }
-                composable("reels") { ReelsScreen(navController) }
+                composable("reels") {
+                    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                    ReelsScreen(navController = navController, userId = currentUserId)
+                }
                 composable("modules") { ModulesScreen(navController) }
                 composable("moduleDetail/{moduleId}") { backStackEntry ->
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
