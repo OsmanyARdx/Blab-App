@@ -118,7 +118,7 @@ fun SidebarMenu(navController: NavController) {
                         when (item) {
                             "Profile" -> navController.navigate("profile")
                             "Friend List" -> navController.navigate("friends_list")
-                            "Settings" -> {} // Navigate to settings screen (if needed)
+                            "Settings" -> navController.navigate("settings")
                             "Saved" -> {} // Navigate to saved items screen (if needed)
                             "Log out" -> { FirebaseAuth.getInstance().signOut()
                                 navController.navigate("loginScreen") {
