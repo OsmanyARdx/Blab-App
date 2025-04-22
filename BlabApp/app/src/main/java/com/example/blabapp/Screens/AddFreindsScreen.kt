@@ -28,8 +28,12 @@ import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun AddFriendsScreen(navController: NavController) {
@@ -41,7 +45,8 @@ fun AddFriendsScreen(navController: NavController) {
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     var currentFriendList by remember { mutableStateOf<List<String>>(emptyList()) }
 
-    LaunchedEffect(searchQuery) {
+
+        LaunchedEffect(searchQuery) {
         coroutineScope.launch {
             val user = UserRepository.getUser()
             user?.let {
@@ -53,8 +58,7 @@ fun AddFriendsScreen(navController: NavController) {
         if (searchQuery.isNotEmpty()) {
             val firestore = FirebaseFirestore.getInstance()
             firestore.collection("users")
-                .whereGreaterThanOrEqualTo("name", searchQuery)
-                .whereLessThanOrEqualTo("name", searchQuery + "\uf8ff")
+                .whereEqualTo("userId", searchQuery)
                 .get()
                 .addOnSuccessListener { result ->
                     val users = mutableListOf<User>()
@@ -122,10 +126,18 @@ fun AddFriendsScreen(navController: NavController) {
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "Your Friend Code:",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                    Text(
+                        text = "$currentUserId",
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        label = { Text("Search for friends") },
+                        label = { Text("Enter Friend Code") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
