@@ -195,6 +195,10 @@ suspend fun addFriend(userId: String, navController: NavController) {
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUserId = firebaseAuth.currentUser?.uid ?: return
 
+
+    firestore.collection("users").document(userId)
+        .update("friendList", FieldValue.arrayUnion(currentUserId))
+
     firestore.collection("users").document(currentUserId)
         .update("friendList", FieldValue.arrayUnion(userId))
         .addOnSuccessListener {
@@ -219,15 +223,16 @@ fun createChatRoom(currentUserId: String, friendUserId: String) {
             firestore.collection("chatRooms").document(chatRoomId)
                 .update("chatRoomId", chatRoomId)
                 .addOnSuccessListener {
-                    initializeMessagesSubcollection(chatRoomId)
-                    updateUserChatList(currentUserId, chatRoomId)
-                    updateUserChatList(friendUserId, chatRoomId)
+                    //initializeMessagesSubcollection(chatRoomId)
+                    updateUserChatList(currentUserId, friendUserId, chatRoomId)
                 }
         }
 }
 
-fun updateUserChatList(userId: String, chatRoomId: String) {
+fun updateUserChatList(userId: String, friendUserId: String, chatRoomId: String) {
     FirebaseFirestore.getInstance().collection("users").document(userId)
+        .update("chatList", FieldValue.arrayUnion(chatRoomId))
+    FirebaseFirestore.getInstance().collection("users").document(friendUserId)
         .update("chatList", FieldValue.arrayUnion(chatRoomId))
 }
 
