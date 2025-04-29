@@ -52,9 +52,6 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import com.example.blabapp.Screens.SidebarMenu
-import com.example.blabapp.ui.theme.BlabYellow
-import com.example.blabapp.ui.theme.Pink80
-import com.example.blabapp.ui.theme.Purple40
 import java.text.SimpleDateFormat
 import java.util.*
 import coil.compose.rememberAsyncImagePainter
@@ -117,8 +114,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         contentDescription = "Profile Picture",
                         modifier = Modifier
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple),
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary),
                         contentScale = ContentScale.Crop
                     )
                 } else {
@@ -127,8 +124,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         contentDescription = "Default Profile Picture",
                         modifier = Modifier
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple)
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary)
                     )
                 }
             }
@@ -137,21 +134,22 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                 Icon(
                     imageVector = Icons.Default.Email,
                     contentDescription = "Messenger",
-                    tint = MaterialTheme.colorScheme.onTertiary
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
 
             Text(
                 text = userRank.value,
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onTertiary,
-                modifier = Modifier.align(Alignment.Center)
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.align(Alignment.Center),
+                fontWeight = FontWeight.Bold
             )
         }
 
         Box(modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)) {
+            .background(MaterialTheme.colorScheme.background)) {
             Column(
                 modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -161,7 +159,7 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                     text = if (userLearning.equals("EN")) "Racha: ${userStreak.value}" else "Streak: ${userStreak.value}",
                     fontSize = 24.sp,
                     modifier = Modifier.padding(top = 16.dp),
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -173,8 +171,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         modifier = Modifier
                             .size(300.dp)
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple),
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary),
                         contentScale = ContentScale.Crop
                     )
                 } else {
@@ -184,8 +182,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         modifier = Modifier
                             .size(300.dp)
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple)
+                            .border(1.dp, MaterialTheme.colorScheme.tertiary, CircleShape)
+                            .background(MaterialTheme.colorScheme.secondary)
                     )
                 }
 
@@ -204,16 +202,16 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                     modifier = Modifier
                         .size(width = 300.dp, height = 100.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, if (isSpanish.value) Pink80 else BlabPurple, RoundedCornerShape(50.dp))
+                        .border(3.dp, if (isSpanish.value) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary, RoundedCornerShape(50.dp))
                         .background(
-                            animateColorAsState(targetValue = if (isSpanish.value) BlabPurple else Pink80).value,
+                            animateColorAsState(targetValue = if (isSpanish.value) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiary).value,
                             RoundedCornerShape(50.dp)
                         )
                         .padding(1.dp)
                 ) {
                     Button(
                         onClick = { isSpanish.value = !isSpanish.value },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        colors = ButtonDefaults.buttonColors(containerColor = Transparent),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Column(
@@ -223,7 +221,7 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                             Text(
                                 text = (if (isSpanish.value) "Frase del día:" else "Phrase of the Day:") + "\n\n" +
                                         if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
-                                color = if (isSpanish.value) Pink80 else BlabPurple,
+                                color = if (isSpanish.value) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary,
                                 fontSize = 18.sp,
                                 textAlign = TextAlign.Center
                             )

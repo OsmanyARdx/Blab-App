@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +27,7 @@ fun GameLevelScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -34,19 +35,19 @@ fun GameLevelScreen(navController: NavHostController) {
                 text = "Select Game Level",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.surface
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = { navController.navigate("card_matching_game/1") },
-                modifier = Modifier.width(200.dp),
+                modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    contentColor = MaterialTheme.colorScheme.surface
                 )
             ) {
                 Text(text = "Level 1", fontSize = 24.sp)
@@ -56,12 +57,12 @@ fun GameLevelScreen(navController: NavHostController) {
 
             Button(
                 onClick = { navController.navigate("card_matching_game/2") },
-                modifier = Modifier.width(200.dp),
+                modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    contentColor = MaterialTheme.colorScheme.surface
                 )
             ) {
                 Text(text = "Level 2", fontSize = 24.sp)
@@ -71,12 +72,12 @@ fun GameLevelScreen(navController: NavHostController) {
 
             Button(
                 onClick = { navController.navigate("card_matching_game/3") },
-                modifier = Modifier.width(200.dp),
+                modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    contentColor = MaterialTheme.colorScheme.surface
                 )
             ) {
                 Text(text = "Level 3", fontSize = 24.sp)

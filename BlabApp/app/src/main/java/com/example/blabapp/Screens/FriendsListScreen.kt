@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -153,8 +154,8 @@ fun FriendsListScreen(navController: NavController) {
                                 contentDescription = "Profile Picture",
                                 modifier = Modifier
                                     .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple),
+                                    .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                                    .background(MaterialTheme.colorScheme.secondary),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -163,8 +164,8 @@ fun FriendsListScreen(navController: NavController) {
                                 contentDescription = "Default Profile Picture",
                                 modifier = Modifier
                                     .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple)
+                                    .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                                    .background(MaterialTheme.colorScheme.secondary)
                             )
                         }
                     }
@@ -172,7 +173,7 @@ fun FriendsListScreen(navController: NavController) {
                     Text(
                         text = "Friends List",
                         fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onTertiary,
+                        color = MaterialTheme.colorScheme.surface,
                         modifier = Modifier.align(Alignment.Center).padding(top = 16.dp)
                     )
                 }
@@ -180,7 +181,7 @@ fun FriendsListScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(16.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
@@ -214,7 +215,14 @@ fun FriendsListScreen(navController: NavController) {
                         ) {
                             Button(
                                 onClick = { navController.navigate("add_friends") },
-                                modifier = Modifier.width(200.dp).align(Alignment.Center)
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .fillMaxWidth(.7f)
+                                    .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                                shape = RoundedCornerShape(50.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.surface)
                             ) {
                                 Text("Add Friends", fontSize = 25.sp)
                             }

@@ -26,8 +26,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.ChatScreen
 import com.example.blabapp.MessagesScreen
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment

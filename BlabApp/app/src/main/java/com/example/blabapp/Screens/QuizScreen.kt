@@ -3,6 +3,7 @@ package com.example.blabapp.Screens
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,7 @@ import com.example.blabapp.ui.theme.BlabBlue
 import com.example.blabapp.ui.theme.BlabGreen
 import com.google.firebase.auth.FirebaseAuth
 import com.example.blabapp.ViewModels.saveWrongAnswerToFirestore
+import com.example.blabapp.ui.theme.BlabRed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ fun QuizScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         when {
@@ -83,7 +85,7 @@ fun QuizScreen(
                             text = "Question ${questionIndex + 1}/${quizQuestions.size}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.secondary
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -93,7 +95,7 @@ fun QuizScreen(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onTertiary
+                            color = MaterialTheme.colorScheme.surface
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -110,30 +112,36 @@ fun QuizScreen(
                                 singleLine = true
                             )
 
-                            Button(
-                                onClick = {
-                                    val answer = userInput.value.trim()
-                                    selectedAnswer.value = answer
-                                    selectedAnswers.value =
-                                        selectedAnswers.value + (questionIndex to answer)
-                                    showResult.value = true
+                            if (!showResult.value) { // 👈 Only show Submit if not answered yet
+                                Button(
+                                    onClick = {
+                                        val answer = userInput.value.trim()
+                                        selectedAnswer.value = answer
+                                        selectedAnswers.value =
+                                            selectedAnswers.value + (questionIndex to answer)
+                                        showResult.value = true
 
-                                    val isCorrect =
-                                        normalize(answer) == normalize(currentQuestion.answer)
-                                    if (!isCorrect && userId != null) {
-                                        CoroutineScope(Dispatchers.IO).launch {
-                                            saveWrongAnswerToFirestore(currentQuestion)
+                                        val isCorrect = normalize(answer) == normalize(currentQuestion.answer)
+                                        if (!isCorrect && userId != null) {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                saveWrongAnswerToFirestore(currentQuestion)
+                                            }
                                         }
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                            ) {
-                                Text("Submit")
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.7f)
+                                        .align(Alignment.CenterHorizontally),
+                                    shape = RoundedCornerShape(50.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.surface
+                                    )
+                                ) {
+                                    Text("Submit")
+                                }
                             }
-                        } else {
+                        }
+                        else {
                             currentQuestion.options.forEach { option ->
                                 val isSelected = selectedAnswer.value == option
                                 val isCorrect = option == currentQuestion.answer
@@ -153,14 +161,12 @@ fun QuizScreen(
                                             }
                                         }
                                     },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp),
+                                    modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
                                     enabled = !showResult.value,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = when {
                                             showResult.value && isCorrect -> BlabGreen
-                                            showResult.value && isSelected -> Color.Red
+                                            showResult.value && isSelected -> BlabRed
                                             else -> MaterialTheme.colorScheme.primary
                                         }
                                     )
@@ -181,7 +187,7 @@ fun QuizScreen(
                                 text = if (isCorrect) "Correct!" else "Wrong! The correct answer is ${currentQuestion.answer}",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isCorrect) BlabGreen else Color.Red
+                                color = if (isCorrect) BlabGreen else BlabRed
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -199,11 +205,11 @@ fun QuizScreen(
                                         navController.navigate("quiz_score/$score/${quizQuestions.size}/$moduleId")
                                     }
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             ) {
                                 Text(
                                     text = if (questionIndex < quizQuestions.size - 1) "Next" else "Finish",
-                                    color = MaterialTheme.colorScheme.onTertiary
+                                    color = MaterialTheme.colorScheme.surface
                                 )
                             }
                         }
@@ -228,10 +234,10 @@ fun QuizScreen(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50.dp),
-                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
+                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onTertiary
+                            contentColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
                         Text(text = "Back", fontSize = 20.sp)

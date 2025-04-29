@@ -48,16 +48,11 @@ import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.R
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
-import com.example.blabapp.ui.theme.BlabBlue
-import com.example.blabapp.ui.theme.BlabGreen
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.TextField
-import com.example.blabapp.ui.theme.DarkBlabBlue
 
 
 @Composable
@@ -79,7 +74,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -107,7 +102,6 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
             InputField("Password", password, isPassword = true) { password = it }
             InputField("Confirm Password", confirmPassword, isPassword = true) { confirmPassword = it }
 
-
             // Language selection with two buttons
             Text("I want to learn:", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
 
@@ -119,9 +113,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "EN" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "EN") BlabPurple else MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.Black
-                    )
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Text("English", fontSize = 16.sp)
                 }
@@ -130,9 +123,8 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "ES" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "ES") BlabPurple else MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.Black
-                    )
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Text("Spanish", fontSize = 16.sp)
                 }
@@ -165,26 +157,26 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                         }
                     }
                 },
-
                 modifier = Modifier
                     .size(150.dp, 50.dp)
-                    .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50.dp))
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50.dp))
                     .clip(RoundedCornerShape(50.dp))
-                    .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.Black)
+                    .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
             ) {
                 Text(text = "Register", fontSize = 20.sp)
             }
 
             Row {
 
-                Text(text = "Already have an account?",
-                    color = BlabPurple)
-
+                Text(text = "Already have an account?", color = MaterialTheme.colorScheme.surface)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Login",
-                    color = BlabGreen,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { navController.navigate("loginScreen") }
                 )
             }

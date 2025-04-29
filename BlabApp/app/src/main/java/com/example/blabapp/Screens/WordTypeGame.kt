@@ -50,8 +50,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.blabapp.R
 import com.example.blabapp.ui.theme.BlabGreen
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
+import com.example.blabapp.ui.theme.BlabLight
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -183,7 +182,7 @@ fun WordTypeGame(navController: NavHostController) {
                         .drawBehind {
                             val strokeWidth = 2.dp.toPx()
                             drawLine(
-                                color = BlabPurple,
+                                color = BlabLight,
                                 start = Offset(0f, size.height),
                                 end = Offset(size.width, size.height),
                                 strokeWidth = strokeWidth
@@ -195,7 +194,7 @@ fun WordTypeGame(navController: NavHostController) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.surface
                         )
                     }
 
@@ -221,7 +220,7 @@ fun WordTypeGame(navController: NavHostController) {
                                 "Game Complete!!",
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Green
+                                color = BlabGreen
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(

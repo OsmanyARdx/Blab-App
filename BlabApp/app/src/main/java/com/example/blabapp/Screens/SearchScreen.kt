@@ -61,13 +61,13 @@ fun SearchScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Purple header with search
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
             OutlinedTextField(
@@ -76,7 +76,7 @@ fun SearchScreen(navController: NavHostController) {
                 label = {
                     Text(
                         text = searchLabel,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.surface
                     )
                 },
                 trailingIcon = {
@@ -87,19 +87,19 @@ fun SearchScreen(navController: NavHostController) {
                         Icon(
                             Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.surface
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
+                    .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp)),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
-                    cursorColor = MaterialTheme.colorScheme.onSurface,
-                    focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                    focusedBorderColor = MaterialTheme.colorScheme.surface,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                    cursorColor = MaterialTheme.colorScheme.secondary,
+                    focusedLabelColor = MaterialTheme.colorScheme.surface,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -133,7 +133,7 @@ fun SearchScreen(navController: NavHostController) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = if (userLearning == "EN") "Buscando..." else "Searching...",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.surface
                         )
                     }
                 }
@@ -186,7 +186,7 @@ fun SearchScreen(navController: NavHostController) {
                                     Text(
                                         text = "$wordLabel ${translatedSearchWord}",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
 
                                     entry.meanings.forEach { meaning ->
@@ -225,7 +225,7 @@ fun SearchScreen(navController: NavHostController) {
                                             Text(
                                                 text = "${index + 1}. $translatedDefinition",
                                                 modifier = Modifier.padding(top = 4.dp, start = 8.dp),
-                                                color = MaterialTheme.colorScheme.onSurface
+                                                color = MaterialTheme.colorScheme.secondary
                                             )
 
                                             if (translatedExample.isNotBlank()) {
