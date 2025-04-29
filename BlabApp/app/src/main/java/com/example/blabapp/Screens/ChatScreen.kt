@@ -217,7 +217,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.tertiary)
                 .padding(7.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -255,12 +255,13 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
                 value = newMessage,
+
                 onValueChange = { newMessage = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("Type a message...") }

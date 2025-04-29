@@ -66,7 +66,7 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(MaterialTheme.colorScheme.tertiary)
                     .padding(7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
