@@ -1,8 +1,5 @@
 package com.example.blabapp
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,17 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import android.util.Log
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.ui.text.style.TextAlign
 import okhttp3.*
 import org.json.JSONArray
@@ -36,33 +29,14 @@ import java.io.IOException
 import java.net.URLEncoder
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Message
-import android.speech.tts.TextToSpeech
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import com.example.blabapp.Screens.SidebarMenu
 import java.text.SimpleDateFormat
 import java.util.*
 import coil.compose.rememberAsyncImagePainter
-import com.example.blabapp.Repository.UserRepository
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(title: String, navController: NavHostController, context: Context) {
