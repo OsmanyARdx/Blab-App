@@ -198,8 +198,8 @@ private fun checkMatch(
 fun GoodJobDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Good Job!") },
-        text = { Text("You have matched all the cards!") },
+        title = { Text("Good Job!", color = MaterialTheme.colorScheme.background) },
+        text = { Text("You have matched all the cards!", color = MaterialTheme.colorScheme.background) },
         confirmButton = {
             Button(
                 onClick = onDismiss

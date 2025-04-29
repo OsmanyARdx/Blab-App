@@ -29,6 +29,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.blabapp.ui.theme.BlabDarkRed
+import com.example.blabapp.ui.theme.BlabRed
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -112,7 +113,7 @@ fun InteractionBar(
                 Icon(
                     imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = if (isLiked) "Unlike" else "Like",
-                    tint = if (isLiked) BlabDarkRed else Color.Gray
+                    tint = if (isLiked) BlabRed else Color.Gray
                 )
             }
             Text(
@@ -247,7 +248,7 @@ fun VideoPlayer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(750.dp)
+                .height(725.dp)
         ) {
 
             // Display the player view
