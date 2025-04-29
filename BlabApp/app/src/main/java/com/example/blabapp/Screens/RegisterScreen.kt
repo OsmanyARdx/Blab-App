@@ -1,7 +1,6 @@
 package com.example.blabapp.Screens
 
 import android.content.Context
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 
@@ -24,9 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,12 +43,6 @@ import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.R
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.TextField
-
 
 @Composable
 fun RegisterScreen(accountRepository: AccountRepository, navController: NavController) {
@@ -113,7 +102,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "EN" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Text("English", fontSize = 16.sp)
@@ -123,7 +112,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     onClick = { selectedLanguage = "ES" },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Text("Spanish", fontSize = 16.sp)
