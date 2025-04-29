@@ -106,7 +106,6 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .padding(4.dp)
-                    .border(2.dp, color = Color.Black, RoundedCornerShape(50.dp))
             ) {
                 Button(
                     onClick = {
@@ -127,7 +126,7 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                     },
                     modifier = Modifier
                         .width(200.dp)
-                        .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                        .border(3.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
                     shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,

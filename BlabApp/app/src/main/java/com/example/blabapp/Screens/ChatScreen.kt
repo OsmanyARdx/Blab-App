@@ -241,7 +241,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
             modifier = Modifier
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 0.dp),
             state = lazyColumnListState
 
         ) {

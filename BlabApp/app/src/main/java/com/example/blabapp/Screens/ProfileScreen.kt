@@ -129,23 +129,6 @@ fun ProfileScreen(navHostController: NavHostController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    showEditImageFields = !showEditImageFields
-                    previewImageUrl = null
-                    newImageUrl = ""
-                },
-                modifier = Modifier.fillMaxWidth(.7f),
-                shape = RoundedCornerShape(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Text(text = if (showEditImageFields) "Cancel" else "Edit Image", fontSize = 15.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             if (showEditImageFields) {
                 InputField(
                     label = "Paste Image URL",
@@ -201,6 +184,22 @@ fun ProfileScreen(navHostController: NavHostController) {
                 Text(text = "Edit Profile", fontSize = 15.sp)
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    showEditImageFields = !showEditImageFields
+                    previewImageUrl = null
+                    newImageUrl = ""
+                },
+                modifier = Modifier.fillMaxWidth(.7f),
+                shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Text(text = if (showEditImageFields) "Cancel" else "Edit Image", fontSize = 15.sp)
+            }
         } else {
             // Editable Profile Form
             InputField(label = "First Name", value = firstName, onValueChange = { firstName = it })
