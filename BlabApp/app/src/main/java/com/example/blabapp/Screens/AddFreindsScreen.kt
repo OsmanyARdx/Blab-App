@@ -1,5 +1,6 @@
 package com.example.blabapp.Screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,7 +45,7 @@ fun AddFriendsScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     var currentFriendList by remember { mutableStateOf<List<String>>(emptyList()) }
-
+    var currentUserFriendCode by remember { mutableStateOf("") }
 
         LaunchedEffect(searchQuery) {
         coroutineScope.launch {
@@ -52,13 +53,14 @@ fun AddFriendsScreen(navController: NavController) {
             user?.let {
                 profileImageUrl.value = it.imageUrl ?: ""
                 currentFriendList = it.friendList ?: emptyList()
+                currentUserFriendCode = it.friendCode
             }
         }
 
         if (searchQuery.isNotEmpty()) {
             val firestore = FirebaseFirestore.getInstance()
             firestore.collection("users")
-                .whereEqualTo("userId", searchQuery)
+                .whereEqualTo("friendCode", searchQuery)
                 .get()
                 .addOnSuccessListener { result ->
                     val users = mutableListOf<User>()
@@ -131,13 +133,13 @@ fun AddFriendsScreen(navController: NavController) {
                         color = MaterialTheme.colorScheme.tertiary
                     )
                     Text(
-                        text = "$currentUserId",
+                        text = currentUserFriendCode,
                         color = MaterialTheme.colorScheme.tertiary,
                     )
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        label = { Text("Enter Friend Code") },
+                        label = { Text("Search for friends") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -202,11 +204,25 @@ fun AddFriendsScreen(navController: NavController) {
     }
 }
 
+suspend fun requestFriend(userId: String, navController: NavController){
+    val firestore = FirebaseFirestore.getInstance()
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUserId = firebaseAuth.currentUser?.uid ?: return
+    firestore.collection("users").document(userId)
+        .update("friendRequests", FieldValue.arrayUnion(currentUserId))
+        .addOnSuccessListener { Log.d("Request Status", "Friend Request Sent")}
+        .addOnFailureListener { Log.d("Request Status", "Friend Request Failed")}
+
+    delay(500) // Let Firestore sync up before refreshing
+
+    UserRepository.refreshUser()
+    navController.popBackStack()
+}
+
 suspend fun addFriend(userId: String, navController: NavController) {
     val firestore = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUserId = firebaseAuth.currentUser?.uid ?: return
-
     firestore.collection("users").document(currentUserId)
         .update("friendList", FieldValue.arrayUnion(userId))
         .addOnSuccessListener {
