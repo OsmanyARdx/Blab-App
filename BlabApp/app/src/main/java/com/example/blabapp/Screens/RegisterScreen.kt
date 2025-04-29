@@ -43,6 +43,7 @@ import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.R
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
+import com.example.blabapp.ui.theme.BlabLight
 
 @Composable
 fun RegisterScreen(accountRepository: AccountRepository, navController: NavController) {
@@ -103,7 +104,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.surface)
+                        contentColor = MaterialTheme.colorScheme.background)
                 ) {
                     Text("English", fontSize = 16.sp)
                 }
@@ -113,7 +114,7 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.surface)
+                        contentColor = MaterialTheme.colorScheme.background)
                 ) {
                     Text("Spanish", fontSize = 16.sp)
                 }
