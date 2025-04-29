@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.example.blabapp.ui.theme.BlabDarkRed
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -75,7 +76,7 @@ fun InteractionBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -111,7 +112,7 @@ fun InteractionBar(
                 Icon(
                     imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = if (isLiked) "Unlike" else "Like",
-                    tint = if (isLiked) Color.Red else Color.Gray
+                    tint = if (isLiked) BlabDarkRed else Color.Gray
                 )
             }
             Text(
@@ -246,7 +247,7 @@ fun VideoPlayer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(700.dp)
+                .height(750.dp)
         ) {
 
             // Display the player view
@@ -255,7 +256,7 @@ fun VideoPlayer(
                     player = exoPlayer
                     useController = false // Hide controls
                 }
-            }, modifier = Modifier.fillMaxWidth().height(700.dp))
+            }, modifier = Modifier.fillMaxSize())
 
             // Comment section overlays bottom half of video
             AnimatedVisibility(
@@ -269,7 +270,7 @@ fun VideoPlayer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(350.dp)
-                        .background(Color(0x80000000)),
+                        .background(color = MaterialTheme.colorScheme.background),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     CommentSection(

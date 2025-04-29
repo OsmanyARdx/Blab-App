@@ -3,12 +3,10 @@ package com.example.blabapp.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,10 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.blabapp.R
-import com.example.blabapp.ui.theme.BlabBlue
-
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 
 
 @Composable
@@ -44,7 +38,7 @@ fun StartupScreen(navController: NavController) {
     val logoPic = painterResource(R.drawable.logo)
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
 
@@ -65,7 +59,7 @@ fun StartupScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(35.dp))
 
-            Text("Welcome to Blab", fontSize = 30.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            Text("Welcome to Blab", fontSize = 30.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -73,13 +67,11 @@ fun StartupScreen(navController: NavController) {
                 onClick = { navController.navigate("LoginScreen") },
                 modifier = Modifier
                     .width(200.dp)
-                    .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50.dp))
-                    .clip(RoundedCornerShape(50.dp))
-                    .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
+                    .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = Color.Black
-                ),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
             ) {
                 Text(text = "Login", fontSize = 30.sp)
             }
@@ -88,13 +80,13 @@ fun StartupScreen(navController: NavController) {
 
             Button(
                 onClick = { navController.navigate("RegisterScreen") },
-                modifier = Modifier.width(200.dp)
-                    .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50.dp))
-                    .clip(RoundedCornerShape(50.dp))
-                    .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
+                modifier = Modifier
+                    .width(200.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = Color.Black),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
             ){
                 Text(text = "Register", fontSize = 30.sp)
             }

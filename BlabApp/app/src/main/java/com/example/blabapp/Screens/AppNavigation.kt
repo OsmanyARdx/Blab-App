@@ -20,8 +20,6 @@ import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.MessagesScreen
 import com.example.blabapp.Screens.ModulesScreen
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 
 
 @Composable
@@ -39,7 +37,7 @@ fun BottomNavigationBar(
     )
 
     NavigationBar(
-        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+        modifier = Modifier.background(MaterialTheme.colorScheme.primary).height(70.dp),
         containerColor = MaterialTheme.colorScheme.primary
     ) {
         screens.forEach { (screen, icon) ->
@@ -53,10 +51,12 @@ fun BottomNavigationBar(
                     Icon(
                         icon,
                         contentDescription = screen,
-                        tint = if (screen == selectedScreen) BlabYellow else Color.Black
+                        modifier = Modifier.size(24.dp),
+                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
                     )
                 },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent),
+                alwaysShowLabel = false
             )
         }
     }
@@ -65,7 +65,7 @@ fun BottomNavigationBar(
 @Composable
 fun ScreenContent(title: String) {
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         Text(
             text = title,

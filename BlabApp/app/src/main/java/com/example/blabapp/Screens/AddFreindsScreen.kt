@@ -91,8 +91,8 @@ fun AddFriendsScreen(navController: NavController) {
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .border(1.dp, BlabPurple, CircleShape)
-                                .background(BlabPurple),
+                                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.primary),
                             contentScale = ContentScale.Crop
                         )
                     } else {
@@ -101,8 +101,8 @@ fun AddFriendsScreen(navController: NavController) {
                             contentDescription = "Default Profile Picture",
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .border(1.dp, BlabPurple, CircleShape)
-                                .background(BlabPurple)
+                                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.primary)
                         )
                     }
                 }
@@ -110,7 +110,7 @@ fun AddFriendsScreen(navController: NavController) {
                 Text(
                     text = "Add Friends",
                     fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onTertiary,
+                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.align(Alignment.Center).padding(top = 16.dp)
                 )
             }
@@ -118,7 +118,7 @@ fun AddFriendsScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -152,7 +152,7 @@ fun AddFriendsScreen(navController: NavController) {
                                     Text(
                                         "Already Friends",
                                         fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.tertiary
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
                                 }
                             }
@@ -168,7 +168,14 @@ fun AddFriendsScreen(navController: NavController) {
                     ) {
                         Button(
                             onClick = { navController.navigate("friends_list") },
-                            modifier = Modifier.width(250.dp).align(Alignment.Center)
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth(.7f)
+                                .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                            shape = RoundedCornerShape(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Text("Back to Friends", fontSize = 25.sp)
                         }

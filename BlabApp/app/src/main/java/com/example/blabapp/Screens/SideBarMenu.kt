@@ -2,6 +2,7 @@ package com.example.blabapp.Screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +64,7 @@ fun SidebarMenu(navController: NavController) {
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth(0.7f)
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.tertiary)
             .padding(16.dp)
     ) {
         // Profile Image and User Info at the Top
@@ -69,6 +73,7 @@ fun SidebarMenu(navController: NavController) {
                 painter = rememberAsyncImagePainter(profileImageUrl.value),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
+                    .border(2.dp, color = MaterialTheme.colorScheme.secondary, CircleShape)
                     .size(120.dp)
                     .clip(CircleShape)
                     .align(Alignment.CenterHorizontally)
@@ -78,6 +83,7 @@ fun SidebarMenu(navController: NavController) {
                 painter = painterResource(id = R.drawable.default_profile_photo),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
+                    .border(2.dp, color = MaterialTheme.colorScheme.secondary, CircleShape)
                     .size(120.dp)
                     .clip(CircleShape)
                     .align(Alignment.CenterHorizontally)
@@ -90,7 +96,7 @@ fun SidebarMenu(navController: NavController) {
             userName.value,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -100,7 +106,7 @@ fun SidebarMenu(navController: NavController) {
         Text(
             "${numFriends.value} Friends",
             fontSize = 17.sp,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -109,7 +115,7 @@ fun SidebarMenu(navController: NavController) {
         // Scrollable Menu Items
         LazyColumn(
             modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(top = 16.dp) // Add top padding to start from the top
         ) {
             items(listOf("Profile", "Friend List", "Settings", "Saved", "Log out")) { item ->
@@ -126,11 +132,13 @@ fun SidebarMenu(navController: NavController) {
                                 }}
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Text(item, fontSize = 20.sp, color = Color.White)
+                    Text(item, fontSize = 20.sp, color = MaterialTheme.colorScheme.surface)
                 }
             }
         }

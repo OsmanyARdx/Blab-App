@@ -2,16 +2,20 @@ package com.example.blabapp.Screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +39,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 data class CommentWithUser(
     val comment: String,
@@ -68,7 +76,7 @@ fun CommentSection(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        Text("Comments", color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.Bold)
+        Text("Comments", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.Bold)
         if (comments.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -76,17 +84,20 @@ fun CommentSection(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No comments yet.", color = Color.Gray)
+                Text("No comments yet.", color = MaterialTheme.colorScheme.surface)
             }
         } else {
 
-            LazyColumn(modifier = Modifier.height(200.dp)) {
+            LazyColumn(modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
 
-                items(comments) { comment ->
+            items(comments) { comment ->
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("@${comment.name}")
+                                append(comment.name)
                             }
                             append(": ${comment.comment}")
                         },
@@ -94,41 +105,46 @@ fun CommentSection(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .background(MaterialTheme.colorScheme.background),
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
 
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextField(
             value = commentText,
             onValueChange = { commentText = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Add a Comment") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                if (commentText.isNotBlank()) {
-                    postCommentToFirestore(
-                        videoId = videoId,
-                        userId = userId,
-                        commentText = commentText,
-                        onSuccess = {
-                            refreshComments()
-                            commentText = ""
-                        },
-                        onFailure = { }
+            label = { Text("Add a Comment") },
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        if (commentText.isNotBlank()) {
+                            postCommentToFirestore(
+                                videoId = videoId,
+                                userId = userId,
+                                commentText = commentText,
+                                onSuccess = {
+                                    refreshComments()
+                                    commentText = ""
+                                },
+                                onFailure = { }
+                            )
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Send Comment",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Post Comment")
-        }
+            singleLine = true
+        )
     }
 }
 

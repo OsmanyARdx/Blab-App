@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -86,7 +87,7 @@ fun ProfileScreen(navHostController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -102,8 +103,8 @@ fun ProfileScreen(navHostController: NavHostController) {
                     modifier = Modifier
                         .size(200.dp)
                         .clip(CircleShape)
-                        .border(2.dp, BlabPurple, CircleShape)
-                        .background(BlabPurple),
+                        .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
                     contentScale = ContentScale.Crop
                 )
             } else {
@@ -113,16 +114,20 @@ fun ProfileScreen(navHostController: NavHostController) {
                     modifier = Modifier
                         .size(200.dp)
                         .clip(CircleShape)
-                        .border(2.dp, BlabPurple, CircleShape)
-                        .background(BlabPurple)
+                        .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = bio,
                 modifier = Modifier.padding(vertical = 8.dp),
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.surface
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -130,10 +135,16 @@ fun ProfileScreen(navHostController: NavHostController) {
                     previewImageUrl = null
                     newImageUrl = ""
                 },
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth(.7f),
+                shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
             ) {
                 Text(text = if (showEditImageFields) "Cancel" else "Edit Image", fontSize = 15.sp)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (showEditImageFields) {
                 InputField(
@@ -165,17 +176,28 @@ fun ProfileScreen(navHostController: NavHostController) {
                         }
                     },
                     enabled = newImageUrl.isNotBlank(),
-                    modifier = Modifier
-                        .width(220.dp)
-                        .padding(top = 8.dp)
+                    modifier = Modifier.fillMaxWidth(.7f),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.surface)
                 ) {
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(text = "Confirm Image URL")
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { isEditingProfile = true }) {
+            Button(onClick = { isEditingProfile = true },
+                modifier = Modifier.fillMaxWidth(.7f),
+                shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
+            ) {
                 Text(text = "Edit Profile", fontSize = 15.sp)
             }
 
@@ -207,7 +229,12 @@ fun ProfileScreen(navHostController: NavHostController) {
                             Toast.makeText(context, "Failed to update profile", Toast.LENGTH_SHORT).show()
                         }
                 }
-            }) {
+            },
+                modifier = Modifier.fillMaxWidth(),shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface)
+            ) {
                 Text(text = "Confirm Changes", fontSize = 15.sp)
             }
         }

@@ -19,8 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.blabapp.R
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 
 
 @Composable

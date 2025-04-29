@@ -2,33 +2,23 @@ package com.example.blabapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF67509E)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val BlabBlue  = Color(0xFF7BA2FF)
-val DarkBlabBlue  = Color(0xFF374B72)
-val BlabGreen  = Color(0xFF80B5AB)
-val BlabYellow  = Color(0xFFFFEAD3)
+val BlabLightPurple = Color(0xFFD9AADA)
 val BlabPurple  = Color(0xFFA349A4)
-val BlabDarkPurple  = Color(0xFF33284F)
+val BlabDarkPurple  = Color(0xFF612C62)
+
+val BlabLightBlue  = Color(0xFFCADAFF)
+val BlabBlue  = Color(0xFF7BA2FF)
+val BlabDarkBlue  = Color(0xFF496199)
+
+val BlabLightGreen  = Color(0xFFC7E1DD)
+val BlabGreen  = Color(0xFF80B5AB)
+val BlabDarkGreen  = Color(0xFF4D6D67)
+
+val BlabRed = Color(0xFFB44D5B)
+val BlabLightRed  = Color(0xFFDA9CA4)
+val BlabDarkRed  = Color(0xFF6D2F37)
+
+val BlabLight  = Color(0xFFFFF4DA)
 val BlabDark = Color(0xFF3F3D3F)
-val BlabDarkBlue = Color(0xFF007CC9)
-val Blablight  = Color(0xFFFFF4DA)
-
-
-
-//val BlabBlue  = Color(0xFF7BA2FF)
-//val DarkBlabBlue  = Color(0xFF374B72)
-//val BlabGreen  = Color(0xFF6FB7AB)
-//val BlabPurple  = Color(0xFFAC77C2)
-//val BlabDarkPurple  = Color(0xFF8E55A7)
-//val BlabGrey = Color(0xFF5C4F5D)
-
-
 
 

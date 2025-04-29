@@ -40,8 +40,6 @@ import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ViewModels.MessagesScreenViewModel
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
 import com.example.blabapp.ViewModels.WordleViewModel
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.Purple40
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -58,20 +56,17 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
         viewModel.loadChatrooms()
     }
 
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -79,13 +74,14 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.surface
                     )
                 }
                 Text(
                     text = "Messages",
                     fontSize = 20.sp,
-                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.padding(start = 16.dp)
                 )
             }
@@ -118,8 +114,8 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                                 modifier = Modifier
                                     .size(60.dp)
                                     .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple),
+                                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -129,8 +125,8 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                                 modifier = Modifier
                                     .size(60.dp)
                                     .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple)
+                                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
                             )
                         }
 
@@ -140,7 +136,7 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                                 text = conversation.otherUserName,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = conversation.lastMessage,

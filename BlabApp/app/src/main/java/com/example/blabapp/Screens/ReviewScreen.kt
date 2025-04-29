@@ -100,20 +100,20 @@ fun ReviewScreen(navController: NavHostController) {
                         text = "Nothing to review.",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiary
+                        color = MaterialTheme.colorScheme.surface
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Button(
                         onClick = { navController.navigate("modules") },
-                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
+                        shape = RoundedCornerShape(50.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.background)
                     ) {
-                        Text("Back to Modules", color = MaterialTheme.colorScheme.tertiary)
+                        Text("Back to Modules", color = MaterialTheme.colorScheme.background)
                     }
                 }
             }
@@ -132,9 +132,10 @@ fun ReviewScreen(navController: NavHostController) {
                             modifier = Modifier
                                 .width(300.dp)
                                 .height(450.dp)
-                                .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
+                                .padding(16.dp)
+                                .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(10.dp))
                                 .clip(RoundedCornerShape(10.dp)),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
@@ -149,7 +150,7 @@ fun ReviewScreen(navController: NavHostController) {
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold,
                                         textAlign = TextAlign.Center,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.surface
                                     )
 
                                     Spacer(modifier = Modifier.height(16.dp))
@@ -158,7 +159,7 @@ fun ReviewScreen(navController: NavHostController) {
                                         text = "Correct answer: ${item.answer}",
                                         fontSize = 24.sp,
                                         fontStyle = FontStyle.Italic,
-                                        color = MaterialTheme.colorScheme.onTertiary,
+                                        color = MaterialTheme.colorScheme.surface,
                                         textAlign = TextAlign.Center
                                     )
 
@@ -176,13 +177,13 @@ fun ReviewScreen(navController: NavHostController) {
                                                 }
                                             }
                                         },
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(top = 16.dp)
                                             .clip(RoundedCornerShape(50.dp))
                                     ) {
-                                        Text("Mark as Reviewed")
+                                        Text("Mark as Reviewed", color = MaterialTheme.colorScheme.background)
                                     }
                                 }
                             }

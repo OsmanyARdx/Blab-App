@@ -2,8 +2,10 @@ package com.example.blabapp.Settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.blabapp.ui.theme.BlabDark
+import com.example.blabapp.ui.theme.BlabDarkRed
+import com.example.blabapp.ui.theme.BlabLight
+import com.example.blabapp.ui.theme.BlabLightRed
+import com.example.blabapp.ui.theme.BlabRed
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -47,7 +54,7 @@ fun SettingsPage(navHostController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Box(
             modifier = Modifier
@@ -59,7 +66,7 @@ fun SettingsPage(navHostController: NavHostController) {
             Text(
                 text = "Settings",
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.surface
             )
         }
 
@@ -68,13 +75,11 @@ fun SettingsPage(navHostController: NavHostController) {
         // Change Language Button
         Button(
             onClick = { showLanguageDialog = true },
+            modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
+            shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                contentColor = MaterialTheme.colorScheme.surface)
         ) {
             Text("Change Language")
         }
@@ -84,13 +89,11 @@ fun SettingsPage(navHostController: NavHostController) {
         // Change Password Button
         Button(
             onClick = { showChangePasswordDialog = true },
+            modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
+            shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                contentColor = MaterialTheme.colorScheme.surface)
         ) {
             Text("Change Password")
         }
@@ -100,37 +103,36 @@ fun SettingsPage(navHostController: NavHostController) {
         // Delete Account Button
         Button(
             onClick = { showDeleteDialog = true },
+            modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
+            shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,
-                contentColor = Color.Red
-            ),
-            border = BorderStroke(1.dp, Color.Red),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+                containerColor = BlabDarkRed,
+                contentColor = BlabLight)
         ) {
             Text("Delete Account")
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 
     // Confirm  Account Deletion
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Confirm Deletion") },
+            title = { Text("Confirm Deletion", color = MaterialTheme.colorScheme.background)},
             text = {
                 Column {
-                    Text("Enter your password to delete your account:")
+                    Text("Enter your password to delete your account:", color = MaterialTheme.colorScheme.background)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password") },
-                        visualTransformation = PasswordVisualTransformation()
+                        label = { Text("Password", color = MaterialTheme.colorScheme.background) },
+                        visualTransformation = PasswordVisualTransformation(),
                     )
                     errorMessage?.let {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(it, color = MaterialTheme.colorScheme.error)
+                        Text(it, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             },
@@ -169,8 +171,9 @@ fun SettingsPage(navHostController: NavHostController) {
     // Change Language Dialog
     if (showLanguageDialog) {
         AlertDialog(
+            textContentColor = MaterialTheme.colorScheme.background,
             onDismissRequest = { showLanguageDialog = false },
-            title = { Text("Select Language") },
+            title = { Text("Select Language", color = MaterialTheme.colorScheme.background)},
             text = {
                 Column {
                     LanguageOption("English", "EN", selectedLanguage) { selectedLanguage = it }
@@ -208,25 +211,26 @@ fun SettingsPage(navHostController: NavHostController) {
     // Change Password Dialog
     if (showChangePasswordDialog) {
         AlertDialog(
+            textContentColor = MaterialTheme.colorScheme.background,
             onDismissRequest = { showChangePasswordDialog = false },
-            title = { Text("Change Password") },
+            title = { Text("Change Password", color = MaterialTheme.colorScheme.background) },
             text = {
                 Column {
-                    Text("Enter your current password:")
+                    Text("Enter your current password:", color = MaterialTheme.colorScheme.background)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = oldPassword,
                         onValueChange = { oldPassword = it },
-                        label = { Text("Current Password") },
+                        label = { Text("Current Password", color = MaterialTheme.colorScheme.background) },
                         visualTransformation = PasswordVisualTransformation()
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Enter your new password:")
+                    Text("Enter your new password:", color = MaterialTheme.colorScheme.background)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        label = { Text("New Password") },
+                        label = { Text("New Password", color = MaterialTheme.colorScheme.background) },
                         visualTransformation = PasswordVisualTransformation()
                     )
                     errorMessage?.let {
