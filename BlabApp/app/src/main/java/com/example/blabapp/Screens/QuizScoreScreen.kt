@@ -2,10 +2,12 @@ package com.example.blabapp.Screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.Repository.UserRepository.refreshUser
 import com.example.blabapp.ui.theme.BlabGreen
+import com.example.blabapp.ui.theme.BlabRed
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,7 +40,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
     val coroutineScope = rememberCoroutineScope()
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -45,7 +48,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
                 text = "Quiz Completed!",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -54,7 +57,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
                 text = "Your Score",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -63,7 +66,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
                 text = "$score / $totalQuestions",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (score >= totalQuestions / 2) BlabGreen else Color.Red
+                color = if (score >= totalQuestions / 2) BlabGreen else BlabRed
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -71,12 +74,13 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
             Text(
                 text = "You scored ${"%.2f".format(scorePercentage)}%",
                 fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
+                modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
                 onClick = {
                     // Update Firestore after quiz completion
                     val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -103,7 +107,7 @@ fun QuizScoreScreen(navController: NavHostController, score: Int, totalQuestions
                 Text(
                     text = "Return to Module",
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onTertiary
+                    color = MaterialTheme.colorScheme.surface
                 )
             }
         }

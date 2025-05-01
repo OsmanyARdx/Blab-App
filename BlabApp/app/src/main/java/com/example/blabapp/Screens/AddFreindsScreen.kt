@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -97,8 +98,8 @@ fun AddFriendsScreen(navController: NavController) {
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .border(1.dp, BlabPurple, CircleShape)
-                                .background(BlabPurple),
+                                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.primary),
                             contentScale = ContentScale.Crop
                         )
                     } else {
@@ -107,8 +108,8 @@ fun AddFriendsScreen(navController: NavController) {
                             contentDescription = "Default Profile Picture",
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .border(1.dp, BlabPurple, CircleShape)
-                                .background(BlabPurple)
+                                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.primary)
                         )
                     }
                 }
@@ -116,7 +117,7 @@ fun AddFriendsScreen(navController: NavController) {
                 Text(
                     text = "Add Friends",
                     fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onTertiary,
+                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.align(Alignment.Center).padding(top = 16.dp)
                 )
             }
@@ -124,7 +125,7 @@ fun AddFriendsScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -166,7 +167,7 @@ fun AddFriendsScreen(navController: NavController) {
                                     Text(
                                         "Already Friends",
                                         fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.tertiary
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
                                 }
                             }
@@ -182,7 +183,14 @@ fun AddFriendsScreen(navController: NavController) {
                     ) {
                         Button(
                             onClick = { navController.navigate("friends_list") },
-                            modifier = Modifier.width(250.dp).align(Alignment.Center)
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth(.7f)
+                                .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp)),
+                            shape = RoundedCornerShape(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Text("Back to Friends", fontSize = 25.sp)
                         }
@@ -193,12 +201,23 @@ fun AddFriendsScreen(navController: NavController) {
 
         if (isSidebarVisible.value) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
-                    .clickable { isSidebarVisible.value = false }
+                modifier = Modifier.fillMaxSize()
             ) {
-                SidebarMenu(navController)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            onClick = { isSidebarVisible.value = false },
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        )
+                )
+
+                SidebarMenu(
+                    navController = navController,
+                    isVisible = isSidebarVisible.value,
+                    onDismiss = { isSidebarVisible.value = false }
+                )
             }
         }
     }
@@ -223,6 +242,7 @@ suspend fun addFriend(userId: String, navController: NavController) {
     val firestore = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUserId = firebaseAuth.currentUser?.uid ?: return
+
     firestore.collection("users").document(currentUserId)
         .update("friendList", FieldValue.arrayUnion(userId))
         .addOnSuccessListener {
@@ -247,15 +267,16 @@ fun createChatRoom(currentUserId: String, friendUserId: String) {
             firestore.collection("chatRooms").document(chatRoomId)
                 .update("chatRoomId", chatRoomId)
                 .addOnSuccessListener {
-                    initializeMessagesSubcollection(chatRoomId)
-                    updateUserChatList(currentUserId, chatRoomId)
-                    updateUserChatList(friendUserId, chatRoomId)
+                    //initializeMessagesSubcollection(chatRoomId)
+                    updateUserChatList(currentUserId, friendUserId, chatRoomId)
                 }
         }
 }
 
-fun updateUserChatList(userId: String, chatRoomId: String) {
+fun updateUserChatList(userId: String, friendUserId: String, chatRoomId: String) {
     FirebaseFirestore.getInstance().collection("users").document(userId)
+        .update("chatList", FieldValue.arrayUnion(chatRoomId))
+    FirebaseFirestore.getInstance().collection("users").document(friendUserId)
         .update("chatList", FieldValue.arrayUnion(chatRoomId))
 }
 

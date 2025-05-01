@@ -9,15 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import com.example.blabapp.ui.theme.*
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun InputField(label: String, value: String, isPassword: Boolean = false, onValueChange: (String) -> Unit) {
@@ -31,16 +29,16 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label, color = if (isFocused) Color.Black else BlabPurple) },
+            label = { Text(label, color = if (isFocused) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary) },
             visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             modifier = Modifier
                 .fillMaxWidth()
-                .border(2.dp, if (isFocused) Color.Black else BlabPurple, RoundedCornerShape(50.dp))
+                .border(2.dp, if (isFocused) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary, RoundedCornerShape(50.dp))
                 .onFocusChanged { isFocused = it.isFocused },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = BlabPurple, unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = Color.Black, unfocusedTextColor =  BlabPurple,
+                focusedContainerColor = MaterialTheme.colorScheme.tertiary, unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedTextColor = MaterialTheme.colorScheme.surface, unfocusedTextColor =  MaterialTheme.colorScheme.secondary,
                 focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(50.dp),
@@ -49,7 +47,7 @@ fun InputField(label: String, value: String, isPassword: Boolean = false, onValu
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                         contentDescription = "Toggle Password Visibility",
-                        tint = if (isFocused) Color.Black else BlabPurple,
+                        tint = if (isFocused) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.clickable { passwordVisible = !passwordVisible }
                     )
                 }

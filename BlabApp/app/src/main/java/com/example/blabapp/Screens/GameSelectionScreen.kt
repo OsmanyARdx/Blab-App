@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.graphicsLayer
@@ -97,11 +98,8 @@ fun GameSelectionScreen(navController: NavHostController) {
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BlabBlue)
+                    modifier = Modifier.fillMaxSize().padding(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
                 ) {
                     Text(
                         text = "Game ${index + 1}",
@@ -109,7 +107,7 @@ fun GameSelectionScreen(navController: NavHostController) {
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp
                         ),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
             }

@@ -1,7 +1,6 @@
 package com.example.blabapp.Screens
 
 import android.content.Context
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -15,18 +14,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,17 +45,8 @@ import com.example.blabapp.Design.InputField
 import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.R
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
-import com.example.blabapp.ui.theme.BlabBlue
-import com.example.blabapp.ui.theme.BlabGreen
+import com.example.blabapp.ui.theme.BlabLight
 import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.TextField
-import com.example.blabapp.ui.theme.DarkBlabBlue
-
 
 @Composable
 fun RegisterScreen(accountRepository: AccountRepository, navController: NavController) {
@@ -76,122 +64,195 @@ fun RegisterScreen(accountRepository: AccountRepository, navController: NavContr
 
     val context = LocalContext.current
 
+    val scrollState = rememberScrollState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(scrollState), // 🔽 Make content scrollable
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp, horizontal = 16.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(200.dp)
-                    .background(Color.Transparent, shape = RoundedCornerShape(75.dp))
-                    .padding(16.dp),
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = logoPic,
-                    contentDescription = null,
-                    modifier = Modifier.size(300.dp)
-                )
-            }
-            InputField("First Name", firstName) { firstName = it }
-            InputField("Last Name", lastName) { lastName = it }
-            InputField("Email Address", email) { email = it }
-            InputField("Phone Number", phone) { phone = it }
-            InputField("Password", password, isPassword = true) { password = it }
-            InputField("Confirm Password", confirmPassword, isPassword = true) { confirmPassword = it }
-
-
-            // Language selection with two buttons
-            Text("I want to learn:", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Button(
-                    onClick = { selectedLanguage = "EN" },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "EN") BlabPurple else MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.Black
-                    )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("English", fontSize = 16.sp)
-                }
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .background(Color.Transparent, shape = RoundedCornerShape(75.dp))
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = logoPic,
+                            contentDescription = null,
+                            modifier = Modifier.size(300.dp)
+                        )
+                    }
+                    InputField("First Name", firstName) { firstName = it }
+                    InputField("Last Name", lastName) { lastName = it }
+                    InputField("Email Address", email) { email = it }
+                    InputField("Phone Number", phone) { phone = it }
+                    InputField("Password", password, isPassword = true) { password = it }
+                    InputField(
+                        "Confirm Password",
+                        confirmPassword,
+                        isPassword = true
+                    ) { confirmPassword = it }
 
-                Button(
-                    onClick = { selectedLanguage = "ES" },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedLanguage == "ES") BlabPurple else MaterialTheme.colorScheme.tertiary,
-                        contentColor = Color.Black
+                    // Language selection with two buttons
+                    Text(
+                        "I want to learn:",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                ) {
-                    Text("Spanish", fontSize = 16.sp)
-                }
-            }
 
-            Button(
-                onClick = {
-                    when {
-                        firstName.isEmpty() || lastName.isEmpty() -> showToast(context, "Name fields cannot be empty")
-                        email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> showToast(context, "Enter a valid email")
-                        phone.isEmpty() || !phone.matches(Regex("^\\d{10}$")) -> showToast(context, "Enter a valid 10-digit phone number")
-                        password.length < 6 -> showToast(context, "Password must be at least 6 characters")
-                        password != confirmPassword -> showToast(context, "Passwords do not match")
-                        selectedLanguage == null -> showToast(context, "Please select a language") // Language selection check
-                        else -> {
-                            viewModel.registerUserFirebase(
-                                email = email,
-                                password = password,
-                                name = "$firstName $lastName",
-                                imageUrl = "",
-                                learning = selectedLanguage!!, // Use selectedLanguage with non-null assertion
-                                successfulRegistrationHandler = {
-                                    Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                    navController.navigate("LoginScreen")
-                                },
-                                unsuccessfulRegistrationHandler = { error ->
-                                    Toast.makeText(context, "Registration failed: $error", Toast.LENGTH_SHORT).show()
-                                }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(0.7f)
+                    ) {
+                        Button(
+                            onClick = { selectedLanguage = "EN" },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selectedLanguage == "EN") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text(
+                                "English", fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+
+                        Button(
+                            onClick = { selectedLanguage = "ES" },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selectedLanguage == "ES") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text(
+                                "Spanish", fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
-                },
 
-                modifier = Modifier
-                    .size(150.dp, 50.dp)
-                    .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50.dp))
-                    .clip(RoundedCornerShape(50.dp))
-                    .border(2.dp, Color.Black, RoundedCornerShape(50.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary, contentColor = Color.Black)
-            ) {
-                Text(text = "Register", fontSize = 20.sp)
-            }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(4.dp)
+                    ) {
+                    Button(
+                        onClick = {
+                            when {
+                                firstName.isEmpty() || lastName.isEmpty() -> showToast(
+                                    context,
+                                    "Name fields cannot be empty"
+                                )
 
-            Row {
+                                email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email)
+                                    .matches() -> showToast(context, "Enter a valid email")
 
-                Text(text = "Already have an account?",
-                    color = BlabPurple)
+                                phone.isEmpty() || !phone.matches(Regex("^\\d{10}$")) -> showToast(
+                                    context,
+                                    "Enter a valid 10-digit phone number"
+                                )
 
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Login",
-                    color = BlabGreen,
-                    modifier = Modifier.clickable { navController.navigate("loginScreen") }
-                )
+                                password.length < 6 -> showToast(
+                                    context,
+                                    "Password must be at least 6 characters"
+                                )
+
+                                password != confirmPassword -> showToast(
+                                    context,
+                                    "Passwords do not match"
+                                )
+
+                                selectedLanguage == null -> showToast(
+                                    context,
+                                    "Please select a language"
+                                ) // Language selection check
+                                else -> {
+                                    viewModel.registerUserFirebase(
+                                        email = email,
+                                        password = password,
+                                        name = "$firstName $lastName",
+                                        imageUrl = "",
+                                        learning = selectedLanguage!!, // Use selectedLanguage with non-null assertion
+                                        successfulRegistrationHandler = {
+                                            Toast.makeText(
+                                                context,
+                                                "Registration successful!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            navController.navigate("LoginScreen")
+                                        },
+                                        unsuccessfulRegistrationHandler = { error ->
+                                            Toast.makeText(
+                                                context,
+                                                "Registration failed: $error",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    )
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .width(200.dp)
+                            .border(
+                                3.dp,
+                                MaterialTheme.colorScheme.surface,
+                                RoundedCornerShape(50.dp)
+                            ),
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Text(text = "Register", fontSize = 20.sp)
+                    }
+                }
+
+                    Row {
+
+                        Text(
+                            text = "Already have an account?",
+                            color = MaterialTheme.colorScheme.surface
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Login",
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable { navController.navigate("loginScreen") }
+                        )
+                    }
+                }
             }
         }
     }
 }
-
-private fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-}
+    private fun showToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }

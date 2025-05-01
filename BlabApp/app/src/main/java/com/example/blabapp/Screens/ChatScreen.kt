@@ -73,7 +73,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.tertiary)
                 .padding(7.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -81,14 +81,14 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
 
             Text(
                 text = otherUserName,
                 fontSize = 20.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.surface
             )
         }
 
@@ -96,8 +96,8 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 12.dp, vertical = 0.dp),
             state = lazyColumnListState
 
         ) {
@@ -111,12 +111,13 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
                 value = newMessage,
+
                 onValueChange = { newMessage = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("Type a message...") }
@@ -129,7 +130,7 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
                     }
                 }
             ) {
-                Icon(imageVector = Icons.Default.Send, contentDescription = "Send", tint = MaterialTheme.colorScheme.onTertiary)
+                Icon(imageVector = Icons.Default.Send, contentDescription = "Send", tint = MaterialTheme.colorScheme.surface)
             }
         }
     }
@@ -156,8 +157,8 @@ fun ChatScreen(navController: NavHostController, chatRoomId: String, currentUser
 
 @Composable
 fun ChatBubble(message: Message, senderName: String, isUser: Boolean, thisUserImageUrl: String, otherUserImageUrl: String) {
-    val bubbleColor = if (isUser) BlabPurple else Color.Yellow
-    val textColor = if (isUser) Color.White else Color.Black
+    val bubbleColor = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+    val textColor = if (isUser) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.tertiary
     val alignment = if (isUser) Arrangement.End else Arrangement.Start
 
     Row(
@@ -196,9 +197,8 @@ fun UserImage(profileImageUrl: String) {
             modifier = Modifier
                 .size(46.dp)
                 .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple),
-
+                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
             contentScale = ContentScale.Crop
         )
     } else {
@@ -209,8 +209,8 @@ fun UserImage(profileImageUrl: String) {
             modifier = Modifier
                 .size(46.dp)
                 .clip(CircleShape)
-                .border(1.dp, BlabPurple, CircleShape)
-                .background(BlabPurple)
+                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
         )
     }
 }

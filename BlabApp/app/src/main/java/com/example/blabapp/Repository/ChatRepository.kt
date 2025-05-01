@@ -44,7 +44,7 @@ object ChatRepository {
                 .get()
                 .await()
 
-            val lastMessage = lastMessageQuery.documents.firstOrNull()?.getString("text") ?: "No messages"
+            val lastMessage = lastMessageQuery.documents.firstOrNull()?.getString("message") ?: "No messages"
 
             chatrooms.add(ChatroomPreview(chatroomId, otherUserId, otherUserName, otherUserImage, lastMessage, userId, userImage))
         }

@@ -30,6 +30,8 @@ class LoginScreenViewModel(private var accountRepository: AccountRepository): Vi
                 // Update last login and streak
                 updateLoginStreak(userId)
 
+                UserRepository.refreshUser()
+
                 successfulLoginHandler()
             } catch (e: Exception) {
                 unsuccessfulLoginHandler()
@@ -43,7 +45,7 @@ class LoginScreenViewModel(private var accountRepository: AccountRepository): Vi
         val document = userRef.get().await()
         if (document.exists()) {
             val lastLoginTimestamp = document.getTimestamp("lastLogin")
-            val userStreak = document.getLong("userStreak") ?: 0
+            val userStreak = document.getLong("userStreak") ?: 1
 
             val today = Calendar.getInstance()
             val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
@@ -51,13 +53,18 @@ class LoginScreenViewModel(private var accountRepository: AccountRepository): Vi
             val lastLoginCal = Calendar.getInstance()
             lastLoginTimestamp?.toDate()?.let { lastLoginCal.time = it }
 
-            val newStreak = if (
+            val isToday =
+                lastLoginCal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                        lastLoginCal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+
+            val isYesterday =
                 lastLoginCal.get(Calendar.YEAR) == yesterday.get(Calendar.YEAR) &&
-                lastLoginCal.get(Calendar.DAY_OF_YEAR) == yesterday.get(Calendar.DAY_OF_YEAR)
-            ) {
-                userStreak + 1 // Continue the streak
-            } else {
-                1 // Reset the streak
+                        lastLoginCal.get(Calendar.DAY_OF_YEAR) == yesterday.get(Calendar.DAY_OF_YEAR)
+
+            val newStreak = when {
+                isToday -> userStreak // Same day, no change
+                isYesterday -> userStreak + 1 // Continue streak
+                else -> 1 // Missed a day, reset to 1
             }
 
             // Update Firestore
@@ -69,4 +76,5 @@ class LoginScreenViewModel(private var accountRepository: AccountRepository): Vi
             ).await()
         }
     }
+
 }

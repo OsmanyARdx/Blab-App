@@ -40,8 +40,6 @@ import com.example.blabapp.Repository.UserRepository
 import com.example.blabapp.ViewModels.MessagesScreenViewModel
 import com.example.blabapp.ViewModels.RegisterScreenViewModel
 import com.example.blabapp.ViewModels.WordleViewModel
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.Purple40
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -53,18 +51,17 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
     val viewModel = viewModel { MessagesScreenViewModel(accountRepository) }
     val conversations by viewModel.chatrooms.collectAsState()
 
+    val isLoading by viewModel.isLoading
+
     // Fetch conversations when the screen is loaded
     LaunchedEffect(Unit) {
         viewModel.loadChatrooms()
     }
 
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Header
@@ -79,79 +76,107 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.surface
                     )
                 }
                 Text(
                     text = "Messages",
                     fontSize = 20.sp,
-                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.padding(start = 16.dp)
                 )
             }
 
-            // Message List
-            LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items(conversations) { conversation ->
-                    Log.d(
-                        "ChatroomPreview", "Chatroom ID: ${conversation.chatroomId}, " +
-                                "Other User ID: ${conversation.otherUserId}, " +
-                                "Other User Name: ${conversation.otherUserName}, " +
-                                "Other User Image: ${conversation.otherUserImage}, " +
-                                "Last Message: ${conversation.lastMessage}"
+            if (isLoading) {
+                // Show loading spinner
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clickable {
-                                val currentEncodedUrl = URLEncoder.encode(conversation.currentUserImage, StandardCharsets.UTF_8.toString())
-                                val otherEncodedUrl = URLEncoder.encode(conversation.otherUserImage, StandardCharsets.UTF_8.toString())
-                                navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}/${conversation.otherUserName}") // navigate to Chat screen
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (conversation.otherUserImage.isNotEmpty()) {
-                            Image(
-                                painter = rememberAsyncImagePainter(conversation.otherUserImage),
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier
-                                    .size(60.dp)
-                                    .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple),
-                                contentScale = ContentScale.Crop
+                }
+            } else {
+                    // Message List
+                    LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        items(conversations) { conversation ->
+                            Log.d(
+                                "ChatroomPreview", "Chatroom ID: ${conversation.chatroomId}, " +
+                                        "Other User ID: ${conversation.otherUserId}, " +
+                                        "Other User Name: ${conversation.otherUserName}, " +
+                                        "Other User Image: ${conversation.otherUserImage}, " +
+                                        "Last Message: ${conversation.lastMessage}"
                             )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.default_profile_photo),
-                                contentDescription = "Default Profile Picture",
+                            Row(
                                 modifier = Modifier
-                                    .size(60.dp)
-                                    .clip(CircleShape)
-                                    .border(1.dp, BlabPurple, CircleShape)
-                                    .background(BlabPurple)
-                            )
-                        }
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .clickable {
+                                        val currentEncodedUrl = URLEncoder.encode(
+                                            conversation.currentUserImage,
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                        val otherEncodedUrl = URLEncoder.encode(
+                                            conversation.otherUserImage,
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                        navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}/${conversation.otherUserName}") // navigate to Chat screen
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (conversation.otherUserImage.isNotEmpty()) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(conversation.otherUserImage),
+                                        contentDescription = "Profile Picture",
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .clip(CircleShape)
+                                            .border(
+                                                1.dp,
+                                                MaterialTheme.colorScheme.primary,
+                                                CircleShape
+                                            )
+                                            .background(MaterialTheme.colorScheme.primary),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.default_profile_photo),
+                                        contentDescription = "Default Profile Picture",
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .clip(CircleShape)
+                                            .border(
+                                                1.dp,
+                                                MaterialTheme.colorScheme.primary,
+                                                CircleShape
+                                            )
+                                            .background(MaterialTheme.colorScheme.primary)
+                                    )
+                                }
 
-                        // Message text content
-                        Column(modifier = Modifier.padding(start = 16.dp)) {
-                            Text(
-                                text = conversation.otherUserName,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            Text(
-                                text = conversation.lastMessage,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold, // Bold if unread
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                                // Message text content
+                                Column(modifier = Modifier.padding(start = 16.dp)) {
+                                    Text(
+                                        text = conversation.otherUserName,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = conversation.lastMessage,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold, // Bold if unread
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-}

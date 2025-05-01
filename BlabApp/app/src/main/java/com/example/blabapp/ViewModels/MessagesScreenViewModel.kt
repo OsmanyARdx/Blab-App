@@ -1,5 +1,6 @@
 package com.example.blabapp.ViewModels
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.blabapp.Nav.AccountRepository
@@ -17,9 +18,17 @@ class MessagesScreenViewModel(private var accountRepository: AccountRepository):
     private val _chatrooms = MutableStateFlow<List<ChatroomPreview>>(emptyList())
     val chatrooms = _chatrooms.asStateFlow()
 
+
+    var isLoading = mutableStateOf(true)
+        private set
+
     fun loadChatrooms() {
         viewModelScope.launch {
+            isLoading.value = true
             _chatrooms.value = ChatRepository.getUserChatrooms()
+
+            isLoading.value = false
         }
+
     }
 }
