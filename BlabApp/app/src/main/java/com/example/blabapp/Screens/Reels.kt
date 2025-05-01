@@ -3,6 +3,9 @@ package com.example.blabapp.Screens
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -42,8 +45,17 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storageMetadata
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
-// Data class for video metadata
+// Data class for video metadata (without the direct video URL initially)
+data class VideoMetadata(
+    val id: String = "",
+    val caption: String = "",
+    val userId: String = "",
+    val likes: Int = 0
+)
+
+// Data class for video information including the URL
 data class VideoData(
     val id: String = "",
     val videoUrl: String = "",
@@ -51,6 +63,7 @@ data class VideoData(
     val userId: String = "",
     val likes: Int = 0
 )
+
 
 @Composable
 fun InteractionBar(
@@ -138,26 +151,33 @@ fun InteractionBar(
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, "Watch this video: $videoUrl")
             }
-            context.startActivity(Intent.createChooser(intent, "Share via"))
+            try {
+                context.startActivity(Intent.createChooser(intent, "Share via"))
+            } catch (e: Exception) {
+                Log.e("ShareIntent", "Error launching share intent: ${e.localizedMessage}")
+                Toast.makeText(context, "Could not share video.", Toast.LENGTH_SHORT).show()
+            }
         }) {
             Icon(Icons.Default.Share, contentDescription = "Share")
         }
     }
 }
 
-
 @Composable
 fun ReelsScreen(navController: NavHostController, userId: String) {
-    var videos by remember { mutableStateOf(listOf<VideoData>()) }
+    var videoMetadataList by remember { mutableStateOf(listOf<VideoMetadata>()) }
     var isLoading by remember { mutableStateOf(true) }
-    var currentlyPlayingIndex by remember { mutableStateOf(0) } // Start at the first video (index 0)
-    var expandedComments by remember { mutableStateOf<String?>(null) }  // Track the expanded comment section for a single video
+    var currentlyPlayingIndex by remember { mutableStateOf(0) }
+    var expandedComments by remember { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        fetchVideosFromFirebase { loadedVideos ->
-            videos = loadedVideos
+        fetchVideoMetadataFromFirebase { loadedMetadata ->
+            videoMetadataList = loadedMetadata
             isLoading = false
-            Log.d("Video", videos.toString())
+            Log.d("VideoMetadata", videoMetadataList.toString())
         }
     }
 
@@ -169,42 +189,77 @@ fun ReelsScreen(navController: NavHostController, userId: String) {
             CircularProgressIndicator()
         }
     } else {
-        // LazyColumn with vertical scrolling
-        val listState = rememberLazyListState()
-
-        // Manages scrolling and centering videos
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center
         ) {
-            items(videos) { video ->
+            items(videoMetadataList) { videoMetadata ->
+                val isCurrentItemVisible = remember {
+                    derivedStateOf {
+                        listState.layoutInfo.visibleItemsInfo.any { it.index == videoMetadataList.indexOf(videoMetadata) }
+                    }
+                }
+                var videoUri by remember { mutableStateOf<Uri?>(null) }
+                var isVideoLoading by remember { mutableStateOf(false) }
+
+                LaunchedEffect(isCurrentItemVisible.value) {
+                    if (isCurrentItemVisible.value && videoUri == null) {
+                        isVideoLoading = true
+                        fetchVideoUrl(videoId = videoMetadata.id) { uri ->
+                            videoUri = uri
+                            isVideoLoading = false
+                        }
+                    }
+                }
+
                 Column {
-                    VideoPlayer(
-                        videoData = video,
-                        isPlaying = currentlyPlayingIndex == videos.indexOf(video),
-                        onPlay = {
-                            Log.d("Video", "Playing video: ${video.videoUrl}")
-                        },
-                        onPause = {
-                            Log.d("Video", "Pausing video: ${video.videoUrl}")
-                        },
-                        userId = userId,
-                        onCommentClick = {
-                            // Toggle comment section for the current video
-                            expandedComments = if (expandedComments == video.id) null else video.id
-                        },
-                        expandedComments = expandedComments,
-                        setExpandedComments = { expandedComments = it }
-                    )
+                    if (videoUri != null) {
+                        VideoPlayer(
+                            videoData = VideoData(
+                                id = videoMetadata.id,
+                                videoUrl = videoUri.toString(),
+                                caption = videoMetadata.caption,
+                                userId = videoMetadata.userId,
+                                likes = videoMetadata.likes
+                            ),
+                            isPlaying = currentlyPlayingIndex == videoMetadataList.indexOf(videoMetadata),
+                            onPlay = {
+                                Log.d("Video", "Playing video: ${videoMetadata.id}")
+                            },
+                            onPause = {
+                                Log.d("Video", "Pausing video: ${videoMetadata.id}")
+                            },
+                            userId = userId,
+                            onCommentClick = {
+                                expandedComments = if (expandedComments == videoMetadata.id) null else videoMetadata.id
+                            },
+                            expandedComments = expandedComments,
+                            setExpandedComments = { expandedComments = it }
+                        )
+                    } else {
+                        // Placeholder while the video is loading or not yet visible
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(725.dp)
+                                .background(Color.Black),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isVideoLoading) {
+                                CircularProgressIndicator(color = Color.White)
+                            } else {
+                                Text("Loading Preview", color = Color.White)
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // Update the currently playing video index based on scrolling
         LaunchedEffect(listState.firstVisibleItemIndex) {
             val firstVisibleIndex = listState.firstVisibleItemIndex
-            if (firstVisibleIndex != currentlyPlayingIndex) {
+            if (firstVisibleIndex != currentlyPlayingIndex && firstVisibleIndex < videoMetadataList.size) {
                 currentlyPlayingIndex = firstVisibleIndex
             }
         }
@@ -216,7 +271,7 @@ fun ReelsScreen(navController: NavHostController, userId: String) {
                 },
                 modifier = Modifier
                     .padding(16.dp)
-                    .align(Alignment.BottomEnd) ,
+                    .align(Alignment.BottomEnd),
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Upload Video", tint = MaterialTheme.colorScheme.secondary)
@@ -237,7 +292,7 @@ fun VideoPlayer(
     setExpandedComments: (String?) -> Unit
 ) {
     val context = LocalContext.current
-    val exoPlayer = remember {
+    val exoPlayer = remember(context, videoData.videoUrl) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(videoData.videoUrl))
             prepare()
@@ -245,19 +300,17 @@ fun VideoPlayer(
         }
     }
 
-    // Ensure that the ExoPlayer reacts to play/pause state
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
             exoPlayer.play()
-            onPlay() // Notify that the video is playing
+            onPlay()
         } else {
             exoPlayer.pause()
-            onPause() // Notify that the video is paused
+            onPause()
         }
     }
 
-    // Ensures the player is properly disposed of when the screen is changed
-    DisposableEffect(context) {
+    DisposableEffect(exoPlayer) {
         onDispose {
             exoPlayer.release()
         }
@@ -269,16 +322,16 @@ fun VideoPlayer(
                 .fillMaxWidth()
                 .height(725.dp)
         ) {
+            AndroidView(
+                factory = {
+                    PlayerView(it).apply {
+                        player = exoPlayer
+                        useController = false
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
 
-            // Display the player view
-            AndroidView(factory = {
-                PlayerView(it).apply {
-                    player = exoPlayer
-                    useController = false // Hide controls
-                }
-            }, modifier = Modifier.fillMaxSize())
-
-            // Comment section overlays bottom half of video
             AnimatedVisibility(
                 visible = expandedComments == videoData.id,
                 enter = slideInVertically(initialOffsetY = { it }),
@@ -316,11 +369,9 @@ fun VideoPlayer(
     val userName = remember { mutableStateOf("Loading...") }
     val profileImageUrl = remember { mutableStateOf("") }
 
-    val coroutineScope = rememberCoroutineScope()
-    val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     LaunchedEffect(videoData.userId) {
-        videoData.userId?.let { uid ->
+        videoData.userId.let { uid ->
             db.collection("users").document(uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
@@ -330,20 +381,22 @@ fun VideoPlayer(
                 }
         }
     }
-    // Interaction bar below video
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
     ) {
         Column(horizontalAlignment = Alignment.Start) {
-            Row { Text(videoData.caption,   color = MaterialTheme.colorScheme.secondary) }
+            Row { Text(videoData.caption, color = MaterialTheme.colorScheme.secondary) }
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = profileImageUrl.value,
                     contentDescription = "User Profile",
-                    modifier = Modifier.size(24.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(userName.value, color = MaterialTheme.colorScheme.surface)
@@ -361,72 +414,40 @@ fun VideoPlayer(
                     }
                 )
             }
-
         }
     }
-
 }
 
-// Uploads a video to Firebase Storage
-fun uploadVideoToFirebase(
-    uri: Uri,
-    onSuccess: (String) -> Unit,
-    onFailure: (Exception) -> Unit
-) {
-    val storageRef: StorageReference = FirebaseStorage.getInstance().reference
-    val videoRef = storageRef.child("videos/${System.currentTimeMillis()}.mp4")
-
-    videoRef.putFile(uri, storageMetadata { contentType = "video/mp4" })
-        .addOnSuccessListener {
-            videoRef.downloadUrl.addOnSuccessListener { downloadUrl ->
-                onSuccess(downloadUrl.toString())
-            }
-        }
-        .addOnFailureListener { exception ->
-            onFailure(exception)
-        }
-}
-
-// Fetch videos from Firestore
-fun fetchVideosFromFirebase(onVideosLoaded: (List<VideoData>) -> Unit) {
+// Fetch only video metadata (excluding the URL)
+fun fetchVideoMetadataFromFirebase(onVideoMetadataLoaded: (List<VideoMetadata>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
     db.collection("videos")
         .get()
         .addOnSuccessListener { result ->
-            val videos = mutableListOf<VideoData>()
-            val tasks = mutableListOf<Task<Uri>>()
-
-            for (doc in result.documents) {
-                val videoId = doc.id
-                val caption = doc.getString("caption") ?: ""
-                val userId = doc.getString("userId") ?: ""
-                val likes = doc.getLong("likes")?.toInt() ?: 0
-                val storageRef = FirebaseStorage.getInstance().reference.child("videos/$videoId.mp4")
-
-                val downloadTask = storageRef.downloadUrl
-                    .addOnSuccessListener { downloadUrl ->
-                        videos.add(
-                            VideoData(
-                                id = videoId,
-                                videoUrl = downloadUrl.toString(),
-                                caption = caption,
-                                userId = userId,
-                                likes = likes
-                            )
-                        )
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Firebase", "Error getting download URL: $e")
-                    }
-
-                tasks.add(downloadTask)
+            val videoMetadataList = result.documents.map { doc ->
+                VideoMetadata(
+                    id = doc.id,
+                    caption = doc.getString("caption") ?: "",
+                    userId = doc.getString("userId") ?: "",
+                    likes = doc.getLong("likes")?.toInt() ?: 0
+                )
             }
-
-            Tasks.whenAllComplete(tasks).addOnSuccessListener {
-                onVideosLoaded(videos)
-            }
+            onVideoMetadataLoaded(videoMetadataList)
         }
         .addOnFailureListener { e ->
             Log.e("Firebase", "Error getting video documents: $e")
+        }
+}
+
+// Fetch the video URL for a specific video ID
+fun fetchVideoUrl(videoId: String, onVideoUrlFetched: (Uri?) -> Unit) {
+    val storageRef = FirebaseStorage.getInstance().reference.child("videos/$videoId.mp4")
+    storageRef.downloadUrl
+        .addOnSuccessListener { uri ->
+            onVideoUrlFetched(uri)
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firebase", "Error getting download URL for $videoId: $e")
+            onVideoUrlFetched(null)
         }
 }
