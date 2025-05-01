@@ -82,7 +82,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                         backDispatcher?.onBackPressed()
                     } else {
                         backPressedOnce = true
-                        Toast.makeText(context, "Press back again to exit", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
                         Handler(Looper.getMainLooper()).postDelayed({
                             backPressedOnce = false
                         }, 2000)

@@ -1,5 +1,6 @@
 package com.example.blabapp.Screens
 
+import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -142,6 +144,7 @@ fun SidebarMenu(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val context = LocalContext.current
                 // Button list
                 LazyColumn(
                     modifier = Modifier.fillMaxHeight(),
@@ -157,9 +160,10 @@ fun SidebarMenu(
                                     "Settings" -> navController.navigate("settings")
                                     "Log out" -> {
                                         FirebaseAuth.getInstance().signOut()
-                                        navController.navigate("loginScreen") {
-                                            popUpTo("loginScreen") { inclusive = true }
+                                        navController.navigate("startupScreen") {
+                                            popUpTo(0) { inclusive = true }
                                         }
+                                        Toast.makeText(context, "Logged Out", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                                 onDismiss()
