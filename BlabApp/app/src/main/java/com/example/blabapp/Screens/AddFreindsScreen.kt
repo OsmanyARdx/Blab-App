@@ -1,6 +1,5 @@
 package com.example.blabapp.Screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,12 +29,8 @@ import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.toObject
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
 fun AddFriendsScreen(navController: NavController) {
@@ -46,22 +41,21 @@ fun AddFriendsScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     var currentFriendList by remember { mutableStateOf<List<String>>(emptyList()) }
-    var currentUserFriendCode by remember { mutableStateOf("") }
 
-        LaunchedEffect(searchQuery) {
+    LaunchedEffect(searchQuery) {
         coroutineScope.launch {
             val user = UserRepository.getUser()
             user?.let {
                 profileImageUrl.value = it.imageUrl ?: ""
                 currentFriendList = it.friendList ?: emptyList()
-                currentUserFriendCode = it.friendCode
             }
         }
 
         if (searchQuery.isNotEmpty()) {
             val firestore = FirebaseFirestore.getInstance()
             firestore.collection("users")
-                .whereEqualTo("friendCode", searchQuery)
+                .whereGreaterThanOrEqualTo("name", searchQuery)
+                .whereLessThanOrEqualTo("name", searchQuery + "\uf8ff")
                 .get()
                 .addOnSuccessListener { result ->
                     val users = mutableListOf<User>()
@@ -129,14 +123,6 @@ fun AddFriendsScreen(navController: NavController) {
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = "Your Friend Code:",
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                    Text(
-                        text = currentUserFriendCode,
-                        color = MaterialTheme.colorScheme.tertiary,
-                    )
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -223,25 +209,14 @@ fun AddFriendsScreen(navController: NavController) {
     }
 }
 
-suspend fun requestFriend(userId: String, navController: NavController){
-    val firestore = FirebaseFirestore.getInstance()
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val currentUserId = firebaseAuth.currentUser?.uid ?: return
-    firestore.collection("users").document(userId)
-        .update("friendRequests", FieldValue.arrayUnion(currentUserId))
-        .addOnSuccessListener { Log.d("Request Status", "Friend Request Sent")}
-        .addOnFailureListener { Log.d("Request Status", "Friend Request Failed")}
-
-    delay(500) // Let Firestore sync up before refreshing
-
-    UserRepository.refreshUser()
-    navController.popBackStack()
-}
-
 suspend fun addFriend(userId: String, navController: NavController) {
     val firestore = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUserId = firebaseAuth.currentUser?.uid ?: return
+
+
+    firestore.collection("users").document(userId)
+        .update("friendList", FieldValue.arrayUnion(currentUserId))
 
     firestore.collection("users").document(currentUserId)
         .update("friendList", FieldValue.arrayUnion(userId))

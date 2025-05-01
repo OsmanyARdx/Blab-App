@@ -15,8 +15,6 @@ data class User(
     val friendList: MutableList<String> = mutableListOf<String>(),
     val lastLogin: Timestamp = Timestamp.now(),
     val completeMod: MutableList<String> = mutableListOf<String>(),
-    val likedReelsIds: MutableList<String> = mutableListOf<String>(),
-    val friendCode: String = "0000000000"
 
 
 

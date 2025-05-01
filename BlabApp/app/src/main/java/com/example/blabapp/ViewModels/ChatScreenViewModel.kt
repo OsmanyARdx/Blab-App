@@ -46,10 +46,10 @@ class ChatScreenViewModel(): ViewModel() {
                         val senderId = doc.getString("senderId")
                         val message = doc.getString("message")
                         val read = doc.getBoolean("read") ?: false
-                        val timeCreated = doc.getTimestamp("timeCreated")
+                        val timeCreated = doc.getDate("timeCreated")?.toString() ?: ""
 
                         if (senderId != null && message != null) {
-                            Message(senderId, message, read, timeCreated!!)
+                            Message(senderId, message, read, timeCreated)
                         } else null
                     }
                     _messages.clear()
