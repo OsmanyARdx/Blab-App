@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -233,12 +234,23 @@ fun FriendsListScreen(navController: NavController) {
         }
         if (isSidebarVisible.value) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
-                    .clickable { isSidebarVisible.value = false }
+                modifier = Modifier.fillMaxSize()
             ) {
-                SidebarMenu(navController)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            onClick = { isSidebarVisible.value = false },
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        )
+                )
+
+                SidebarMenu(
+                    navController = navController,
+                    isVisible = isSidebarVisible.value,
+                    onDismiss = { isSidebarVisible.value = false }
+                )
             }
         }
     }

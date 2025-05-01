@@ -30,6 +30,7 @@ import java.net.URLEncoder
 
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
@@ -130,7 +131,7 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
             ) {
                 // [NEW] "Streak" in English or Spanish
                 Text(
-                    text = if (userLearning.equals("EN")) "Racha: ${userStreak.value}" else "Streak: ${userStreak.value}",
+                    text = if (userLearning.value.equals("EN")) "Racha: ${userStreak.value}" else "Streak: ${userStreak.value}",
                     fontSize = 24.sp,
                     modifier = Modifier.padding(top = 16.dp),
                     color = MaterialTheme.colorScheme.secondary,
@@ -206,17 +207,28 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
         }
     }
 
-    // Sidebar
     if (isSidebarVisible.value) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
-                .clickable { isSidebarVisible.value = false }
+            modifier = Modifier.fillMaxSize()
         ) {
-            SidebarMenu(navController)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        onClick = { isSidebarVisible.value = false },
+                        indication = null, // no ripple
+                        interactionSource = remember { MutableInteractionSource() }
+                    )
+            )
+
+            SidebarMenu(
+                navController = navController,
+                isVisible = isSidebarVisible.value,
+                onDismiss = { isSidebarVisible.value = false }
+            )
         }
     }
+
 }
 
 

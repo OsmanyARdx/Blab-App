@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -20,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -28,6 +31,7 @@ import androidx.navigation.NavHostController
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import coil.compose.AsyncImage
 import com.example.blabapp.ui.theme.BlabDarkRed
 import com.example.blabapp.ui.theme.BlabRed
 import com.google.android.gms.tasks.Task
@@ -37,6 +41,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storageMetadata
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 
 // Data class for video metadata
 data class VideoData(
@@ -203,6 +208,20 @@ fun ReelsScreen(navController: NavHostController, userId: String) {
                 currentlyPlayingIndex = firstVisibleIndex
             }
         }
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate("upload_video_screen")
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.BottomEnd) ,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Upload Video", tint = MaterialTheme.colorScheme.secondary)
+            }
+        }
     }
 }
 
@@ -293,24 +312,57 @@ fun VideoPlayer(
             }
         }
     }
+
+    val userName = remember { mutableStateOf("Loading...") }
+    val profileImageUrl = remember { mutableStateOf("") }
+
+    val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    LaunchedEffect(videoData.userId) {
+        videoData.userId?.let { uid ->
+            db.collection("users").document(uid)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot != null && snapshot.exists()) {
+                        userName.value = snapshot.getString("name") ?: "User"
+                        profileImageUrl.value = snapshot.getString("imageUrl") ?: ""
+                    }
+                }
+        }
+    }
     // Interaction bar below video
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(horizontal = 12.dp)
     ) {
-        InteractionBar(
-            videoId = videoData.id,
-            videoUrl = videoData.videoUrl,
-            userId = userId,
-            onCommentClick = {
-                if (expandedComments == videoData.id) {
-                    setExpandedComments(null)
-                } else {
-                    setExpandedComments(videoData.id)
-                }
+        Column(horizontalAlignment = Alignment.Start) {
+            Row { Text(videoData.caption,   color = MaterialTheme.colorScheme.secondary) }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AsyncImage(
+                    model = profileImageUrl.value,
+                    contentDescription = "User Profile",
+                    modifier = Modifier.size(24.dp).clip(CircleShape)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(userName.value, color = MaterialTheme.colorScheme.surface)
+                Spacer(modifier = Modifier.width(12.dp))
+                InteractionBar(
+                    videoId = videoData.id,
+                    videoUrl = videoData.videoUrl,
+                    userId = userId,
+                    onCommentClick = {
+                        if (expandedComments == videoData.id) {
+                            setExpandedComments(null)
+                        } else {
+                            setExpandedComments(videoData.id)
+                        }
+                    }
+                )
             }
-        )
+
+        }
     }
 
 }
@@ -332,26 +384,6 @@ fun uploadVideoToFirebase(
         }
         .addOnFailureListener { exception ->
             onFailure(exception)
-        }
-}
-
-// Saves video metadata to Firestore
-fun saveVideoMetadata(videoUrl: String, caption: String, userId: String) {
-    val db = FirebaseFirestore.getInstance()
-    val videoData = hashMapOf(
-        "videoUrl" to videoUrl,
-        "caption" to caption,
-        "userId" to userId,
-        "likes" to 0,
-        "timestamp" to FieldValue.serverTimestamp()
-    )
-
-    db.collection("videos").add(videoData)
-        .addOnSuccessListener { documentReference ->
-            Log.d("Firebase", "Video metadata added with ID: ${documentReference.id}")
-        }
-        .addOnFailureListener { e ->
-            Log.e("Firebase", "Error adding video metadata: $e")
         }
 }
 

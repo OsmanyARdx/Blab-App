@@ -47,6 +47,7 @@ import com.example.blabapp.Screens.WordleScreen
 import com.example.blabapp.Screens.ReviewScreen
 import com.example.blabapp.Screens.ScrambleScreen
 import com.example.blabapp.Screens.SearchScreen
+import com.example.blabapp.Screens.UploadVideoScreen
 import com.example.blabapp.Screens.WordTypeGame
 import com.example.blabapp.Settings.SettingsPage
 import com.google.firebase.auth.FirebaseAuth
@@ -144,7 +145,7 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("game3") { WordTypeGame(navController) }
                 composable("game4") { WordleScreen() }
                 composable("settings") { SettingsPage(navController) }
-
+                composable("upload_video_screen") { UploadVideoScreen(navController) }
 
 
             }
