@@ -3,8 +3,13 @@ package com.example.blabapp
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
@@ -56,22 +61,58 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun RootScreen(accountRepository: AccountRepository) {
     val navController = rememberNavController()
-
-
-    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games", "friends_list",
-        "add_friends", "lesson/{moduleId}", "moduleDetail/{moduleId}", "quiz/{moduleId}",
-        "quiz_score/{score}/{totalQuestions}", "games", "profile", "settings")
-
-
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    var backPressedOnce by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
     var selectedScreen by remember { mutableStateOf("home") }
+
+    // Update selectedScreen whenever the current route changes
+    LaunchedEffect(currentRoute) {
+        selectedScreen = currentRoute ?: "home" // Default to home if route is null
+    }
+
+    val onBackPressedCallback = remember(currentRoute) {
+        object : OnBackPressedCallback(currentRoute == "home") {
+            override fun handleOnBackPressed() {
+                if (currentRoute == "home") {
+                    if (backPressedOnce) {
+                        isEnabled = false
+                        backDispatcher?.onBackPressed()
+                    } else {
+                        backPressedOnce = true
+                        Toast.makeText(context, "Press back again to exit", Toast.LENGTH_LONG).show()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            backPressedOnce = false
+                        }, 2000)
+                    }
+                } else {
+                    navController.popBackStack()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(backDispatcher, onBackPressedCallback) {
+        backDispatcher?.addCallback(onBackPressedCallback)
+        onDispose {
+            onBackPressedCallback.remove()
+        }
+    }
+
+    val screensWithNavBar = listOf("home", "search", "reels", "modules", "games")
 
     Scaffold(
         bottomBar = {
-            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
             if (currentRoute in screensWithNavBar) {
                 BottomNavigationBar(navController, selectedScreen) { route ->
                     selectedScreen = route
                     navController.navigate(route) {
+                        popUpTo("home") {
+                            inclusive = false
+                            saveState = true
+                        }
                         launchSingleTop = true
                         restoreState = true
                     }
@@ -91,7 +132,6 @@ fun RootScreen(accountRepository: AccountRepository) {
                 startDestination = "splashScreen",
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Handle all your screens here in a single NavHost
                 composable("splashScreen") { SplashScreen(navController) }
                 composable("startupScreen") { StartupScreen(navController) }
                 composable("loginScreen") { LoginScreen(BlabApp.accountRepository, navController) }
@@ -121,7 +161,6 @@ fun RootScreen(accountRepository: AccountRepository) {
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
                     QuizScoreScreen(navController, score, totalQuestions, moduleId)
                 }
-
                 composable("games") { GameSelectionScreen(navController) }
                 composable("game1"){ ScrambleScreen(navController) }
                 composable("game2") { GameLevelScreen(navController) }
@@ -146,8 +185,6 @@ fun RootScreen(accountRepository: AccountRepository) {
                 composable("game4") { WordleScreen() }
                 composable("settings") { SettingsPage(navController) }
                 composable("upload_video_screen") { UploadVideoScreen(navController) }
-
-
             }
         }
     }

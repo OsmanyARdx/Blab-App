@@ -28,13 +28,15 @@ fun BottomNavigationBar(
     selectedScreen: String,
     onScreenSelected: (String) -> Unit
 ) {
-    val screens = listOf(
-        "home" to Icons.Default.Home,
-        "search" to Icons.Default.Search,
-        "reels" to Icons.Default.PlayArrow,
-        "modules" to Icons.Default.List,
-        "games" to Icons.Default.Face
-    )
+    val mainScreens = listOf("home", "search", "reels", "modules", "games")
+    val screens = mainScreens.map { it to when (it) {
+        "home" -> Icons.Default.Home
+        "search" -> Icons.Default.Search
+        "reels" -> Icons.Default.PlayArrow
+        "modules" -> Icons.Default.List
+        "games" -> Icons.Default.Face
+        else -> Icons.Default.QuestionMark // Fallback
+    }}
 
     NavigationBar(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary).height(70.dp),
@@ -44,8 +46,19 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = screen == selectedScreen,
                 onClick = {
-                    navController.navigate(screen)
-                    onScreenSelected(screen)
+                    onScreenSelected(screen) // Update the selected screen state
+
+                    if (mainScreens.contains(screen)) {
+                        navController.navigate(screen) {
+                            // Pop back to the "home" screen and clear everything above it
+                            popUpTo("home") {
+                                inclusive = false // Don't remove "home"
+                                saveState = true     // Optionally save state of "home"
+                            }
+                            launchSingleTop = true // Ensure only one instance of the screen
+                            restoreState = true    // Optionally restore state
+                        }
+                    }
                 },
                 icon = {
                     Icon(

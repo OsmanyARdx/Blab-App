@@ -116,7 +116,9 @@ fun LoginScreen(accountRepository: AccountRepository, navController: NavControll
                             email = email,
                             password = password,
                             successfulLoginHandler = {
-                                navController.navigate("home")
+                                navController.navigate("home") {
+                                    popUpTo("splashScreen") { inclusive = true }
+                                }
                                 Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
                             },
                             unsuccessfulLoginHandler = {
