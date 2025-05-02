@@ -70,27 +70,31 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
         }
     }
 
-    fun generateUniqueFriendCode(db: FirebaseFirestore): String{
+    suspend fun generateUniqueFriendCode(db: FirebaseFirestore): String{
+        Log.d("generateUniqueFriendCode", "start")
         val min = 1000000000L
         val max = 9999999999L
-        var friendCode = "-1"
+        var friendCode = Random.nextLong(min,max+1).toString()
         var tryAgain = true
 
         while(tryAgain){
-            friendCode = Random.nextLong(min,max+1).toString()
-            db.collection("users").whereEqualTo("friendCode", friendCode).get()
-                .addOnSuccessListener { doc ->
-                    if(doc.isEmpty){
-                        generateUniqueFriendCode(db)
-                    }
-                    else{
-                        tryAgain = false
-                    }
-                }
+            Log.d("generateUniqueFriendCode", "top of loop")
+
+            Log.d("generateUniqueFriendCode", friendCode)
+
+            if(db.collection("users").whereEqualTo("friendCode", friendCode).get().await().isEmpty){
+                Log.d("generateUniqueFriendCode", "found unique")
+                tryAgain = false
+            }
+            else{
+                Log.d("generateUniqueFriendCode", "generate new code")
+                friendCode = Random.nextLong(min,max+1).toString()
+                Log.d("generateUniqueFriendCode", friendCode)
+            }
+
         }
+        Log.d("generateUniqueFriendCode", "end")
         return friendCode
-
-
     }
 
     fun updateUserFields(
