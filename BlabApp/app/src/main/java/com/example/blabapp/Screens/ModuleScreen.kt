@@ -3,6 +3,7 @@ package com.example.blabapp.Screens
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,11 +48,11 @@ fun ModulesScreen(navController: NavHostController) {
 
 
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(7.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -59,7 +60,7 @@ fun ModulesScreen(navController: NavHostController) {
                 text = "Select a Module",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.surface
             )
         }
 
@@ -68,7 +69,7 @@ fun ModulesScreen(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .weight(1f)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             if (modules.value.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -93,18 +94,17 @@ fun ModulesScreen(navController: NavHostController) {
             onClick = {
                 navController.navigate("review")
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally),
             shape = RoundedCornerShape(50.dp),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.onTertiary),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary,
-                contentColor = MaterialTheme.colorScheme.onTertiary
-            )
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.background)
         ) {
             Text(text = "Review Items", fontSize = 16.sp)
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
     }
 }
 
@@ -117,7 +117,7 @@ fun ModuleItem(
     isCompleted: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isCompleted) Color.Green else MaterialTheme.colorScheme.primary
+    val backgroundColor = if (isCompleted) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.tertiary
     val displayTopic = if (userLearningPreference == "ES") module.topic else module.topicES
 
     Card(
@@ -133,12 +133,12 @@ fun ModuleItem(
                 text = "Module ${module.moduleNum}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.surface
             )
             Text(
                 text = "Topic: $displayTopic",
                 fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.surface
             )
         }
     }

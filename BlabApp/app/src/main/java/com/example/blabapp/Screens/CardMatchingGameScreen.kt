@@ -49,7 +49,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -57,8 +57,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
             text = "Card Matching Game (Level $levelId)",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
+            color = MaterialTheme.colorScheme.surface)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -75,7 +74,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
 
                     // Set different colors for Spanish and English words
                     val cardColor = if (isFlipped) {
-                        if (selectedWords.any { it.first == word }) Color.Cyan else Color.Magenta
+                        if (selectedWords.any { it.first == word }) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
                     } else {
                         MaterialTheme.colorScheme.secondary
                     }
@@ -85,7 +84,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
                             .padding(8.dp)
                             .fillMaxWidth()
                             .aspectRatio(1.5f)
-                            .fillMaxHeight(0.25f),
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(8.dp),
                         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -108,7 +107,7 @@ fun CardMatchingGameScreen(navController: NavHostController, levelId: String) {
                                     text = word,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.surface
                                 )
                             }
                         }
@@ -199,8 +198,8 @@ private fun checkMatch(
 fun GoodJobDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Good Job!") },
-        text = { Text("You have matched all the cards!") },
+        title = { Text("Good Job!", color = MaterialTheme.colorScheme.background) },
+        text = { Text("You have matched all the cards!", color = MaterialTheme.colorScheme.background) },
         confirmButton = {
             Button(
                 onClick = onDismiss

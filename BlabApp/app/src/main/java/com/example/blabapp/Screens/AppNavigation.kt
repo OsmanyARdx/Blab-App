@@ -20,8 +20,6 @@ import com.example.blabapp.Nav.AccountRepository
 import com.example.blabapp.Screens.LessonScreen
 import com.example.blabapp.MessagesScreen
 import com.example.blabapp.Screens.ModulesScreen
-import com.example.blabapp.ui.theme.BlabPurple
-import com.example.blabapp.ui.theme.BlabYellow
 
 
 @Composable
@@ -30,33 +28,48 @@ fun BottomNavigationBar(
     selectedScreen: String,
     onScreenSelected: (String) -> Unit
 ) {
-    val screens = listOf(
-        "home" to Icons.Default.Home,
-        "search" to Icons.Default.Search,
-        "reels" to Icons.Default.PlayArrow,
-        "modules" to Icons.Default.List,
-        "games" to Icons.Default.Face
-    )
+    val mainScreens = listOf("home", "search", "reels", "modules", "games")
+    val screens = mainScreens.map { it to when (it) {
+        "home" -> Icons.Default.Home
+        "search" -> Icons.Default.Search
+        "reels" -> Icons.Default.PlayArrow
+        "modules" -> Icons.Default.List
+        "games" -> Icons.Default.Face
+        else -> Icons.Default.QuestionMark // Fallback
+    }}
 
     NavigationBar(
-        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+        modifier = Modifier.background(MaterialTheme.colorScheme.primary).height(70.dp),
         containerColor = MaterialTheme.colorScheme.primary
     ) {
         screens.forEach { (screen, icon) ->
             NavigationBarItem(
                 selected = screen == selectedScreen,
                 onClick = {
-                    navController.navigate(screen)
-                    onScreenSelected(screen)
+                    onScreenSelected(screen) // Update the selected screen state
+
+                    if (mainScreens.contains(screen)) {
+                        navController.navigate(screen) {
+                            // Pop back to the "home" screen and clear everything above it
+                            popUpTo("home") {
+                                inclusive = false // Don't remove "home"
+                                saveState = true     // Optionally save state of "home"
+                            }
+                            launchSingleTop = true // Ensure only one instance of the screen
+                            restoreState = true    // Optionally restore state
+                        }
+                    }
                 },
                 icon = {
                     Icon(
                         icon,
                         contentDescription = screen,
-                        tint = if (screen == selectedScreen) BlabYellow else Color.Black
+                        modifier = Modifier.size(24.dp),
+                        tint = if (screen == selectedScreen) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
                     )
                 },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent),
+                alwaysShowLabel = false
             )
         }
     }
@@ -65,7 +78,7 @@ fun BottomNavigationBar(
 @Composable
 fun ScreenContent(title: String) {
     Box(
-        modifier = Modifier.fillMaxSize().background(BlabYellow)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         Text(
             text = title,

@@ -223,10 +223,10 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onTertiary
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
-            Text(text = moduleName.value, fontSize = 20.sp, color = Color.Black)
+            Text(text = " Module:${moduleName.value}", fontSize = 20.sp, color = MaterialTheme.colorScheme.surface)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -236,7 +236,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(MaterialTheme.colorScheme.surface),
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -252,9 +252,9 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                             .width(300.dp)
                             .height(450.dp)
                             .padding(16.dp)
-                            .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
+                            .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(10.dp))
                             .clip(RoundedCornerShape(10.dp)),
-                        colors = CardDefaults.cardColors(containerColor = BlabGreen)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -269,7 +269,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.surface
                                 )
 
 
@@ -279,7 +279,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     text = "Showing: ${displayLabels[lessonIndex.value]}",
                                     fontSize = 18.sp,
                                     fontStyle = FontStyle.Italic,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.surface
                                 )
 
                                 Spacer(modifier = Modifier.height(32.dp))
@@ -297,7 +297,7 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Medium,
                                     textAlign = TextAlign.Center,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.surface
                                 )
 
                                 Spacer(modifier = Modifier.height(32.dp))
@@ -312,12 +312,12 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                                         modifier = Modifier.size(50.dp),
                                         imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                                         contentDescription = "Play Audio",
-                                        tint = Color.Black,
+                                        tint = MaterialTheme.colorScheme.surface,
                                     )
                                 }
                             }
                         }
-                        Text(text = "Back", color = MaterialTheme.colorScheme.onTertiary)
+                        Text(text = "Back", color = MaterialTheme.colorScheme.surface)
                     }
 
                 }
@@ -330,9 +330,9 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                 ) {
                     Button(
                         modifier = Modifier
-                            .border(2.dp, Color.Black, RoundedCornerShape(50.dp))
+                            .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp))
                             .clip(RoundedCornerShape(50.dp))
-                            .background(MaterialTheme.colorScheme.tertiary),
+                            .background(MaterialTheme.colorScheme.primary),
                         onClick = {
                             if (lessonIndex.value > 0) {
                                 lessonIndex.value--
@@ -350,8 +350,8 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
                         Text(text = "Back")
@@ -360,9 +360,9 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
 
                     Button(
                         modifier = Modifier
-                            .border(2.dp, Color.Black, RoundedCornerShape(50.dp))
+                            .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp))
                             .clip(RoundedCornerShape(50.dp))
-                            .background(MaterialTheme.colorScheme.tertiary),
+                            .background(MaterialTheme.colorScheme.primary),
                         onClick = {
                             if (lessonIndex.value < 2) {
                                 lessonIndex.value++
@@ -378,8 +378,8 @@ fun LessonScreen(navController: NavHostController, moduleId: String) {
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
                         val nextText = if (wordIndex.value == lessons.value.size - 1 && lessonIndex.value == 2) "Complete" else "Next"
@@ -412,7 +412,7 @@ fun ModuleName(module: Module) {
             text = "Module #${module.moduleNum}",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onTertiary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -483,13 +483,13 @@ fun DownloadButton(moduleId: String) {
         onClick = {
             showDialog.value = true // Show  dialog when user clicks  button
         },
-        colors = ButtonDefaults.buttonColors(containerColor = BlabPurple),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
         modifier = Modifier
             .padding(13.dp)
             .width(150.dp)
             .height(50.dp)
-            .border(2.dp, Color.Black, RoundedCornerShape(50.dp))
+            .border(2.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(50.dp))
     ) {
-        Text("Download PDF", color = Color.Black)
+        Text("Download PDF", color = MaterialTheme.colorScheme.surface)
     }
 }

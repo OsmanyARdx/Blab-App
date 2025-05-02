@@ -1,8 +1,5 @@
 package com.example.blabapp
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,17 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.blabapp.ui.theme.BlabPurple
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import android.util.Log
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.ui.text.style.TextAlign
 import okhttp3.*
 import org.json.JSONArray
@@ -36,36 +29,15 @@ import java.io.IOException
 import java.net.URLEncoder
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Message
-import android.speech.tts.TextToSpeech
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import com.example.blabapp.Screens.SidebarMenu
-import com.example.blabapp.ui.theme.BlabYellow
-import com.example.blabapp.ui.theme.Pink80
-import com.example.blabapp.ui.theme.Purple40
 import java.text.SimpleDateFormat
 import java.util.*
 import coil.compose.rememberAsyncImagePainter
-import com.example.blabapp.Repository.UserRepository
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(title: String, navController: NavHostController, context: Context) {
@@ -74,14 +46,17 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
     val userName = remember { mutableStateOf("Loading...") }
     val profileImageUrl = remember { mutableStateOf("") }
     val (phraseInEnglish, phraseInSpanish) = rememberPhraseOfTheDay(context)
-    val isSpanish = remember { mutableStateOf(true) }
+
+    val isSpanish = remember { mutableStateOf(true) } // will auto-adjust based on user learning
     val isSidebarVisible = remember { mutableStateOf(false) }
+    val userLearning = remember { mutableStateOf("EN") } // [NEW] Track user's learning language
+
     val coroutineScope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     val currentUser = auth.currentUser
 
-    // Realtime listener for profile updates
+    // Realtime listener for profile and learning language updates
     LaunchedEffect(currentUser) {
         currentUser?.uid?.let { uid ->
             db.collection("users").document(uid)
@@ -91,6 +66,10 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         profileImageUrl.value = snapshot.getString("imageUrl") ?: ""
                         userStreak.value = snapshot.getLong("userStreak")?.toString() ?: "Loading..."
                         userRank.value = snapshot.getString("userRank") ?: "Loading..."
+                        userLearning.value = snapshot.getString("learning") ?: "EN"
+
+                        // [NEW] Adjust language for UI text
+                        isSpanish.value = (userLearning.value == "EN")
                     }
                 }
         }
@@ -110,8 +89,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         contentDescription = "Profile Picture",
                         modifier = Modifier
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple),
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary),
                         contentScale = ContentScale.Crop
                     )
                 } else {
@@ -120,8 +99,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         contentDescription = "Default Profile Picture",
                         modifier = Modifier
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple)
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary)
                     )
                 }
             }
@@ -130,28 +109,32 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                 Icon(
                     imageVector = Icons.Default.Email,
                     contentDescription = "Messenger",
-                    tint = MaterialTheme.colorScheme.onTertiary
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
 
             Text(
                 text = userRank.value,
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onTertiary,
-                modifier = Modifier.align(Alignment.Center)
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.align(Alignment.Center),
+                fontWeight = FontWeight.Bold
             )
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)) {
             Column(
                 modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // [NEW] "Streak" in English or Spanish
                 Text(
-                    text = "Streak: ${userStreak.value}",
+                    text = if (userLearning.value.equals("EN")) "Racha: ${userStreak.value}" else "Streak: ${userStreak.value}",
                     fontSize = 24.sp,
                     modifier = Modifier.padding(top = 16.dp),
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -163,8 +146,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         modifier = Modifier
                             .size(300.dp)
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple),
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary),
                         contentScale = ContentScale.Crop
                     )
                 } else {
@@ -174,8 +157,8 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                         modifier = Modifier
                             .size(300.dp)
                             .clip(CircleShape)
-                            .border(1.dp, BlabPurple, CircleShape)
-                            .background(BlabPurple)
+                            .border(1.dp, MaterialTheme.colorScheme.tertiary, CircleShape)
+                            .background(MaterialTheme.colorScheme.secondary)
                     )
                 }
 
@@ -194,16 +177,16 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                     modifier = Modifier
                         .size(width = 300.dp, height = 100.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, if (isSpanish.value) Pink80 else BlabPurple, RoundedCornerShape(50.dp))
+                        .border(3.dp, if (isSpanish.value) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary, RoundedCornerShape(50.dp))
                         .background(
-                            animateColorAsState(targetValue = if (isSpanish.value) BlabPurple else Pink80).value,
+                            animateColorAsState(targetValue = if (isSpanish.value) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiary).value,
                             RoundedCornerShape(50.dp)
                         )
                         .padding(1.dp)
                 ) {
                     Button(
                         onClick = { isSpanish.value = !isSpanish.value },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        colors = ButtonDefaults.buttonColors(containerColor = Transparent),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Column(
@@ -211,8 +194,9 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Phrase of the Day:\n\n" + if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
-                                color = if (isSpanish.value) Pink80 else BlabPurple,
+                                text = (if (isSpanish.value) "Frase del día:" else "Phrase of the Day:") + "\n\n" +
+                                        if (isSpanish.value) phraseInSpanish.value else phraseInEnglish.value,
+                                color = if (isSpanish.value) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary,
                                 fontSize = 18.sp,
                                 textAlign = TextAlign.Center
                             )
@@ -223,24 +207,34 @@ fun HomeScreen(title: String, navController: NavHostController, context: Context
         }
     }
 
-    // Sidebar
     if (isSidebarVisible.value) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp)) // semi-transparent background
-                .clickable { isSidebarVisible.value = false } // close sidebar on click outside
+            modifier = Modifier.fillMaxSize()
         ) {
-            SidebarMenu(navController) // Sidebar content
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        onClick = { isSidebarVisible.value = false },
+                        indication = null, // no ripple
+                        interactionSource = remember { MutableInteractionSource() }
+                    )
+            )
+
+            SidebarMenu(
+                navController = navController,
+                isVisible = isSidebarVisible.value,
+                onDismiss = { isSidebarVisible.value = false }
+            )
         }
     }
-}
 
+}
 
 
 // Fetches an English phrase and translates it to Spanish
 fun fetchAndTranslateRandomPhrase(onResult: (String, String) -> Unit) {
-    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=50"
+    val url = "https://tatoeba.org/eng/api_v0/search?from=eng&limit=100"
 
     val request = Request.Builder().url(url).build()
     val client = OkHttpClient()
@@ -306,6 +300,33 @@ fun translateSentence(sentence: String, onResult: (String) -> Unit) {
     })
 }
 
+
+// Translates an Spanish sentence to English
+fun translateSentenceFromEStoEN(sentence: String, onResult: (String) -> Unit) {
+    val encodedSentence = URLEncoder.encode(sentence, "UTF-8")
+    val url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=$encodedSentence"
+
+    val request = Request.Builder().url(url).build()
+    val client = OkHttpClient()
+
+    client.newCall(request).enqueue(object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            onResult("Failed to translate sentence")
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            response.body?.string()?.let { json ->
+                try {
+                    val jsonArray = JSONArray(json)
+                    val translatedText = jsonArray.getJSONArray(0).getJSONArray(0).getString(0)
+                    onResult(translatedText)
+                } catch (e: Exception) {
+                    onResult("Error parsing translation")
+                }
+            } ?: onResult("No response from server")
+        }
+    })
+}
 
 
 @Composable
