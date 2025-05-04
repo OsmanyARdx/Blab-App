@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.random.Random
 
 class RegisterScreenViewModel(private var accountRepository: AccountRepository): ViewModel() {
 
@@ -49,6 +50,7 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
                         "friendList" to friendList,
                         "lastLogin" to com.google.firebase.Timestamp.now(),
                         "completeMod" to completeMod,
+                        "friendCode" to generateUniqueFriendCode(firestore)
                     )
 
                     firestore.collection("users")
@@ -65,6 +67,34 @@ class RegisterScreenViewModel(private var accountRepository: AccountRepository):
                 unsuccessfulRegistrationHandler(e.message ?: "Unknown error occurred")
             }
         }
+    }
+
+
+    suspend fun generateUniqueFriendCode(db: FirebaseFirestore): String{
+        Log.d("generateUniqueFriendCode", "start")
+        val min = 1000000000L
+        val max = 9999999999L
+        var friendCode = Random.nextLong(min,max+1).toString()
+        var tryAgain = true
+
+        while(tryAgain){
+            Log.d("generateUniqueFriendCode", "top of loop")
+
+            Log.d("generateUniqueFriendCode", friendCode)
+
+            if(db.collection("users").whereEqualTo("friendCode", friendCode).get().await().isEmpty){
+                Log.d("generateUniqueFriendCode", "found unique")
+                tryAgain = false
+            }
+            else{
+                Log.d("generateUniqueFriendCode", "generate new code")
+                friendCode = Random.nextLong(min,max+1).toString()
+                Log.d("generateUniqueFriendCode", friendCode)
+            }
+
+        }
+        Log.d("generateUniqueFriendCode", "end")
+        return friendCode
     }
 
     fun updateUserFields(
