@@ -141,20 +141,20 @@ fun AddFriendsScreen(navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(user.name, fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
-                                if (!currentFriendList.contains(user.userId)) {
-                                    Button(onClick = {
-                                        coroutineScope.launch {
-                                            addFriend(user.userId, navController)
-                                        }
-                                    }) {
-                                        Text("Add")
-                                    }
-                                }else{
+                                if (currentFriendList.contains(user.userId)) {
                                     Text(
                                         "Already Friends",
                                         fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.secondary
                                     )
+                                } else {
+                                    Button(onClick = {
+                                        coroutineScope.launch {
+                                            sendFriendRequest(user.userId, navController)
+                                        }
+                                    }) {
+                                        Text("Add")
+                                    }
                                 }
                             }
                         }
@@ -209,64 +209,23 @@ fun AddFriendsScreen(navController: NavController) {
     }
 }
 
-suspend fun addFriend(userId: String, navController: NavController) {
+
+suspend fun sendFriendRequest(receiverUserId: String, navController: NavController) {
     val firestore = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUserId = firebaseAuth.currentUser?.uid ?: return
 
-
-    firestore.collection("users").document(userId)
-        .update("friendList", FieldValue.arrayUnion(currentUserId))
-
-    firestore.collection("users").document(currentUserId)
-        .update("friendList", FieldValue.arrayUnion(userId))
-        .addOnSuccessListener {
-            createChatRoom(currentUserId, userId)
+    // Add the current user's ID to the receiver's requestList
+    firestore.collection("users").document(receiverUserId)
+        .update("requestList", FieldValue.arrayUnion(currentUserId))
+        .addOnFailureListener { e ->
+            println("Error sending friend request: $e")
         }
-        .addOnFailureListener { }
 
-    delay(500) // Let Firestore sync up before refreshing
-
+    delay(500)
     UserRepository.refreshUser()
     navController.popBackStack()
 }
 
-fun createChatRoom(currentUserId: String, friendUserId: String) {
-    val firestore = FirebaseFirestore.getInstance()
-    val chatRoomData = hashMapOf("members" to listOf(currentUserId, friendUserId))
-
-    firestore.collection("chatRooms")
-        .add(chatRoomData)
-        .addOnSuccessListener { documentReference ->
-            val chatRoomId = documentReference.id
-            firestore.collection("chatRooms").document(chatRoomId)
-                .update("chatRoomId", chatRoomId)
-                .addOnSuccessListener {
-                    //initializeMessagesSubcollection(chatRoomId)
-                    updateUserChatList(currentUserId, friendUserId, chatRoomId)
-                }
-        }
-}
-
-fun updateUserChatList(userId: String, friendUserId: String, chatRoomId: String) {
-    FirebaseFirestore.getInstance().collection("users").document(userId)
-        .update("chatList", FieldValue.arrayUnion(chatRoomId))
-    FirebaseFirestore.getInstance().collection("users").document(friendUserId)
-        .update("chatList", FieldValue.arrayUnion(chatRoomId))
-}
-
-fun initializeMessagesSubcollection(chatRoomId: String) {
-    val firestore = FirebaseFirestore.getInstance()
-    val messageData = hashMapOf(
-        "message" to "f",
-        "read" to false,
-        "senderId" to "",
-        "timeCreated" to FieldValue.serverTimestamp()
-    )
-
-    firestore.collection("chatRooms").document(chatRoomId)
-        .collection("messages")
-        .add(messageData)
-}
 
 data class User(val name: String = "", val userId: String = "", val friendList: List<String>? = null)
