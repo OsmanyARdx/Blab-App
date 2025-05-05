@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -244,6 +245,8 @@ fun FriendsListScreen(navController: NavController) {
                         )
 
 
+                        // Inside the LazyColumn where you display friends and requests:
+
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             // Requests Section
                             if (filteredRequest.isNotEmpty()) {
@@ -300,39 +303,40 @@ fun FriendsListScreen(navController: NavController) {
                                     }
                                 }
                             }
-                            val db = FirebaseFirestore.getInstance()
+
                             // Friends Section
                             if (filteredFriends.isNotEmpty()) {
                                 items(friendsList.value.zip(filteredFriends)) { (friendId, friend) ->
-                                    var friendImageUrl by remember { mutableStateOf("") }
-
-                                    LaunchedEffect(Unit) {
-                                        coroutineScope.launch {
-                                            try {
-                                                val userDoc = db.collection("users").document(currentUserId.value).get().await()
-                                                val userImageUrl = userDoc.getString("imageUrl")
-
-                                                if (userImageUrl != null) {
-                                                    friendImageUrl = userImageUrl
-                                                } else {
-                                                }
-                                            } catch (e: Exception) {
-                                            }
-                                        }
-                                    }
-
                                     Row {
-                                    Text(
-                                        text = friend,
-                                        fontSize = 18.sp,
+                                        Text(
+                                            text = friend,
+                                            fontSize = 18.sp,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(12.dp),
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+                                }
+                            } else if (filteredRequest.isEmpty() && filteredFriends.isEmpty()) {
+                                item {
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(12.dp),
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                                            .fillParentMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "\uD83D\uDD78\uFE0F So empty... Not even a tumbleweed in sight!\nTime to make your first friend. \uD83C\uDF89",
+                                            fontSize = 18.sp,
+                                            color = Color(0xFF757575),
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .padding(24.dp)
+                                        )
                                     }
                                 }
                             }
+
                         }
 
 

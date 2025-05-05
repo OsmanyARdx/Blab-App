@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -102,76 +103,95 @@ fun MessagesScreen(navController: NavHostController, accountRepository: AccountR
             } else {
                     // Message List
                     LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        items(conversations) { conversation ->
-                            Log.d(
-                                "ChatroomPreview", "Chatroom ID: ${conversation.chatroomId}, " +
-                                        "Other User ID: ${conversation.otherUserId}, " +
-                                        "Other User Name: ${conversation.otherUserName}, " +
-                                        "Other User Image: ${conversation.otherUserImage}, " +
-                                        "Last Message: ${conversation.lastMessage}"
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                                    .clickable {
-                                        val currentEncodedUrl = URLEncoder.encode(
-                                            conversation.currentUserImage,
-                                            StandardCharsets.UTF_8.toString()
-                                        )
-                                        val otherEncodedUrl = URLEncoder.encode(
-                                            conversation.otherUserImage,
-                                            StandardCharsets.UTF_8.toString()
-                                        )
-                                        navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}/${conversation.otherUserName}") // navigate to Chat screen
-                                    },
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (conversation.otherUserImage.isNotEmpty()) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(conversation.otherUserImage),
-                                        contentDescription = "Profile Picture",
+                        if (conversations.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillParentMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "📭 Your inbox is emptier than a ghost town...\nGo start some chats and stir things up! 💬👻",
+                                        fontSize = 18.sp,
+                                        color = Color(0xFF757575),
+                                        textAlign = TextAlign.Center,
                                         modifier = Modifier
-                                            .size(60.dp)
-                                            .clip(CircleShape)
-                                            .border(
-                                                1.dp,
-                                                MaterialTheme.colorScheme.primary,
-                                                CircleShape
-                                            )
-                                            .background(MaterialTheme.colorScheme.primary),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.default_profile_photo),
-                                        contentDescription = "Default Profile Picture",
-                                        modifier = Modifier
-                                            .size(60.dp)
-                                            .clip(CircleShape)
-                                            .border(
-                                                1.dp,
-                                                MaterialTheme.colorScheme.primary,
-                                                CircleShape
-                                            )
-                                            .background(MaterialTheme.colorScheme.primary)
+                                            .padding(24.dp)
                                     )
                                 }
+                            }
+                        } else {
+                            items(conversations) { conversation ->
+                                Log.d(
+                                    "ChatroomPreview", "Chatroom ID: ${conversation.chatroomId}, " +
+                                            "Other User ID: ${conversation.otherUserId}, " +
+                                            "Other User Name: ${conversation.otherUserName}, " +
+                                            "Other User Image: ${conversation.otherUserImage}, " +
+                                            "Last Message: ${conversation.lastMessage}"
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                        .clickable {
+                                            val currentEncodedUrl = URLEncoder.encode(
+                                                conversation.currentUserImage,
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                            val otherEncodedUrl = URLEncoder.encode(
+                                                conversation.otherUserImage,
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                            navController.navigate("ChatScreen/${conversation.chatroomId}/${conversation.currentUserId}/${currentEncodedUrl}/${otherEncodedUrl}/${conversation.otherUserName}") // navigate to Chat screen
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    if (conversation.otherUserImage.isNotEmpty()) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(conversation.otherUserImage),
+                                            contentDescription = "Profile Picture",
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                                .clip(CircleShape)
+                                                .border(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.primary,
+                                                    CircleShape
+                                                )
+                                                .background(MaterialTheme.colorScheme.primary),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.default_profile_photo),
+                                            contentDescription = "Default Profile Picture",
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                                .clip(CircleShape)
+                                                .border(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.primary,
+                                                    CircleShape
+                                                )
+                                                .background(MaterialTheme.colorScheme.primary)
+                                        )
+                                    }
 
-                                // Message text content
-                                Column(modifier = Modifier.padding(start = 16.dp)) {
-                                    Text(
-                                        text = conversation.otherUserName,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = conversation.lastMessage,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold, // Bold if unread
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                                    // Message text content
+                                    Column(modifier = Modifier.padding(start = 16.dp)) {
+                                        Text(
+                                            text = conversation.otherUserName,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = conversation.lastMessage,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold, // Bold if unread
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
                                 }
                             }
                         }
