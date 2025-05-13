@@ -71,4 +71,11 @@ Blab offers an immersive, social approach to language learning by connecting use
 ## Design Flow
 
 ![Blab App - Design Flow](https://github.com/user-attachments/assets/b0bdcc1d-c58f-4b28-ac4f-f87e19184465)  
+
+---
+
+## Initial UI
+
 ![Blab App - Figma HiFi](https://github.com/user-attachments/assets/73d39909-b01f-40a8-b11a-1250df18331c)
+
+---
